@@ -749,39 +749,39 @@ input:focus, select:focus, textarea:focus {
 ================================================================ */
 @media (max-width: 1024px) {
   .app-main { padding: 22px 24px; }
-  .responsive-grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
-  .responsive-grid-3 { grid-template-columns: repeat(2, 1fr) !important; }
-  .responsive-grid-2-1 { grid-template-columns: 1fr !important; }
-  .responsive-profile-grid { grid-template-columns: 1fr 1fr !important; }
+  .responsive-grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .responsive-grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .responsive-grid-2-1 { grid-template-columns: 1fr; }
+  .responsive-profile-grid { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 768px) {
   .hamburger-btn { display: flex; }
   .mobile-bottom-nav { display: flex; }
-  .header-controls { display: none !important; }
-  .header-search-bar { display: none !important; }
-  .header-search-toggle { display: none !important; }
+  .header-controls { display: none; }
+  .header-search-bar { display: none; }
+  .header-search-toggle { display: none; }
   .header-brand { flex: 1; }
 
   .app-sidebar {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    bottom: 0 !important;
-    height: 100vh !important;
-    z-index: 300 !important;
-    width: 280px !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100vh;
+    z-index: 300;
+    width: 280px;
     transform: translateX(-100%);
     box-shadow: 6px 0 30px rgba(0,0,0,0.6);
-    background: var(--bg-secondary) !important;
+    background: var(--bg-secondary);
   }
 
   .app-sidebar.sidebar-open {
-    transform: translateX(0) !important;
+    transform: translateX(0);
   }
 
   .app-main {
-    padding: 14px 14px 80px 14px !important;
+    padding: 14px 14px 80px 14px;
   }
 
   .header-brand-subtitle {
@@ -812,11 +812,11 @@ input:focus, select:focus, textarea:focus {
   .responsive-grid-2,
   .responsive-profile-grid,
   .responsive-auth-grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr;
   }
 
   .responsive-auth-banner {
-    display: none !important;
+    display: none;
   }
 
   .glass-panel {
@@ -880,14 +880,6 @@ input:focus, select:focus, textarea:focus {
 }
 
 @media (max-width: 480px) {
-  .responsive-grid-4 {
-    grid-template-columns: 1fr !important;
-  }
-
-  .header-user-name, .header-user-role {
-    display: none;
-  }
-
   .app-header {
     padding: 0 12px;
     gap: 8px;
@@ -904,6 +896,10 @@ input:focus, select:focus, textarea:focus {
 
   .header-brand-tag {
     font-size: 0.75rem;
+  }
+
+  .header-user-name, .header-user-role {
+    display: none;
   }
 }
 
