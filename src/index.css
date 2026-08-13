@@ -788,6 +788,24 @@ input:focus, select:focus, textarea:focus {
     display: none;
   }
 
+  .mobile-bottom-nav {
+    height: 62px;
+    padding: 5px 2px 6px;
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
+  }
+
+  .mobile-nav-item {
+    padding: 3px 1px;
+    gap: 2px;
+    border-radius: 8px;
+  }
+
+  .mobile-nav-label {
+    font-size: 0.58rem;
+    letter-spacing: 0;
+    margin-top: 1px;
+  }
+
   .responsive-grid-4,
   .responsive-grid-3,
   .responsive-grid-2-1,
