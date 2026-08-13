@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Shield, Bell, Moon, Sun, Search, GraduationCap, X, Trash2, Menu } from 'lucide-react';
 
 export default function Header({
   theme, setTheme, currentUser, onOpenAuth, onLogout,
   notifications, onMarkNotificationRead, onClearNotifications,
   searchQuery, setSearchQuery, onSelectSearchResult,
-  onMenuToggle, t
+  onMenuToggle, showSearch, setShowSearch, showNotifications, setShowNotifications,
+  t
 }) {
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [showSearch, setShowSearch] = useState(false);
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (

@@ -33,8 +33,9 @@ function AppInner() {
     { id: 1, title: 'High-Risk Phishing Intercepted', message: 'paypal-secure-login.com blocked with 90/100 risk.', type: 'THREAT', time: '10 min ago', read: false },
     { id: 2, title: 'ML Engine Status', message: 'Random Forest and NLP BERT models synchronized.', type: 'INFO', time: '1 hour ago', read: false },
   ]);
-
   const [searchQuery, setSearchQuery] = useState('');
+  const [showSearch, setShowSearch] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [currentUser, setCurrentUser] = useState({
     name: 'Amna Najam',
     username: 'amna_najam',
@@ -139,6 +140,10 @@ function AppInner() {
         searchQuery={searchQuery} setSearchQuery={setSearchQuery}
         onSelectSearchResult={() => setActiveTab('scan-history')}
         onMenuToggle={() => setSidebarOpen(v => !v)}
+        showSearch={showSearch}
+        setShowSearch={setShowSearch}
+        showNotifications={showNotifications}
+        setShowNotifications={setShowNotifications}
         t={t}
       />
 
@@ -205,6 +210,9 @@ function AppInner() {
       <BottomNav
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        onSearchToggle={() => setShowSearch(v => !v)}
+        onNotificationToggle={() => setShowNotifications(v => !v)}
+        unreadCount={notifications.filter(n => !n.read).length}
         t={t}
       />
 

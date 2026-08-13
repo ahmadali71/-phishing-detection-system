@@ -1,7 +1,7 @@
 import React from 'react';
-import { LayoutDashboard, Link, Mail, Bot, Settings } from 'lucide-react';
+import { LayoutDashboard, Link, Mail, Bot, Settings, Search, Bell } from 'lucide-react';
 
-export default function BottomNav({ activeTab, setActiveTab, t }) {
+export default function BottomNav({ activeTab, setActiveTab, onSearchToggle, onNotificationToggle, unreadCount, t }) {
   const navItems = [
     { id: 'dashboard',       label: 'Home',    icon: LayoutDashboard },
     { id: 'url-detection',   label: 'URL',     icon: Link },
@@ -30,6 +30,33 @@ export default function BottomNav({ activeTab, setActiveTab, t }) {
           </button>
         );
       })}
+
+      {onSearchToggle && (
+        <button
+          onClick={onSearchToggle}
+          className="mobile-nav-item"
+          aria-label="Search"
+        >
+          <span className="mobile-nav-icon-wrap">
+            <Search size={22} strokeWidth={1.8} />
+          </span>
+          <span className="mobile-nav-label">Search</span>
+        </button>
+      )}
+
+      {onNotificationToggle && (
+        <button
+          onClick={onNotificationToggle}
+          className="mobile-nav-item"
+          aria-label="Notifications"
+        >
+          <span className="mobile-nav-icon-wrap">
+            <Bell size={22} strokeWidth={1.8} />
+            {unreadCount > 0 && <span className="mobile-nav-badge">{unreadCount}</span>}
+          </span>
+          <span className="mobile-nav-label">Alerts</span>
+        </button>
+      )}
     </nav>
   );
 }
