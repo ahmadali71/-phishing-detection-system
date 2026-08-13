@@ -77,214 +77,143 @@ export default function EmailScanner({ onScanComplete, t }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '22px', maxWidth: '950px', margin: '0 auto' }}>
-      {/* Header (Exact Match to PDF Page 63) */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+    <div className="email-scanner-container">
+      {/* Header */}
+      <div className="email-scanner-header">
         <div>
-          <h2 style={{ fontSize: '1.8rem', fontWeight: '800' }}>Email Detection</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-            Analyze email content for phishing threats
-          </p>
+          <h2 className="email-scanner-title">Email Detection</h2>
+          <p className="email-scanner-subtitle">Analyze email content for phishing threats</p>
         </div>
-        <div style={{ display: 'flex', gap: '8px', color: 'var(--text-muted)' }}>
+        <div className="email-scanner-actions">
           <button className="btn-icon" title="Scan History"><Clock size={16} /></button>
           <button className="btn-icon" title="Export Results"><Download size={16} /></button>
           <button className="btn-icon" title="Documentation"><Info size={16} /></button>
         </div>
       </div>
 
-      {/* Tabs & Input Box (Exact Match to PDF Page 63) */}
-      <div className="glass-panel" style={{ padding: '24px' }}>
-        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+      {/* Tabs & Input Box */}
+      <div className="glass-panel email-scanner-card">
+        <div className="email-scanner-tabs">
           <button
             onClick={() => setActiveTab('text')}
-            style={{
-              padding: '8px 18px',
-              borderRadius: '20px',
-              border: 'none',
-              background: activeTab === 'text' ? '#3b82f6' : 'var(--bg-input)',
-              color: activeTab === 'text' ? '#ffffff' : 'var(--text-secondary)',
-              fontWeight: '700',
-              fontSize: '0.85rem',
-              cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
+            className={`email-tab ${activeTab === 'text' ? 'active' : ''}`}
           >
             Paste Email Content
           </button>
           <button
             onClick={() => setActiveTab('file')}
-            style={{
-              padding: '8px 18px',
-              borderRadius: '20px',
-              border: 'none',
-              background: activeTab === 'file' ? '#3b82f6' : 'var(--bg-input)',
-              color: activeTab === 'file' ? '#ffffff' : 'var(--text-secondary)',
-              fontWeight: '700',
-              fontSize: '0.85rem',
-              cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
+            className={`email-tab ${activeTab === 'file' ? 'active' : ''}`}
           >
             Upload .eml File
           </button>
         </div>
 
         {activeTab === 'text' ? (
-          <div>
+          <div className="email-input-section">
             <textarea
-              rows={6}
+              rows={5}
               value={emailContent}
               onChange={(e) => setEmailContent(e.target.value)}
               placeholder="Paste your email content here..."
               maxLength={5000}
-              style={{ width: '100%', resize: 'vertical', padding: '14px', fontSize: '0.9rem' }}
+              className="email-textarea"
             />
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '6px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+            <div className="email-char-count">
               {emailContent.length}/5000
             </div>
           </div>
         ) : (
-          <div style={{
-            padding: '36px',
-            border: '2px dashed var(--border-color)',
-            borderRadius: '14px',
-            textAlign: 'center',
-            background: 'var(--bg-input)'
-          }}>
-            <Upload size={38} color="var(--text-muted)" style={{ margin: '0 auto 10px auto' }} />
-            <div style={{ fontWeight: '700', fontSize: '0.95rem' }}>
+          <div className="email-upload-area">
+            <Upload size={32} color="var(--text-muted)" className="email-upload-icon" />
+            <div className="email-upload-text">
               {selectedFile ? selectedFile.name : 'Select or Drop .eml File'}
             </div>
             <input type="file" accept=".eml,.txt,.msg" onChange={handleFileUpload} style={{ display: 'none' }} id="eml-upload-file" />
-            <label htmlFor="eml-upload-file" className="btn-secondary" style={{ marginTop: '12px', cursor: 'pointer' }}>
+            <label htmlFor="eml-upload-file" className="btn-secondary email-upload-btn">
               Browse Files
             </label>
           </div>
         )}
 
         {errorMessage && (
-          <div style={{ marginTop: '10px', color: '#f43f5e', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div className="email-error">
             <AlertTriangle size={15} /> {errorMessage}
           </div>
         )}
 
-        <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end' }}>
-          <button onClick={handleScan} disabled={isScanning} className="btn-primary" style={{ padding: '11px 28px', fontSize: '0.92rem' }}>
+        <div className="email-scan-btn-wrap">
+          <button onClick={handleScan} disabled={isScanning} className="btn-primary email-scan-btn">
             {isScanning ? 'Analyzing...' : 'Analyze Email'}
           </button>
         </div>
       </div>
 
-      {/* Result Section (Exact Match to PDF Page 63) */}
+      {/* Result Section */}
       {scanResult && (
-        <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {/* Top Row: Result Banner & Risk Score Gauge */}
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', alignItems: 'stretch' }}>
-            {/* Result Box */}
-            <div style={{
-              padding: '20px',
-              borderRadius: '14px',
-              background: scanResult.verdict.includes('Phishing') ? 'rgba(239, 68, 68, 0.12)' : (scanResult.verdict.includes('Suspicious') ? 'rgba(245, 158, 11, 0.12)' : 'rgba(16, 185, 129, 0.12)'),
-              border: `1px solid ${scanResult.verdict.includes('Phishing') ? 'rgba(239, 68, 68, 0.4)' : (scanResult.verdict.includes('Suspicious') ? 'rgba(245, 158, 11, 0.4)' : 'rgba(16, 185, 129, 0.4)')}`,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center'
-            }}>
-              <div style={{ fontSize: '0.78rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '4px' }}>Result</div>
-              <div style={{
-                fontSize: '1.4rem',
-                fontWeight: '900',
-                color: scanResult.verdict.includes('Phishing') ? '#ef4444' : (scanResult.verdict.includes('Suspicious') ? '#f59e0b' : '#10b981'),
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}>
-                {scanResult.verdict.includes('Phishing') ? <AlertTriangle size={24} /> : <CheckCircle2 size={24} />}
+        <div className="glass-panel email-result-card">
+          {/* Top Row: Result Banner & Risk Score */}
+          <div className="email-result-top">
+            <div className={`email-result-banner ${scanResult.verdict.includes('Phishing') ? 'danger' : scanResult.verdict.includes('Suspicious') ? 'warning' : 'success'}`}>
+              <div className="email-result-label">Result</div>
+              <div className="email-result-verdict">
+                {scanResult.verdict.includes('Phishing') ? <AlertTriangle size={22} /> : <CheckCircle2 size={22} />}
                 {scanResult.verdict}
               </div>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '6px' }}>
-                This email contains suspicious patterns and links.
-              </p>
+              <p className="email-result-desc">This email contains suspicious patterns and links.</p>
             </div>
 
-            {/* Risk Score Gauge */}
-            <div style={{
-              padding: '20px',
-              borderRadius: '14px',
-              background: 'var(--bg-input)',
-              border: '1px solid var(--border-color)',
-              textAlign: 'center',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <div style={{ fontSize: '0.78rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '6px' }}>Risk Score</div>
-              <div style={{ fontSize: '2.6rem', fontWeight: '900', lineHeight: '1', color: scanResult.riskScore >= 65 ? '#ef4444' : (scanResult.riskScore >= 35 ? '#f59e0b' : '#10b981') }}>
-                {scanResult.riskScore}<span style={{ fontSize: '1.1rem', color: 'var(--text-muted)' }}>/100</span>
+            <div className="email-risk-gauge">
+              <div className="email-risk-label">Risk Score</div>
+              <div className={`email-risk-score ${scanResult.riskScore >= 65 ? 'danger' : scanResult.riskScore >= 35 ? 'warning' : 'success'}`}>
+                {scanResult.riskScore}<span className="email-risk-max">/100</span>
               </div>
-              <div style={{ fontSize: '0.82rem', fontWeight: '800', marginTop: '4px', color: scanResult.riskScore >= 65 ? '#ef4444' : (scanResult.riskScore >= 35 ? '#f59e0b' : '#10b981') }}>
-                {scanResult.riskScore >= 65 ? 'High Risk' : (scanResult.riskScore >= 35 ? 'Medium Risk' : 'Low Risk')}
+              <div className={`email-risk-level ${scanResult.riskScore >= 65 ? 'danger' : scanResult.riskScore >= 35 ? 'warning' : 'success'}`}>
+                {scanResult.riskScore >= 65 ? 'High Risk' : scanResult.riskScore >= 35 ? 'Medium Risk' : 'Low Risk'}
               </div>
             </div>
           </div>
 
-          {/* Email Analysis Details Grid (Exact 7 tiles from PDF Page 63) */}
-          <div>
-            <h3 style={{ fontSize: '1.05rem', fontWeight: '800', marginBottom: '14px' }}>Email Analysis</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px' }}>
-              <div style={{ padding: '14px', background: 'var(--bg-input)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
-                <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: '700' }}>Suspicious Keywords</div>
-                <div style={{ fontSize: '0.95rem', fontWeight: '800', marginTop: '3px' }}>{scanResult.metrics?.suspiciousKeywordsCount || 5} Found</div>
+          {/* Email Analysis Details */}
+          <div className="email-metrics-section">
+            <h3 className="email-metrics-title">Email Analysis</h3>
+            <div className="email-metrics-grid">
+              <div className="email-metric-card">
+                <div className="email-metric-label">Suspicious Keywords</div>
+                <div className="email-metric-value">{scanResult.metrics?.suspiciousKeywordsCount || 5} Found</div>
               </div>
-
-              <div style={{ padding: '14px', background: 'var(--bg-input)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
-                <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: '700' }}>Links</div>
-                <div style={{ fontSize: '0.95rem', fontWeight: '800', marginTop: '3px' }}>{scanResult.metrics?.deceptiveLinksCount || 2} Found</div>
+              <div className="email-metric-card">
+                <div className="email-metric-label">Links</div>
+                <div className="email-metric-value">{scanResult.metrics?.deceptiveLinksCount || 2} Found</div>
               </div>
-
-              <div style={{ padding: '14px', background: 'var(--bg-input)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
-                <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: '700' }}>Attachments</div>
-                <div style={{ fontSize: '0.95rem', fontWeight: '800', marginTop: '3px' }}>{scanResult.metrics?.attachmentsCount || 1} Found</div>
+              <div className="email-metric-card">
+                <div className="email-metric-label">Attachments</div>
+                <div className="email-metric-value">{scanResult.metrics?.attachmentsCount || 1} Found</div>
               </div>
-
-              <div style={{ padding: '14px', background: 'var(--bg-input)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
-                <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: '700' }}>Sender Reputation</div>
-                <div style={{ fontSize: '0.95rem', fontWeight: '800', marginTop: '3px', color: '#f59e0b' }}>{scanResult.metrics?.senderReputation || 'Low'}</div>
+              <div className="email-metric-card">
+                <div className="email-metric-label">Sender Reputation</div>
+                <div className="email-metric-value warning">{scanResult.metrics?.senderReputation || 'Low'}</div>
               </div>
-
-              <div style={{ padding: '14px', background: 'var(--bg-input)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
-                <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: '700' }}>Phishing Indicators</div>
-                <div style={{ fontSize: '0.95rem', fontWeight: '800', marginTop: '3px' }}>{scanResult.metrics?.phishingIndicatorsCount || 4} Found</div>
+              <div className="email-metric-card">
+                <div className="email-metric-label">Phishing Indicators</div>
+                <div className="email-metric-value">{scanResult.metrics?.phishingIndicatorsCount || 4} Found</div>
               </div>
-
-              <div style={{ padding: '14px', background: 'var(--bg-input)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
-                <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: '700' }}>Phishing Intentions</div>
-                <div style={{ fontSize: '0.95rem', fontWeight: '800', marginTop: '3px' }}>{scanResult.metrics?.phishingIntentionsCount || 3}</div>
+              <div className="email-metric-card">
+                <div className="email-metric-label">Phishing Intentions</div>
+                <div className="email-metric-value">{scanResult.metrics?.phishingIntentionsCount || 3}</div>
               </div>
-
-              <div style={{ padding: '14px', background: 'var(--bg-input)', borderRadius: '12px', border: '1px solid var(--border-color)', gridColumn: 'span 2' }}>
-                <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: '700' }}>Spam Probability</div>
-                <div style={{ fontSize: '0.95rem', fontWeight: '800', marginTop: '3px', color: '#ef4444' }}>{scanResult.metrics?.spamProbability || '62%'}</div>
+              <div className="email-metric-card email-metric-wide">
+                <div className="email-metric-label">Spam Probability</div>
+                <div className="email-metric-value danger">{scanResult.metrics?.spamProbability || '62%'}</div>
               </div>
             </div>
           </div>
 
-          {/* Recommendation Banner (Exact Match to PDF Page 63) */}
-          <div style={{
-            padding: '16px',
-            borderRadius: '12px',
-            background: 'var(--bg-input)',
-            border: '1px solid var(--border-color)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px'
-          }}>
-            <AlertTriangle size={20} color="#f59e0b" style={{ flexShrink: 0 }} />
+          {/* Recommendation */}
+          <div className="email-recommendation">
+            <AlertTriangle size={20} color="#f59e0b" className="email-recommendation-icon" />
             <div>
-              <div style={{ fontSize: '0.76rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Recommendation</div>
-              <div style={{ fontSize: '0.88rem', fontWeight: '600', color: 'var(--text-primary)', marginTop: '2px' }}>
+              <div className="email-recommendation-label">Recommendation</div>
+              <div className="email-recommendation-text">
                 {scanResult.recommendation || 'Be cautious. Do not click on links or download attachments.'}
               </div>
             </div>

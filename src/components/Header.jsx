@@ -35,6 +35,64 @@ export default function Header({
         </div>
       </div>
 
+      {/* Mobile overlays: rendered outside header-controls so they stay accessible on mobile */}
+      {showSearch && (
+        <div className="mobile-overlay" onClick={(e) => { if (e.target === e.currentTarget) { setShowSearch(false); } }}>
+          <div className="mobile-overlay-content" style={{ position: 'fixed', top: 'var(--header-height)', right: 12, zIndex: 250 }}>
+            <div className="glass-panel" style={{
+              padding: 12, width: 280, background: 'var(--bg-secondary)', borderRadius: 14,
+              border: '1px solid var(--border-color)', boxShadow: '0 8px 30px rgba(0,0,0,0.4)'
+            }}>
+              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 800, marginBottom: 8 }}>
+                SEARCH: "{searchQuery}"
+              </div>
+              <button onClick={() => { onSelectSearchResult(searchQuery); setShowSearch(false); }}
+                className="btn-secondary" style={{ width: '100%', justifyContent: 'flex-start', fontSize: '0.78rem' }}>
+                Filter Scan History for "{searchQuery}"
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showNotifications && (
+        <div className="mobile-overlay" onClick={(e) => { if (e.target === e.currentTarget) { setShowNotifications(false); } }}>
+          <div className="mobile-overlay-content" style={{ position: 'fixed', top: 'var(--header-height)', right: 12, zIndex: 250, maxHeight: '70vh', overflowY: 'auto' }}>
+            <div className="glass-panel" style={{
+              width: 320, background: 'var(--bg-secondary)', borderRadius: 14,
+              padding: 14, border: '1px solid var(--border-color)', boxShadow: '0 8px 30px rgba(0,0,0,0.4)'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                <div style={{ fontWeight: 800, fontSize: '0.92rem', display: 'flex', alignItems: 'center', gap: 7 }}>
+                  Notifications
+                  {unreadCount > 0 && <span className="badge badge-danger" style={{ fontSize: '0.62rem' }}>{unreadCount} New</span>}
+                </div>
+                <button onClick={onClearNotifications}
+                  style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '0.72rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 3 }}>
+                  <Trash2 size={11} /> Clear
+                </button>
+              </div>
+              {notifications.length === 0 ? (
+                <div style={{ padding: 16, textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.83rem' }}>No notifications.</div>
+              ) : notifications.map(n => (
+                <div key={n.id} onClick={() => onMarkNotificationRead(n.id)}
+                  style={{
+                    padding: '9px 11px', borderRadius: 9, cursor: 'pointer', marginBottom: 6,
+                    background: n.read ? 'var(--bg-input)' : 'rgba(59,130,246,0.1)',
+                    borderLeft: `3px solid ${n.type === 'THREAT' ? '#ef4444' : '#3b82f6'}`
+                  }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 700 }}>
+                    <span style={{ color: n.type === 'THREAT' ? '#ef4444' : 'var(--text-primary)' }}>{n.title}</span>
+                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', flexShrink: 0, marginLeft: 6 }}>{n.time}</span>
+                  </div>
+                  <p style={{ fontSize: '0.73rem', color: 'var(--text-secondary)', marginTop: 2 }}>{n.message}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Right Controls */}
       <div className="header-controls">
         {/* Mobile search toggle — hidden on desktop via CSS */}
@@ -105,41 +163,6 @@ export default function Header({
               }} />
             )}
           </button>
-          {showNotifications && (
-            <div className="glass-panel" style={{
-              position: 'absolute', top: 46, right: 0, width: 320,
-              background: 'var(--bg-secondary)', borderRadius: 14,
-              padding: 14, zIndex: 200, border: '1px solid var(--border-color)',
-              maxHeight: '80vh', overflowY: 'auto'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                <div style={{ fontWeight: 800, fontSize: '0.92rem', display: 'flex', alignItems: 'center', gap: 7 }}>
-                  Notifications
-                  {unreadCount > 0 && <span className="badge badge-danger" style={{ fontSize: '0.62rem' }}>{unreadCount} New</span>}
-                </div>
-                <button onClick={onClearNotifications}
-                  style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '0.72rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 3 }}>
-                  <Trash2 size={11} /> Clear
-                </button>
-              </div>
-              {notifications.length === 0 ? (
-                <div style={{ padding: 16, textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.83rem' }}>No notifications.</div>
-              ) : notifications.map(n => (
-                <div key={n.id} onClick={() => onMarkNotificationRead(n.id)}
-                  style={{
-                    padding: '9px 11px', borderRadius: 9, cursor: 'pointer', marginBottom: 6,
-                    background: n.read ? 'var(--bg-input)' : 'rgba(59,130,246,0.1)',
-                    borderLeft: `3px solid ${n.type === 'THREAT' ? '#ef4444' : '#3b82f6'}`
-                  }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 700 }}>
-                    <span style={{ color: n.type === 'THREAT' ? '#ef4444' : 'var(--text-primary)' }}>{n.title}</span>
-                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', flexShrink: 0, marginLeft: 6 }}>{n.time}</span>
-                  </div>
-                  <p style={{ fontSize: '0.73rem', color: 'var(--text-secondary)', marginTop: 2 }}>{n.message}</p>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* User */}
