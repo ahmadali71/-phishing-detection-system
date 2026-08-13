@@ -818,6 +818,65 @@ input:focus, select:focus, textarea:focus {
   .responsive-auth-banner {
     display: none !important;
   }
+
+  .glass-panel {
+    border-radius: 14px;
+  }
+
+  .btn-primary {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    border-radius: 10px;
+  }
+
+  .btn-secondary {
+    padding: 9px 14px;
+    font-size: 0.82rem;
+    border-radius: 10px;
+  }
+
+  .btn-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .badge {
+    font-size: 0.65rem;
+    padding: 3px 10px;
+  }
+
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  input[type="date"],
+  select,
+  textarea {
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    border-radius: 10px;
+  }
+
+  table {
+    min-width: 480px;
+  }
+
+  th, td {
+    padding: 12px 14px;
+    font-size: 0.82rem;
+  }
+
+  .sidebar-nav-item {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+
+  .sidebar-drawer-header {
+    padding: 14px 10px 12px;
+  }
+
+  .sidebar-academic-card {
+    padding: 12px;
+  }
 }
 
 @media (max-width: 480px) {
