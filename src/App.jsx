@@ -11,6 +11,7 @@ import ScanHistory from './components/ScanHistory';
 import AdminPanel from './components/AdminPanel';
 import ProfileSettings from './components/ProfileSettings';
 import AuthModal from './components/AuthModal';
+import AuthPage from './components/AuthPage';
 import ReportModal from './components/ReportModal';
 
 import { TRANSLATIONS } from './utils/translations';
@@ -36,14 +37,7 @@ function AppInner() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [currentUser, setCurrentUser] = useState({
-    name: 'Amna Najam',
-    username: 'amna_najam',
-    email: 'amnanajam2003@gmail.com',
-    role: 'BS IT Student / Security Analyst',
-    twoFactorAuth: true,
-    loginAlerts: true,
-  });
+  const [currentUser, setCurrentUser] = useState(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
 
@@ -127,112 +121,120 @@ function AppInner() {
     s.result?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleLoginSuccess = useCallback((user) => {
+    setCurrentUser(user);
+    addSystemLog('INFO', 'Auth', `${user.name} logged in.`);
+    addUser(user);
+    addNotification('Welcome Back!', `Logged in as ${user.name}.`, 'INFO');
+  }, [addSystemLog, addUser, addNotification]);
+
   return (
-    <div className="app-layout">
-      <Header
-        theme={theme} setTheme={setTheme}
-        currentUser={currentUser}
-        onOpenAuth={() => setIsAuthOpen(true)}
-        onLogout={() => setCurrentUser(null)}
-        notifications={notifications}
-        onMarkNotificationRead={(id) => setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))}
-        onClearNotifications={() => setNotifications([])}
-        searchQuery={searchQuery} setSearchQuery={setSearchQuery}
-        onSelectSearchResult={() => setActiveTab('scan-history')}
-        onMenuToggle={() => setSidebarOpen(v => !v)}
-        showSearch={showSearch}
-        setShowSearch={setShowSearch}
-        showNotifications={showNotifications}
-        setShowNotifications={setShowNotifications}
-        t={t}
-      />
+    <>
+      {!currentUser ? (
+        <AuthPage onLoginSuccess={handleLoginSuccess} />
+      ) : (
+        <div className="app-layout">
+          <Header
+            theme={theme} setTheme={setTheme}
+            currentUser={currentUser}
+            onOpenAuth={() => setIsAuthOpen(true)}
+            onLogout={() => setCurrentUser(null)}
+            notifications={notifications}
+            onMarkNotificationRead={(id) => setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))}
+            onClearNotifications={() => setNotifications([])}
+            searchQuery={searchQuery} setSearchQuery={setSearchQuery}
+            onSelectSearchResult={() => setActiveTab('scan-history')}
+            onMenuToggle={() => setSidebarOpen(v => !v)}
+            showSearch={showSearch}
+            setShowSearch={setShowSearch}
+            showNotifications={showNotifications}
+            setShowNotifications={setShowNotifications}
+            t={t}
+          />
 
-      <div className="app-body">
-        <Sidebar
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          currentUser={currentUser}
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          t={t}
-        />
-
-        <main className="app-main">
-          {activeTab === 'dashboard' && (
-            <Dashboard stats={stats} recentActivity={recentActivity}
-              onNavigateScan={setActiveTab} onViewDetail={setSelectedRecord} t={t} />
-          )}
-          {activeTab === 'url-detection' && (
-            <UrlScanner onScanComplete={handleScanComplete} onViewDetail={setSelectedRecord} t={t} />
-          )}
-          {activeTab === 'email-detection' && (
-            <EmailScanner onScanComplete={handleScanComplete} t={t} />
-          )}
-          {activeTab === 'ai-assistant' && (
-            <AiChatbot t={t} language={language} />
-          )}
-          {activeTab === 'scan-history' && (
-            <ScanHistory
-              scanHistory={filteredHistory}
-              onViewDetail={setSelectedRecord}
-              onDeleteScan={(id) => {}}
-              onExportPdf={() => window.print()}
-              t={t}
-            />
-          )}
-          {activeTab === 'admin-panel' && (
-            <AdminPanel
-              models={mlModels}
-              onAddModel={addModel}
-              onToggleModelStatus={toggleModelStatus}
-              onDeleteModel={deleteModel}
-              logs={logs}
-              onAddLog={addSystemLog}
-              stats={stats}
-              usersList={users}
-              onUpdateUserRole={updateUserRole}
-              t={t}
-            />
-          )}
-          {activeTab === 'profile-settings' && (
-            <ProfileSettings
+          <div className="app-body">
+            <Sidebar
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
               currentUser={currentUser}
-              onUpdateProfile={handleUpdateProfile}
-              theme={theme} setTheme={setTheme}
-              language={language}
-              onLanguageChange={handleLanguageChange}
+              isOpen={sidebarOpen}
+              onClose={() => setSidebarOpen(false)}
               t={t}
             />
-          )}
-        </main>
-      </div>
 
-      <BottomNav
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        onSearchToggle={() => setShowSearch(v => !v)}
-        onNotificationToggle={() => setShowNotifications(v => !v)}
-        unreadCount={notifications.filter(n => !n.read).length}
-        t={t}
-      />
+            <main className="app-main">
+              {activeTab === 'dashboard' && (
+                <Dashboard stats={stats} recentActivity={recentActivity}
+                  onNavigateScan={setActiveTab} onViewDetail={setSelectedRecord} t={t} />
+              )}
+              {activeTab === 'url-detection' && (
+                <UrlScanner onScanComplete={handleScanComplete} onViewDetail={setSelectedRecord} t={t} />
+              )}
+              {activeTab === 'email-detection' && (
+                <EmailScanner onScanComplete={handleScanComplete} t={t} />
+              )}
+              {activeTab === 'ai-assistant' && (
+                <AiChatbot t={t} language={language} />
+              )}
+              {activeTab === 'scan-history' && (
+                <ScanHistory
+                  scanHistory={filteredHistory}
+                  onViewDetail={setSelectedRecord}
+                  onDeleteScan={(id) => {}}
+                  onExportPdf={() => window.print()}
+                  t={t}
+                />
+              )}
+              {activeTab === 'admin-panel' && (
+                <AdminPanel
+                  models={mlModels}
+                  onAddModel={addModel}
+                  onToggleModelStatus={toggleModelStatus}
+                  onDeleteModel={deleteModel}
+                  logs={logs}
+                  onAddLog={addSystemLog}
+                  stats={stats}
+                  usersList={users}
+                  onUpdateUserRole={updateUserRole}
+                  t={t}
+                />
+              )}
+              {activeTab === 'profile-settings' && (
+                <ProfileSettings
+                  currentUser={currentUser}
+                  onUpdateProfile={handleUpdateProfile}
+                  theme={theme} setTheme={setTheme}
+                  language={language}
+                  onLanguageChange={handleLanguageChange}
+                  t={t}
+                />
+              )}
+            </main>
+          </div>
 
-      <AuthModal
-        isOpen={isAuthOpen}
-        onClose={() => setIsAuthOpen(false)}
-        onLoginSuccess={(user) => {
-          setCurrentUser(user);
-          addSystemLog('INFO', 'Auth', `${user.name} logged in.`);
-          addUser(user);
-          addNotification('Welcome Back!', `Logged in as ${user.name}.`, 'INFO');
-        }}
-      />
+          <BottomNav
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            onSearchToggle={() => setShowSearch(v => !v)}
+            onNotificationToggle={() => setShowNotifications(v => !v)}
+            unreadCount={notifications.filter(n => !n.read).length}
+            t={t}
+          />
 
-      <ReportModal
-        record={selectedRecord}
-        onClose={() => setSelectedRecord(null)}
-        onExportPdf={() => window.print()}
-      />
-    </div>
+          <AuthModal
+            isOpen={isAuthOpen}
+            onClose={() => setIsAuthOpen(false)}
+            onLoginSuccess={handleLoginSuccess}
+          />
+
+          <ReportModal
+            record={selectedRecord}
+            onClose={() => setSelectedRecord(null)}
+            onExportPdf={() => window.print()}
+          />
+        </div>
+      )}
+    </>
   );
 }
 
