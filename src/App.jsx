@@ -42,10 +42,10 @@ function AppInner() {
   const [selectedRecord, setSelectedRecord] = useState(null);
 
   useEffect(() => {
-    const themeClasses = ['light-theme', 'theme-ocean', 'theme-purple', 'theme-emerald'];
+    const themeClasses = ['light-theme', 'theme-ocean', 'theme-purple', 'theme-emerald', 'theme-royal'];
     themeClasses.forEach(cls => document.body.classList.remove(cls));
     if (theme !== 'dark') {
-      const map = { light: 'light-theme', ocean: 'theme-ocean', purple: 'theme-purple', emerald: 'theme-emerald' };
+      const map = { light: 'light-theme', ocean: 'theme-ocean', purple: 'theme-purple', emerald: 'theme-emerald', royal: 'theme-royal' };
       if (map[theme]) document.body.classList.add(map[theme]);
     }
   }, [theme]);

@@ -313,6 +313,7 @@ export default function ProfileSettings({ currentUser, onUpdateProfile, theme, s
                   { id: 'ocean', label: t.oceanTheme || 'Ocean', color: '#0f2140', border: '#38bdf8', dot: '#38bdf8' },
                   { id: 'purple', label: t.purpleTheme || 'Purple', color: '#1a102d', border: '#a78bfa', dot: '#c084fc' },
                   { id: 'emerald', label: t.emeraldTheme || 'Emerald', color: '#0a1f12', border: '#34d399', dot: '#6ee7b7' },
+                  { id: 'royal', label: t.royalTheme || 'Royal Blue', color: '#0f1530', border: '#6366f1', dot: '#818cf8' },
                 ].map(opt => {
                   const active = theme === opt.id;
                   return (

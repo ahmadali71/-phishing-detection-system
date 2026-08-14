@@ -74,7 +74,7 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
                 fontSize: '1.4rem',
                 fontWeight: '900',
                 letterSpacing: '0.04em',
-                color: '#ffffff'
+                color: 'var(--text-primary)'
               }}>
                 APDS
               </span>
