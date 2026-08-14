@@ -2,9 +2,9 @@ const OPENROUTER_API_KEY = (import.meta.env.VITE_OPENROUTER_API_KEY || '').trim(
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 const FALLBACK_MODELS = [
-  'mistralai/mistral-7b-instruct',
-  'google/gemini-2.0-flash-exp:free',
   'meta-llama/llama-3.1-8b-instruct',
+  'google/gemini-2.0-flash-exp:free',
+  'mistralai/mistral-7b-instruct',
   'huggingfaceh4/zephyr-7b-beta'
 ];
 
@@ -19,73 +19,79 @@ export async function getOpenRouterResponse(messages, options = {}) {
 
   const systemPrompt = options.systemPrompt || `You are APDS AI Cyber Defense Assistant, a cybersecurity expert. You help users with phishing detection, email security, URL analysis, and cybersecurity best practices. Be concise, professional, and use markdown formatting. If users share URLs or email content, suggest they use the scanner tools.`;
 
-  const selectedModel = options.model || FALLBACK_MODELS[0];
+  const modelsToTry = options.model ? [options.model] : FALLBACK_MODELS;
 
-  try {
-    const requestBody = {
-      model: selectedModel,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        ...messages.map(m => ({
-          role: m.sender === 'user' ? 'user' : 'assistant',
-          content: m.text
-        }))
-      ],
-      max_tokens: options.maxTokens || 1024,
-      temperature: options.temperature || 0.7,
-      top_p: options.topP || 0.9
-    };
+  for (const selectedModel of modelsToTry) {
+    try {
+      const requestBody = {
+        model: selectedModel,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...messages.map(m => ({
+            role: m.sender === 'user' ? 'user' : 'assistant',
+            content: m.text
+          }))
+        ],
+        max_tokens: options.maxTokens || 1024,
+        temperature: options.temperature || 0.7,
+        top_p: options.topP || 0.9
+      };
 
-    console.log('[OpenRouter] Request model:', selectedModel);
+      console.log('[OpenRouter] Trying model:', selectedModel);
 
-    const response = await fetch(OPENROUTER_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'HTTP-Referer': window.location.origin,
-        'X-Title': 'APDS Cyber Defense Assistant'
-      },
-      body: JSON.stringify(requestBody)
-    });
+      const response = await fetch(OPENROUTER_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+          'HTTP-Referer': window.location.origin,
+          'X-Title': 'APDS Cyber Defense Assistant'
+        },
+        body: JSON.stringify(requestBody)
+      });
 
-    console.log('[OpenRouter] Response status:', response.status, response.statusText);
+      console.log('[OpenRouter] Response status for', selectedModel, ':', response.status, response.statusText);
 
-    if (!response.ok) {
-      let errorMessage = `HTTP ${response.status}`;
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData?.error?.message || errorData?.message || errorMessage;
-      } catch {
-        // keep default errorMessage
+      if (!response.ok) {
+        let errorMessage = `HTTP ${response.status}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData?.error?.message || errorData?.message || errorMessage;
+        } catch {
+          // keep default errorMessage
+        }
+        console.error('[OpenRouter] Model', selectedModel, 'failed:', response.status, errorMessage);
+
+        if (response.status === 404 || response.status === 429) {
+          continue;
+        }
+
+        return {
+          text: `AI service error (${response.status}): ${errorMessage}. You can still use the built-in URL and email scanners.`,
+          suggestions: ['Scan a URL', 'Scan an email', 'What is phishing?']
+        };
       }
-      console.error('[OpenRouter] API error:', response.status, errorMessage);
+
+      const data = await response.json();
+      const aiMessage = data.choices?.[0]?.message?.content?.trim();
+
+      if (!aiMessage) {
+        console.warn('[OpenRouter] Empty response from AI for model:', selectedModel);
+        continue;
+      }
+
       return {
-        text: `AI service error (${response.status}): ${errorMessage}. You can still use the built-in URL and email scanners.`,
-        suggestions: ['Scan a URL', 'Scan an email', 'What is phishing?']
+        text: aiMessage,
+        suggestions: ['Scan a URL', 'Scan an email', 'Explain phishing']
       };
+    } catch (error) {
+      console.error('[OpenRouter] Request failed for model', selectedModel, ':', error);
+      continue;
     }
-
-    const data = await response.json();
-    const aiMessage = data.choices?.[0]?.message?.content?.trim();
-
-    if (!aiMessage) {
-      console.warn('[OpenRouter] Empty response from AI');
-      return {
-        text: 'AI returned an empty response. Please try again.',
-        suggestions: ['Scan a URL', 'Scan an email', 'What is phishing?']
-      };
-    }
-
-    return {
-      text: aiMessage,
-      suggestions: ['Scan a URL', 'Scan an email', 'Explain phishing']
-    };
-  } catch (error) {
-    console.error('[OpenRouter] Request failed:', error);
-    return {
-      text: 'Could not connect to AI service. Please check your internet connection and try again.',
-      suggestions: ['Scan a URL', 'Scan an email', 'What is phishing?']
-    };
   }
+
+  return {
+    text: 'All AI models are temporarily unavailable. Please try again later or use the built-in URL and email scanners.',
+    suggestions: ['Scan a URL', 'Scan an email', 'What is phishing?']
+  };
 }
