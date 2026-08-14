@@ -17,7 +17,7 @@ import {
   Timestamp,
   writeBatch,
 } from 'firebase/firestore';
-import { db } from './init';
+import { getFirebaseServices } from './init';
 
 const COLLECTIONS = {
   SCANS: 'scans',
@@ -27,13 +27,34 @@ const COLLECTIONS = {
   ML_MODELS: 'ml_models',
 };
 
+function getDb() {
+  try {
+    const { db } = getFirebaseServices();
+    return db;
+  } catch (error) {
+    console.error('[Firebase] Not initialized:', error.message);
+    return null;
+  }
+}
+
+function guardFirebase(operation) {
+  const dbInstance = getDb();
+  if (!dbInstance) {
+    console.warn(`[Firebase] Skipping ${operation}: Firestore is not initialized`);
+    return null;
+  }
+  return dbInstance;
+}
+
 /**
  * Scans Collection Operations
  */
 export const scansService = {
   async addScan(scanData) {
     try {
-      const docRef = await addDoc(collection(db, COLLECTIONS.SCANS), {
+      const dbInstance = guardFirebase('addScan');
+      if (!dbInstance) return null;
+      const docRef = await addDoc(collection(dbInstance, COLLECTIONS.SCANS), {
         ...scanData,
         createdAt: Timestamp.now(),
         syncedAt: Timestamp.now(),
@@ -48,8 +69,10 @@ export const scansService = {
 
   async getScans(limitCount = 100) {
     try {
+      const dbInstance = guardFirebase('getScans');
+      if (!dbInstance) return [];
       const q = query(
-        collection(db, COLLECTIONS.SCANS),
+        collection(dbInstance, COLLECTIONS.SCANS),
         orderBy('createdAt', 'desc'),
         limit(limitCount)
       );
@@ -63,8 +86,10 @@ export const scansService = {
 
   async getScansByType(type) {
     try {
+      const dbInstance = guardFirebase('getScansByType');
+      if (!dbInstance) return [];
       const q = query(
-        collection(db, COLLECTIONS.SCANS),
+        collection(dbInstance, COLLECTIONS.SCANS),
         where('type', '==', type),
         orderBy('createdAt', 'desc')
       );
@@ -78,7 +103,9 @@ export const scansService = {
 
   async deleteScan(scanId) {
     try {
-      await deleteDoc(doc(db, COLLECTIONS.SCANS, scanId));
+      const dbInstance = guardFirebase('deleteScan');
+      if (!dbInstance) return;
+      await deleteDoc(doc(dbInstance, COLLECTIONS.SCANS, scanId));
       console.log('Scan deleted:', scanId);
     } catch (error) {
       console.error('Error deleting scan:', error);
@@ -93,7 +120,9 @@ export const scansService = {
 export const logsService = {
   async addLog(logData) {
     try {
-      const docRef = await addDoc(collection(db, COLLECTIONS.LOGS), {
+      const dbInstance = guardFirebase('addLog');
+      if (!dbInstance) return null;
+      const docRef = await addDoc(collection(dbInstance, COLLECTIONS.LOGS), {
         ...logData,
         timestamp: Timestamp.now(),
       });
@@ -106,8 +135,10 @@ export const logsService = {
 
   async getLogs(limitCount = 500) {
     try {
+      const dbInstance = guardFirebase('getLogs');
+      if (!dbInstance) return [];
       const q = query(
-        collection(db, COLLECTIONS.LOGS),
+        collection(dbInstance, COLLECTIONS.LOGS),
         orderBy('timestamp', 'desc'),
         limit(limitCount)
       );
@@ -121,8 +152,10 @@ export const logsService = {
 
   async getLogsByLevel(level) {
     try {
+      const dbInstance = guardFirebase('getLogsByLevel');
+      if (!dbInstance) return [];
       const q = query(
-        collection(db, COLLECTIONS.LOGS),
+        collection(dbInstance, COLLECTIONS.LOGS),
         where('level', '==', level),
         orderBy('timestamp', 'desc')
       );
@@ -141,7 +174,9 @@ export const logsService = {
 export const usersService = {
   async addUser(userData) {
     try {
-      const docRef = await addDoc(collection(db, COLLECTIONS.USERS), {
+      const dbInstance = guardFirebase('addUser');
+      if (!dbInstance) return null;
+      const docRef = await addDoc(collection(dbInstance, COLLECTIONS.USERS), {
         ...userData,
         createdAt: Timestamp.now(),
       });
@@ -154,7 +189,9 @@ export const usersService = {
 
   async getUsers() {
     try {
-      const snapshot = await getDocs(collection(db, COLLECTIONS.USERS));
+      const dbInstance = guardFirebase('getUsers');
+      if (!dbInstance) return [];
+      const snapshot = await getDocs(collection(dbInstance, COLLECTIONS.USERS));
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -164,7 +201,9 @@ export const usersService = {
 
   async updateUser(userId, updates) {
     try {
-      await updateDoc(doc(db, COLLECTIONS.USERS, userId), updates);
+      const dbInstance = guardFirebase('updateUser');
+      if (!dbInstance) return;
+      await updateDoc(doc(dbInstance, COLLECTIONS.USERS, userId), updates);
       console.log('User updated:', userId);
     } catch (error) {
       console.error('Error updating user:', error);
@@ -174,7 +213,9 @@ export const usersService = {
 
   async getUserByEmail(email) {
     try {
-      const q = query(collection(db, COLLECTIONS.USERS), where('email', '==', email));
+      const dbInstance = guardFirebase('getUserByEmail');
+      if (!dbInstance) return null;
+      const q = query(collection(dbInstance, COLLECTIONS.USERS), where('email', '==', email));
       const snapshot = await getDocs(q);
       return snapshot.docs.length > 0 ? { id: snapshot.docs[0].id, ...snapshot.docs[0].data() } : null;
     } catch (error) {
@@ -190,7 +231,9 @@ export const usersService = {
 export const statsService = {
   async updateStats(statsData) {
     try {
-      const docRef = doc(db, COLLECTIONS.STATS, 'current');
+      const dbInstance = guardFirebase('updateStats');
+      if (!dbInstance) return;
+      const docRef = doc(dbInstance, COLLECTIONS.STATS, 'current');
       await updateDoc(docRef, {
         ...statsData,
         updatedAt: Timestamp.now(),
@@ -203,8 +246,10 @@ export const statsService = {
 
   async getStats() {
     try {
-      const docRef = doc(db, COLLECTIONS.STATS, 'current');
-      const docSnap = await getDocs(collection(db, COLLECTIONS.STATS));
+      const dbInstance = guardFirebase('getStats');
+      if (!dbInstance) return null;
+      const docRef = doc(dbInstance, COLLECTIONS.STATS, 'current');
+      const docSnap = await getDocs(collection(dbInstance, COLLECTIONS.STATS));
       if (docSnap.docs.length > 0) {
         return docSnap.docs[0].data();
       }
@@ -222,7 +267,9 @@ export const statsService = {
 export const modelsService = {
   async addModel(modelData) {
     try {
-      const docRef = await addDoc(collection(db, COLLECTIONS.ML_MODELS), {
+      const dbInstance = guardFirebase('addModel');
+      if (!dbInstance) return null;
+      const docRef = await addDoc(collection(dbInstance, COLLECTIONS.ML_MODELS), {
         ...modelData,
         createdAt: Timestamp.now(),
       });
@@ -235,7 +282,9 @@ export const modelsService = {
 
   async getModels() {
     try {
-      const snapshot = await getDocs(collection(db, COLLECTIONS.ML_MODELS));
+      const dbInstance = guardFirebase('getModels');
+      if (!dbInstance) return [];
+      const snapshot = await getDocs(collection(dbInstance, COLLECTIONS.ML_MODELS));
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (error) {
       console.error('Error fetching models:', error);
@@ -245,7 +294,9 @@ export const modelsService = {
 
   async updateModel(modelId, updates) {
     try {
-      await updateDoc(doc(db, COLLECTIONS.ML_MODELS, modelId), updates);
+      const dbInstance = guardFirebase('updateModel');
+      if (!dbInstance) return;
+      await updateDoc(doc(dbInstance, COLLECTIONS.ML_MODELS, modelId), updates);
       console.log('Model updated:', modelId);
     } catch (error) {
       console.error('Error updating model:', error);
@@ -255,7 +306,9 @@ export const modelsService = {
 
   async deleteModel(modelId) {
     try {
-      await deleteDoc(doc(db, COLLECTIONS.ML_MODELS, modelId));
+      const dbInstance = guardFirebase('deleteModel');
+      if (!dbInstance) return;
+      await deleteDoc(doc(dbInstance, COLLECTIONS.ML_MODELS, modelId));
       console.log('Model deleted:', modelId);
     } catch (error) {
       console.error('Error deleting model:', error);
@@ -270,11 +323,13 @@ export const modelsService = {
 export const batchService = {
   async batchAddScans(scans) {
     try {
-      const batch = writeBatch(db);
+      const dbInstance = guardFirebase('batchAddScans');
+      if (!dbInstance) return [];
+      const batch = writeBatch(dbInstance);
       const refs = [];
       
       scans.forEach((scan) => {
-        const docRef = doc(collection(db, COLLECTIONS.SCANS));
+        const docRef = doc(collection(dbInstance, COLLECTIONS.SCANS));
         batch.set(docRef, {
           ...scan,
           createdAt: Timestamp.now(),
