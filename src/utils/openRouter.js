@@ -1,5 +1,7 @@
 const OPENROUTER_API_KEY = (import.meta.env.VITE_OPENROUTER_API_KEY || '').trim();
-const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+const OPENROUTER_API_URL = (import.meta.env.VITE_OPENROUTER_API_URL || 'https://openrouter.ai/api/v1/chat/completions').trim();
+const OPENROUTER_MODEL = (import.meta.env.VITE_OPENROUTER_MODEL || '').trim();
+const OPENROUTER_AUTH_HEADER = (import.meta.env.VITE_OPENROUTER_AUTH_HEADER || 'bearer').trim().toLowerCase();
 
 const FALLBACK_MODELS = [
   'meta-llama/llama-3.1-8b-instruct',
@@ -8,18 +10,41 @@ const FALLBACK_MODELS = [
   'huggingfaceh4/zephyr-7b-beta'
 ];
 
+function buildAuthHeaders(apiKey) {
+  const headers = {
+    'Content-Type': 'application/json',
+    'HTTP-Referer': window.location.origin,
+    'X-Title': 'APDS Cyber Defense Assistant'
+  };
+
+  if (OPENROUTER_AUTH_HEADER === 'x-api-key') {
+    headers['X-API-Key'] = apiKey;
+  } else {
+    headers['Authorization'] = `Bearer ${apiKey}`;
+  }
+
+  return headers;
+}
+
 export async function getOpenRouterResponse(messages, options = {}) {
   if (!OPENROUTER_API_KEY || OPENROUTER_API_KEY === '' || OPENROUTER_API_KEY.includes('YOUR_OPENROUTER_API_KEY')) {
-    console.error('[OpenRouter] API key missing. Check .env for VITE_OPENROUTER_API_KEY and restart the dev server.');
+    console.error('[AI] API key missing. Check .env for VITE_OPENROUTER_API_KEY and restart the dev server.');
     return {
-      text: 'AI service is not configured. Add your OpenRouter API key to .env as VITE_OPENROUTER_API_KEY, then restart the dev server.',
+      text: 'AI service is not configured. Add your API key to .env as VITE_OPENROUTER_API_KEY, then restart the dev server.',
       suggestions: ['Scan a URL', 'Scan an email', 'What is phishing?']
     };
   }
 
   const systemPrompt = options.systemPrompt || `You are APDS AI Cyber Defense Assistant, a cybersecurity expert. You help users with phishing detection, email security, URL analysis, and cybersecurity best practices. Be concise, professional, and use markdown formatting. If users share URLs or email content, suggest they use the scanner tools.`;
 
-  const modelsToTry = options.model ? [options.model] : FALLBACK_MODELS;
+  const modelsToTry = [];
+  if (OPENROUTER_MODEL) {
+    modelsToTry.push(OPENROUTER_MODEL);
+  }
+  if (options.model && !modelsToTry.includes(options.model)) {
+    modelsToTry.push(options.model);
+  }
+  modelsToTry.push(...FALLBACK_MODELS.filter(m => !modelsToTry.includes(m)));
 
   for (const selectedModel of modelsToTry) {
     try {
@@ -37,20 +62,15 @@ export async function getOpenRouterResponse(messages, options = {}) {
         top_p: options.topP || 0.9
       };
 
-      console.log('[OpenRouter] Trying model:', selectedModel);
+      console.log('[AI] Trying model:', selectedModel, 'at:', OPENROUTER_API_URL);
 
       const response = await fetch(OPENROUTER_API_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-          'HTTP-Referer': window.location.origin,
-          'X-Title': 'APDS Cyber Defense Assistant'
-        },
+        headers: buildAuthHeaders(OPENROUTER_API_KEY),
         body: JSON.stringify(requestBody)
       });
 
-      console.log('[OpenRouter] Response status for', selectedModel, ':', response.status, response.statusText);
+      console.log('[AI] Response status for', selectedModel, ':', response.status, response.statusText);
 
       if (!response.ok) {
         let errorMessage = `HTTP ${response.status}`;
@@ -60,9 +80,9 @@ export async function getOpenRouterResponse(messages, options = {}) {
         } catch {
           // keep default errorMessage
         }
-        console.error('[OpenRouter] Model', selectedModel, 'failed:', response.status, errorMessage);
+        console.error('[AI] Model', selectedModel, 'failed:', response.status, errorMessage);
 
-        if (response.status === 404 || response.status === 429) {
+        if (response.status === 404 || response.status === 429 || response.status === 401) {
           continue;
         }
 
@@ -76,7 +96,7 @@ export async function getOpenRouterResponse(messages, options = {}) {
       const aiMessage = data.choices?.[0]?.message?.content?.trim();
 
       if (!aiMessage) {
-        console.warn('[OpenRouter] Empty response from AI for model:', selectedModel);
+        console.warn('[AI] Empty response from AI for model:', selectedModel);
         continue;
       }
 
@@ -85,7 +105,7 @@ export async function getOpenRouterResponse(messages, options = {}) {
         suggestions: ['Scan a URL', 'Scan an email', 'Explain phishing']
       };
     } catch (error) {
-      console.error('[OpenRouter] Request failed for model', selectedModel, ':', error);
+      console.error('[AI] Request failed for model', selectedModel, ':', error);
       continue;
     }
   }
