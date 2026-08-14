@@ -106,8 +106,7 @@ export default function ProfileSettings({ currentUser, onUpdateProfile, theme, s
           fontWeight: '900',
           fontSize: '0.9rem',
           letterSpacing: '0.08em',
-          color: 'var(--accent-blue)',
-          fontFamily: 'var(--font-display)'
+          color: 'var(--accent-blue)'
         }}>
           {t.profileSettings || 'PROFILE & SETTINGS'}
         </span>
@@ -122,13 +121,12 @@ export default function ProfileSettings({ currentUser, onUpdateProfile, theme, s
       {/* ── 3-Column Layout (Exact Match to PDF Page 64 Screen 9) ── */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '210px 1fr 280px',
         gap: '20px',
         alignItems: 'start'
       }} className="responsive-grid-3-col">
 
         {/* ── COLUMN 1: LEFT TAB NAVIGATION (Page 64) ── */}
-        <div className="glass-panel" style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        <div className="glass-panel profile-tabs-sidebar" style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const active = activeTab === tab.id;
@@ -149,7 +147,7 @@ export default function ProfileSettings({ currentUser, onUpdateProfile, theme, s
                   fontSize: '0.86rem',
                   fontFamily: 'var(--font-display)',
                   cursor: 'pointer',
-                  textAlign: 'left',
+                  textAlign: 'start',
                   transition: 'all 0.2s',
                   width: '100%'
                 }}

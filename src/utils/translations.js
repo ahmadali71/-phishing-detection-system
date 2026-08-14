@@ -61,6 +61,36 @@ export const TRANSLATIONS = {
     historyTitle: 'Scan History & Security Reports',
     exportPdf: 'Export PDF Report',
     searchPlaceholder: 'Search by URL domain or email title...',
+    testPresets: 'Test Presets:',
+
+    // URL Scanner
+    urlScannerTitle: 'URL Phishing Detection',
+    urlScannerDesc: 'Analyze any website link in real time to detect typosquatting, raw IP hosting, SSL anomalies, and blacklisted domains.',
+    urlScanError: 'Please enter or paste a valid URL to analyze.',
+    urlAnalysisTitle: 'URL Analysis Details',
+    urlPhishingMsg: 'This URL is malicious and may harm your device or steal your information.',
+    urlSafeMsg: 'This URL passed security validation checks and appears clean.',
+    urlRecommendation: 'Do not visit this URL. Report to your administrator.',
+
+    // Email Scanner
+    emailScannerTitle: 'Email Phishing Detection',
+    emailScannerDesc: 'Scans email content for manufactured urgency, deceptive links, financial harvesting phrasing, and malicious attachments.',
+    emailScanError: 'Please enter email content to analyze.',
+    fileScanError: 'Please upload a valid .eml file to analyze.',
+    emailAnalysisTitle: 'Email Analysis',
+    emailResultDesc: 'This email contains suspicious patterns and links.',
+    emailRecommendation: 'Be cautious. Do not click on links or download attachments.',
+    result: 'Result',
+    // URL Scanner detail labels
+    domainAge: 'ڈومین کی عمر',
+    ipAddress: 'آی پی ایڈریس',
+    sslCertificate: 'ایس ایس ایل سرٹیفکیٹ',
+    redirectCount: 'ری ڈائریکٹ کاؤنٹ',
+    blacklistStatus: 'بلیک لسٹ کی حیثیت',
+    hostingRisk: 'ہوسٹنگ کا خطرہ',
+    highRisk: 'high risk',
+    mediumRisk: 'medium risk',
+    lowRisk: 'low risk',
 
     // Settings
     settingsTitle: 'Profile & Security Settings',
@@ -152,6 +182,35 @@ export const TRANSLATIONS = {
     historyTitle: 'اسکین ہسٹری اور سیکیورٹی رپورٹس',
     exportPdf: 'پی ڈی ایف رپورٹ ایکسپورٹ کریں',
     searchPlaceholder: 'یو آر ایل یا ای میل تلاش کریں...',
+    testPresets: 'ٹیسٹ پری سیٹ:',
+
+    // URL Scanner
+    urlScannerTitle: 'یو آر ایل فِشنگ کی نشاندہی',
+    urlScannerDesc: 'کسی بھی ویب سائٹ کے لنک کی ریئل ٹائم جانچ کریں تاکہ نقلی ڈومینز اور بلیک لسٹ لنکس کا پتہ لگایا جا سکے۔',
+    urlScanError: 'براہ کرم جانچ کے لیے درست یو آر ایل درج کریں۔',
+    urlAnalysisTitle: 'یو آر ایل تجزیہ کی تفصیلات',
+    urlPhishingMsg: 'یہ یو آر ایل مضر ہے اور آپ کے ڈیوائس کو نقصان پہنچا سکتا ہے یا آپ کی معلومات چر سکتا ہے۔',
+    urlSafeMsg: 'یہ یو آر ایل سیکیورٹی تصدیق کے معیار پر پورا اترتا ہے اور صاف لگتا ہے۔',
+    urlRecommendation: 'اس یو آر ایل پر نہ جائیں۔ اپنے منتظم کی رپورٹ کریں۔',
+
+    // Email Scanner
+    emailScannerTitle: 'ای میل فِشنگ کی نشاندہی',
+    emailScannerDesc: 'ای میل کے متن، جعلی پیغامات اور مشکوک فائل اٹیچمنٹس کی این ایل پی کے ذریعے جانچ کریں۔',
+    emailScanError: 'براہ کرم تجزیہ کے لیے ای میل کا مواد درج کریں۔',
+    fileScanError: 'براہ کرم درست .eml فائل اپ لوڈ کریں۔',
+    emailAnalysisTitle: 'ای میل کا تجزیہ',
+    emailResultDesc: 'اس ای میل میں مشکوک پیٹرن اور لنکس ہیں۔',
+    emailRecommendation: 'احتیاط کریں۔ لنکس پر کلک نہ کریں یا اٹیچمنٹس ڈاؤنلوڈ نہ کریں۔',
+    result: 'نتیجہ',
+    recommendation: 'توصیہ',
+
+    // URL Scanner detail labels
+    domainAge: 'ڈومین کی عمر',
+    ipAddress: 'آی پی ایڈریس',
+    sslCertificate: 'ایس ایس ایل سرٹیفکیٹ',
+    redirectCount: 'ری ڈائریکٹ کاؤنٹ',
+    blacklistStatus: 'بلیک لسٹ کی حیثیت',
+    hostingRisk: 'ہوسٹنگ کا خطرہ',
 
     // Settings
     settingsTitle: 'پروفائل اور سیکیورٹی ترتیبات',

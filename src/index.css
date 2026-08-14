@@ -95,6 +95,8 @@
 }
 
 .rtl-layout {
+  --font-display: 'Noto Nastaliq Urdu', 'Outfit', sans-serif;
+  --font-sans: 'Noto Nastaliq Urdu', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   direction: rtl;
   text-align: right;
   font-family: var(--font-urdu), var(--font-display), sans-serif;
@@ -207,12 +209,19 @@ h1, h2, h3, h4, h5, h6 {
   flex-shrink: 0;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
 .header-user-info {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding-left: 10px;
-  border-left: 1px solid var(--border-color);
+  padding-inline-start: 10px;
+  border-inline-start: 1px solid var(--border-color);
 }
 
 .header-user-name {
@@ -255,7 +264,7 @@ h1, h2, h3, h4, h5, h6 {
 .app-sidebar {
   width: var(--sidebar-width);
   background: var(--bg-secondary);
-  border-right: 1px solid var(--border-color);
+  border-inline-end: 1px solid var(--border-color);
   padding: 24px 16px;
   display: flex;
   flex-direction: column;
@@ -275,7 +284,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .sidebar-group-title {
-  padding: 0 12px 8px 12px;
+  padding: 0 12px 8px;
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -297,7 +306,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   font-size: 0.9rem;
   cursor: pointer;
-  text-align: left;
+  text-align: start;
   transition: all 0.2s ease;
   width: 100%;
 }
@@ -336,7 +345,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .sidebar-nav-label {
   flex: 1;
-  text-align: left;
+  text-align: start;
 }
 
 .sidebar-drawer-header {
@@ -483,7 +492,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   font-size: 0.84rem;
   cursor: pointer;
-  text-align: left;
+  text-align: start;
   transition: all 0.2s;
   font-family: var(--font-display);
 }
@@ -827,7 +836,7 @@ table {
 }
 
 th {
-  text-align: left;
+  text-align: start;
   padding: 13px 16px;
   color: var(--text-muted);
   font-size: 0.74rem;
@@ -881,8 +890,8 @@ input:focus, select:focus, textarea:focus {
   display: none;
   position: fixed;
   bottom: 0;
-  left: 0;
-  right: 0;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
   height: 66px;
   background: var(--bg-secondary);
   border-top: 1px solid var(--border-color);
@@ -944,7 +953,7 @@ input:focus, select:focus, textarea:focus {
 .mobile-nav-badge {
   position: absolute;
   top: -2px;
-  right: -4px;
+  inset-inline-end: -4px;
   min-width: 16px;
   height: 16px;
   padding: 0 4px;
@@ -971,8 +980,15 @@ input:focus, select:focus, textarea:focus {
   max-width: 100%;
 }
 
+.responsive-grid-3-col {
+  display: grid;
+  grid-template-columns: 210px 1fr 280px;
+  gap: 20px;
+  align-items: start;
+}
+
 /* ================================================================
-   14. RESPONSIVE BREAKPOINTS (LAPTOP, TABLET & SMARTPHONE)
+    14. RESPONSIVE BREAKPOINTS (LAPTOP, TABLET & SMARTPHONE)
 ================================================================ */
 @media (max-width: 1024px) {
   .app-main { padding: 22px 24px; }
@@ -998,8 +1014,8 @@ input:focus, select:focus, textarea:focus {
 
   .app-sidebar {
     position: fixed;
-    top: 0;
-    left: 0;
+    inset-block-start: 0;
+    inset-inline-start: 0;
     bottom: 0;
     height: 100vh;
     z-index: 300;
@@ -1312,7 +1328,7 @@ input:focus, select:focus, textarea:focus {
   height: 400px;
   background: radial-gradient(circle, rgba(37, 99, 235, 0.5), transparent 70%);
   top: -100px;
-  left: -100px;
+  inset-inline-start: -100px;
   animation-delay: 0s;
 }
 
@@ -1321,7 +1337,7 @@ input:focus, select:focus, textarea:focus {
   height: 350px;
   background: radial-gradient(circle, rgba(124, 58, 237, 0.45), transparent 70%);
   bottom: -80px;
-  right: -80px;
+  inset-inline-end: -80px;
   animation-delay: -3s;
 }
 
@@ -1330,7 +1346,7 @@ input:focus, select:focus, textarea:focus {
   height: 300px;
   background: radial-gradient(circle, rgba(6, 182, 212, 0.35), transparent 70%);
   top: 50%;
-  left: 50%;
+  inset-inline-start: 50%;
   transform: translate(-50%, -50%);
   animation-delay: -5s;
 }
@@ -2306,537 +2322,4 @@ input:focus, select:focus, textarea:focus {
   }
 }
 
-/* ================================================================
-   16. EMAIL SCANNER MOBILE-FRIENDLY STYLES
-=============================================================== */
-.email-scanner-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  max-width: 950px;
-  margin: 0 auto;
-}
 
-.email-scanner-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.email-scanner-title {
-  font-size: 1.6rem;
-  font-weight: 800;
-  font-family: var(--font-display);
-  color: var(--text-primary);
-}
-
-.email-scanner-subtitle {
-  color: var(--text-secondary);
-  font-size: 0.88rem;
-  margin-top: 4px;
-}
-
-.email-scanner-actions {
-  display: flex;
-  gap: 8px;
-  color: var(--text-muted);
-}
-
-.email-scanner-card {
-  padding: 20px;
-}
-
-.email-scanner-tabs {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 14px;
-  flex-wrap: wrap;
-}
-
-.email-tab {
-  padding: 7px 16px;
-  border-radius: 20px;
-  border: none;
-  font-weight: 700;
-  font-size: 0.82rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: var(--font-display);
-}
-
-.email-tab.active {
-  background: #3b82f6;
-  color: #ffffff;
-}
-
-.email-tab:not(.active) {
-  background: var(--bg-input);
-  color: var(--text-secondary);
-}
-
-.email-input-section {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.email-textarea {
-  width: 100%;
-  resize: vertical;
-  padding: 12px;
-  font-size: 0.88rem;
-  border-radius: 10px;
-  background: var(--bg-input) !important;
-  border: 1px solid var(--border-color) !important;
-  color: var(--text-primary) !important;
-  font-family: var(--font-sans);
-  outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.email-textarea:focus {
-  border-color: var(--accent-blue) !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-}
-
-.email-textarea::placeholder {
-  color: var(--text-muted);
-  opacity: 0.7;
-}
-
-.email-char-count {
-  text-align: right;
-  font-size: 0.72rem;
-  color: var(--text-muted);
-}
-
-.email-upload-area {
-  padding: 28px;
-  border: 2px dashed var(--border-color);
-  border-radius: 14px;
-  text-align: center;
-  background: var(--bg-input);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
-.email-upload-icon {
-  margin: 0 auto;
-}
-
-.email-upload-text {
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: var(--text-primary);
-}
-
-.email-upload-btn {
-  margin-top: 8px;
-  cursor: pointer;
-}
-
-.email-error {
-  margin-top: 10px;
-  color: #f43f5e;
-  font-size: 0.82rem;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.email-scan-btn-wrap {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 14px;
-}
-
-.email-scan-btn {
-  padding: 10px 24px;
-  font-size: 0.88rem;
-}
-
-.email-result-card {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.email-result-top {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 16px;
-  align-items: stretch;
-}
-
-.email-result-banner {
-  padding: 18px;
-  border-radius: 14px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 4px;
-}
-
-.email-result-banner.danger {
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.4);
-}
-
-.email-result-banner.warning {
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.4);
-}
-
-.email-result-banner.success {
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.4);
-}
-
-.email-result-label {
-  font-size: 0.72rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 4px;
-}
-
-.email-result-verdict {
-  font-size: 1.25rem;
-  font-weight: 900;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--font-display);
-}
-
-.email-result-banner.danger .email-result-verdict { color: #ef4444; }
-.email-result-banner.warning .email-result-verdict { color: #f59e0b; }
-.email-result-banner.success .email-result-verdict { color: #10b981; }
-
-.email-result-desc {
-  font-size: 0.82rem;
-  color: var(--text-secondary);
-  margin-top: 4px;
-}
-
-.email-risk-gauge {
-  padding: 18px;
-  border-radius: 14px;
-  background: var(--bg-input);
-  border: 1px solid var(--border-color);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-}
-
-.email-risk-label {
-  font-size: 0.72rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 4px;
-}
-
-.email-risk-score {
-  font-size: 2.2rem;
-  font-weight: 900;
-  line-height: 1;
-  font-family: var(--font-display);
-}
-
-.email-risk-score.danger { color: #ef4444; }
-.email-risk-score.warning { color: #f59e0b; }
-.email-risk-score.success { color: #10b981; }
-
-.email-risk-max {
-  font-size: 1rem;
-  color: var(--text-muted);
-}
-
-.email-risk-level {
-  font-size: 0.78rem;
-  font-weight: 800;
-  margin-top: 4px;
-}
-
-.email-risk-level.danger { color: #ef4444; }
-.email-risk-level.warning { color: #f59e0b; }
-.email-risk-level.success { color: #10b981; }
-
-.email-metrics-section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.email-metrics-title {
-  font-size: 1rem;
-  font-weight: 800;
-  font-family: var(--font-display);
-  color: var(--text-primary);
-  margin: 0;
-}
-
-.email-metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-}
-
-.email-metric-card {
-  padding: 12px;
-  background: var(--bg-input);
-  border-radius: 12px;
-  border: 1px solid var(--border-color);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.email-metric-wide {
-  grid-column: span 2;
-}
-
-.email-metric-label {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  font-weight: 700;
-  font-family: var(--font-display);
-}
-
-.email-metric-value {
-  font-size: 0.9rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  font-family: var(--font-display);
-}
-
-.email-metric-value.danger { color: #ef4444; }
-.email-metric-value.warning { color: #f59e0b; }
-.email-metric-value.success { color: #10b981; }
-
-.email-recommendation {
-  padding: 14px;
-  border-radius: 12px;
-  background: var(--bg-input);
-  border: 1px solid var(--border-color);
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.email-recommendation-icon {
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.email-recommendation-label {
-  font-size: 0.72rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  font-family: var(--font-display);
-}
-
-.email-recommendation-text {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-top: 2px;
-  line-height: 1.4;
-}
-
-/* Email mobile */
-@media (max-width: 768px) {
-  .email-scanner-title {
-    font-size: 1.3rem;
-  }
-
-  .email-scanner-subtitle {
-    font-size: 0.82rem;
-  }
-
-  .email-scanner-card {
-    padding: 16px;
-  }
-
-  .email-tab {
-    padding: 6px 14px;
-    font-size: 0.78rem;
-  }
-
-  .email-textarea {
-    padding: 10px 12px;
-    font-size: 0.85rem;
-    border-radius: 10px;
-  }
-
-  .email-upload-area {
-    padding: 22px;
-  }
-
-  .email-upload-icon {
-    width: 28px;
-    height: 28px;
-  }
-
-  .email-upload-text {
-    font-size: 0.82rem;
-  }
-
-  .email-scan-btn {
-    padding: 9px 20px;
-    font-size: 0.85rem;
-    width: 100%;
-    justify-content: center;
-  }
-
-  .email-scan-btn-wrap {
-    justify-content: stretch;
-  }
-
-  .email-result-card {
-    padding: 16px;
-    gap: 14px;
-  }
-
-  .email-result-top {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .email-result-verdict {
-    font-size: 1.1rem;
-  }
-
-  .email-risk-score {
-    font-size: 1.8rem;
-  }
-
-  .email-metrics-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-
-  .email-metric-card {
-    padding: 10px;
-  }
-
-  .email-metric-wide {
-    grid-column: span 2;
-  }
-
-  .email-metric-label {
-    font-size: 0.68rem;
-  }
-
-  .email-metric-value {
-    font-size: 0.85rem;
-  }
-
-  .email-recommendation {
-    padding: 12px;
-  }
-
-  .email-recommendation-text {
-    font-size: 0.82rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .email-scanner-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-
-  .email-scanner-actions {
-    width: 100%;
-    justify-content: flex-end;
-  }
-
-  .email-scanner-title {
-    font-size: 1.15rem;
-  }
-
-  .email-scanner-card {
-    padding: 14px;
-  }
-
-  .email-tab {
-    padding: 6px 12px;
-    font-size: 0.75rem;
-  }
-
-  .email-textarea {
-    padding: 10px;
-    font-size: 0.82rem;
-    border-radius: 8px;
-  }
-
-  .email-upload-area {
-    padding: 18px;
-    border-radius: 10px;
-  }
-
-  .email-upload-icon {
-    width: 24px;
-    height: 24px;
-  }
-
-  .email-upload-text {
-    font-size: 0.78rem;
-  }
-
-  .email-scan-btn {
-    padding: 9px 16px;
-    font-size: 0.82rem;
-    border-radius: 10px;
-  }
-
-  .email-result-card {
-    padding: 14px;
-  }
-
-  .email-result-banner {
-    padding: 14px;
-  }
-
-  .email-result-verdict {
-    font-size: 1rem;
-  }
-
-  .email-risk-gauge {
-    padding: 14px;
-  }
-
-  .email-risk-score {
-    font-size: 1.6rem;
-  }
-
-  .email-metrics-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-
-  .email-metric-card {
-    padding: 10px;
-    border-radius: 10px;
-  }
-
-  .email-metric-label {
-    font-size: 0.65rem;
-  }
-
-  .email-metric-value {
-    font-size: 0.82rem;
-  }
-}

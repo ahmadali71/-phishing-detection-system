@@ -157,7 +157,7 @@ export default function AuthPage({ onLoginSuccess }) {
                       width: '100%',
                       color: '#0f172a',
                       fontSize: '0.95rem',
-                      fontFamily: 'var(--font-sans)',
+
                       padding: 0,
                       fontWeight: '500'
                     }}
@@ -189,7 +189,7 @@ export default function AuthPage({ onLoginSuccess }) {
                       width: '100%',
                       color: '#0f172a',
                       fontSize: '0.95rem',
-                      fontFamily: 'var(--font-sans)',
+
                       padding: 0,
                       paddingRight: '32px',
                       fontWeight: '500'
@@ -257,7 +257,7 @@ export default function AuthPage({ onLoginSuccess }) {
                     padding: '14px',
                     fontWeight: '800',
                     fontSize: '1.02rem',
-                    fontFamily: 'var(--font-display)',
+ 
                     cursor: 'pointer',
                     marginTop: '8px',
                     boxShadow: '0 8px 24px -4px rgba(2, 132, 199, 0.45)',
@@ -393,7 +393,7 @@ export default function AuthPage({ onLoginSuccess }) {
                       width: '100%',
                       color: '#0f172a',
                       fontSize: '0.9rem',
-                      fontFamily: 'var(--font-sans)',
+
                       padding: 0,
                       fontWeight: '500'
                     }}
@@ -424,7 +424,7 @@ export default function AuthPage({ onLoginSuccess }) {
                       width: '100%',
                       color: '#0f172a',
                       fontSize: '0.9rem',
-                      fontFamily: 'var(--font-sans)',
+
                       padding: 0,
                       fontWeight: '500'
                     }}
@@ -455,7 +455,7 @@ export default function AuthPage({ onLoginSuccess }) {
                       width: '100%',
                       color: '#0f172a',
                       fontSize: '0.9rem',
-                      fontFamily: 'var(--font-sans)',
+
                       padding: 0,
                       fontWeight: '500'
                     }}
@@ -487,7 +487,7 @@ export default function AuthPage({ onLoginSuccess }) {
                       width: '100%',
                       color: '#0f172a',
                       fontSize: '0.9rem',
-                      fontFamily: 'var(--font-sans)',
+
                       padding: 0,
                       paddingRight: '30px',
                       fontWeight: '500'
@@ -537,7 +537,7 @@ export default function AuthPage({ onLoginSuccess }) {
                       width: '100%',
                       color: '#0f172a',
                       fontSize: '0.9rem',
-                      fontFamily: 'var(--font-sans)',
+
                       padding: 0,
                       paddingRight: '30px',
                       fontWeight: '500'
@@ -597,7 +597,7 @@ export default function AuthPage({ onLoginSuccess }) {
                     padding: '13px',
                     fontWeight: '800',
                     fontSize: '1rem',
-                    fontFamily: 'var(--font-display)',
+ 
                     cursor: 'pointer',
                     marginTop: '4px',
                     boxShadow: '0 8px 24px -4px rgba(124, 58, 237, 0.4)',
@@ -646,7 +646,7 @@ export default function AuthPage({ onLoginSuccess }) {
           justifyContent: 'center',
           overflow: 'hidden',
           position: 'relative',
-          borderLeft: '1px solid #f1f5f9'
+          borderInlineStart: '1px solid #f1f5f9'
         }} className="auth-modal-banner">
           <img
             src={isRegister ? registerArt : loginArt}

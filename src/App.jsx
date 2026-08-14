@@ -191,6 +191,7 @@ function AppInner() {
                   onDeleteScan={(id) => {}}
                   onExportPdf={() => window.print()}
                   t={t}
+                  searchQuery={searchQuery}
                 />
               )}
               {activeTab === 'admin-panel' && (

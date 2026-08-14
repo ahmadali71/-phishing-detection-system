@@ -74,8 +74,7 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
                 fontSize: '1.4rem',
                 fontWeight: '900',
                 letterSpacing: '0.04em',
-                color: '#ffffff',
-                fontFamily: 'var(--font-display)'
+                color: '#ffffff'
               }}>
                 APDS
               </span>
@@ -114,9 +113,8 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
                     color: active ? '#ffffff' : 'var(--text-secondary)',
                     fontWeight: active ? '800' : '600',
                     fontSize: '0.92rem',
-                    fontFamily: 'var(--font-display)',
                     cursor: 'pointer',
-                    textAlign: 'left',
+                    textAlign: 'start',
                     transition: 'all 0.2s',
                     width: '100%',
                     boxShadow: active ? '0 4px 14px rgba(37, 99, 235, 0.35)' : 'none'
@@ -144,9 +142,8 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
                   color: 'var(--text-muted)',
                   fontWeight: '600',
                   fontSize: '0.92rem',
-                  fontFamily: 'var(--font-display)',
                   cursor: 'pointer',
-                  textAlign: 'left',
+                  textAlign: 'start',
                   transition: 'all 0.2s',
                   width: '100%',
                   marginTop: '10px'
@@ -170,9 +167,8 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
                   color: '#3b82f6',
                   fontWeight: '700',
                   fontSize: '0.92rem',
-                  fontFamily: 'var(--font-display)',
                   cursor: 'pointer',
-                  textAlign: 'left',
+                  textAlign: 'start',
                   transition: 'all 0.2s',
                   width: '100%',
                   marginTop: '10px'
@@ -195,7 +191,7 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
             <Award size={16} color="#f59e0b" />
-            <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#f59e0b', fontFamily: 'var(--font-display)' }}>
+            <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#f59e0b' }}>
               BS IT Final Year Project
             </span>
           </div>

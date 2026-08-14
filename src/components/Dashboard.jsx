@@ -53,33 +53,33 @@ export default function Dashboard({ stats, recentActivity, onNavigateScan, onVie
         {/* Total Scans */}
         <div className="glass-panel" style={{ padding: '22px 24px', background: 'var(--bg-card)' }}>
           <div style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', fontWeight: '700' }}>Total Scans</div>
-          <div style={{ fontSize: '2.4rem', fontWeight: '900', margin: '4px 0', color: '#2563eb', fontFamily: 'var(--font-display)' }}>
-            {stats.totalScans ? stats.totalScans.toLocaleString() : '2,568'}
-          </div>
+          <div style={{ fontSize: '2.4rem', fontWeight: '900', margin: '4px 0', color: '#2563eb' }}>
+             {stats.totalScans ? stats.totalScans.toLocaleString() : '2,568'}
+           </div>
         </div>
 
         {/* Phishing Detected */}
         <div className="glass-panel" style={{ padding: '22px 24px', background: 'var(--bg-card)' }}>
           <div style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', fontWeight: '700' }}>Phishing Detected</div>
-          <div style={{ fontSize: '2.4rem', fontWeight: '900', margin: '4px 0', color: '#ef4444', fontFamily: 'var(--font-display)' }}>
-            {stats.phishingDetected ? stats.phishingDetected.toLocaleString() : '642'}
-          </div>
+          <div style={{ fontSize: '2.4rem', fontWeight: '900', margin: '4px 0', color: '#ef4444' }}>
+             {stats.phishingDetected ? stats.phishingDetected.toLocaleString() : '642'}
+           </div>
         </div>
 
         {/* Safe Items */}
         <div className="glass-panel" style={{ padding: '22px 24px', background: 'var(--bg-card)' }}>
           <div style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', fontWeight: '700' }}>Safe Items</div>
-          <div style={{ fontSize: '2.4rem', fontWeight: '900', margin: '4px 0', color: '#10b981', fontFamily: 'var(--font-display)' }}>
-            {stats.safeItems ? stats.safeItems.toLocaleString() : '1,926'}
-          </div>
+          <div style={{ fontSize: '2.4rem', fontWeight: '900', margin: '4px 0', color: '#10b981' }}>
+             {stats.safeItems ? stats.safeItems.toLocaleString() : '1,926'}
+           </div>
         </div>
 
         {/* Accuracy */}
         <div className="glass-panel" style={{ padding: '22px 24px', background: 'var(--bg-card)' }}>
           <div style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', fontWeight: '700' }}>Accuracy</div>
-          <div style={{ fontSize: '2.4rem', fontWeight: '900', margin: '4px 0', color: '#3b82f6', fontFamily: 'var(--font-display)' }}>
-            {stats.accuracyRate ? `${stats.accuracyRate}%` : '94.6%'}
-          </div>
+          <div style={{ fontSize: '2.4rem', fontWeight: '900', margin: '4px 0', color: '#3b82f6' }}>
+             {stats.accuracyRate ? `${stats.accuracyRate}%` : '94.6%'}
+           </div>
         </div>
       </div>
 
@@ -165,24 +165,24 @@ export default function Dashboard({ stats, recentActivity, onNavigateScan, onVie
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.85rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ef4444', display: 'inline-block' }} />
-                <span style={{ fontWeight: '600', color: 'var(--text-secondary)' }}>Phishing</span>
-                <span style={{ fontWeight: '800', marginLeft: 'auto', color: 'var(--text-primary)' }}>45%</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#f97316', display: 'inline-block' }} />
-                <span style={{ fontWeight: '600', color: 'var(--text-secondary)' }}>Malware</span>
-                <span style={{ fontWeight: '800', marginLeft: 'auto', color: 'var(--text-primary)' }}>25%</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#eab308', display: 'inline-block' }} />
-                <span style={{ fontWeight: '600', color: 'var(--text-secondary)' }}>Suspicious</span>
-                <span style={{ fontWeight: '800', marginLeft: 'auto', color: 'var(--text-primary)' }}>18%</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#06b6d4', display: 'inline-block' }} />
-                <span style={{ fontWeight: '600', color: 'var(--text-secondary)' }}>Other</span>
-                <span style={{ fontWeight: '800', marginLeft: 'auto', color: 'var(--text-primary)' }}>12%</span>
-              </div>
+                 <span style={{ fontWeight: '600', color: 'var(--text-secondary)' }}>Phishing</span>
+                 <span style={{ fontWeight: '800', marginInlineStart: 'auto', color: 'var(--text-primary)' }}>45%</span>
+               </div>
+               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#f97316', display: 'inline-block' }} />
+                 <span style={{ fontWeight: '600', color: 'var(--text-secondary)' }}>Malware</span>
+                 <span style={{ fontWeight: '800', marginInlineStart: 'auto', color: 'var(--text-primary)' }}>25%</span>
+               </div>
+               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#eab308', display: 'inline-block' }} />
+                 <span style={{ fontWeight: '600', color: 'var(--text-secondary)' }}>Suspicious</span>
+                 <span style={{ fontWeight: '800', marginInlineStart: 'auto', color: 'var(--text-primary)' }}>18%</span>
+               </div>
+               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#06b6d4', display: 'inline-block' }} />
+                 <span style={{ fontWeight: '600', color: 'var(--text-secondary)' }}>Other</span>
+                 <span style={{ fontWeight: '800', marginInlineStart: 'auto', color: 'var(--text-primary)' }}>12%</span>
+               </div>
             </div>
           </div>
         </div>
@@ -232,9 +232,9 @@ export default function Dashboard({ stats, recentActivity, onNavigateScan, onVie
                     </span>
                   </td>
                   <td style={{ fontWeight: '800' }}>{item.riskScore}</td>
-                  <td style={{ textAlign: 'right', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
-                    {item.time || item.date || 'Just now'}
-                  </td>
+                   <td style={{ textAlign: 'end', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
+                     {item.time || item.date || 'Just now'}
+                   </td>
                 </tr>
               ))}
             </tbody>

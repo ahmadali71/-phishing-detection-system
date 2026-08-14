@@ -73,21 +73,14 @@ export default function Header({
           }}>
             {badge.num}
           </div>
-          <span style={{
-            fontWeight: '900',
-            fontSize: '0.88rem',
-            letterSpacing: '0.08em',
-            color: 'var(--text-primary)',
-            fontFamily: 'var(--font-display)',
-            textTransform: 'uppercase'
-          }}>
+          <div style={{ fontWeight: '900', fontSize: '0.88rem', letterSpacing: '0.08em', color: 'var(--text-primary)', textTransform: 'uppercase' }}>
             {badge.text}
-          </span>
+          </div>
         </div>
       </div>
 
-      {/* Right Controls */}
-      <div className="header-controls">
+      {/* Search & Notifications — kept outside .header-controls so panels stay visible on mobile */}
+      <div className="header-actions">
         {/* Search */}
         <div ref={searchRef} style={{ position: 'relative' }}>
           <button
@@ -144,11 +137,6 @@ export default function Header({
           )}
         </div>
 
-        {/* Theme Toggle */}
-        <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="btn-icon" title="Toggle Theme" aria-label="Toggle theme">
-          {theme === 'dark' ? <Sun size={17} color="#f59e0b" /> : <Moon size={17} color="#3b82f6" />}
-        </button>
-
         {/* Notifications */}
         <div ref={notifRef} style={{ position: 'relative' }}>
           <button onClick={() => setShowNotifications(v => !v)} className="btn-icon" title="Notifications" aria-label="Notifications" style={{ position: 'relative' }}>
@@ -191,11 +179,11 @@ export default function Header({
                 <div key={n.id} onClick={() => onMarkNotificationRead(n.id)} style={{
                   padding: '10px 12px', borderRadius: 9, cursor: 'pointer', marginBottom: 6,
                   background: n.read ? 'var(--bg-input)' : 'rgba(59,130,246,0.1)',
-                  borderLeft: `3px solid ${n.type === 'THREAT' ? '#ef4444' : '#3b82f6'}`
+                  borderInlineStart: `3px solid ${n.type === 'THREAT' ? '#ef4444' : '#3b82f6'}`
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 700 }}>
                     <span style={{ color: n.type === 'THREAT' ? '#ef4444' : 'var(--text-primary)' }}>{n.title}</span>
-                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', flexShrink: 0, marginLeft: 6 }}>{n.time}</span>
+                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', flexShrink: 0, marginInlineStart: 6 }}>{n.time}</span>
                   </div>
                   <p style={{ fontSize: '0.73rem', color: 'var(--text-secondary)', marginTop: 2 }}>{n.message}</p>
                 </div>
@@ -203,6 +191,14 @@ export default function Header({
             </div>
           )}
         </div>
+      </div>
+
+      {/* Right Controls */}
+      <div className="header-controls">
+        {/* Theme Toggle */}
+        <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="btn-icon" title="Toggle Theme" aria-label="Toggle theme">
+          {theme === 'dark' ? <Sun size={17} color="#f59e0b" /> : <Moon size={17} color="#3b82f6" />}
+        </button>
 
         {/* User Card matching PDF Page 61 Screen 4 (Ayesha Khan / Amna Najam + Premium User) */}
         {currentUser ? (

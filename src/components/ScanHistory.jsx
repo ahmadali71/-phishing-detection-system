@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Download, ExternalLink } from 'lucide-react';
 
-export default function ScanHistory({ scanHistory, onViewDetail, onExportPdf, t }) {
+export default function ScanHistory({ scanHistory, onViewDetail, onExportPdf, t, searchQuery }) {
   const [filter, setFilter] = useState('All');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
@@ -14,9 +14,15 @@ export default function ScanHistory({ scanHistory, onViewDetail, onExportPdf, t 
     { id: 5, type: 'URL', input: 'secure-login.bank.com', result: 'Phishing', riskScore: '95/100', date: '2024-05-14 03:10 PM', category: 'Phishing' },
   ];
 
-  const records = (scanHistory?.length > 0 ? scanHistory : defaultRecords).filter(r =>
-    filter === 'All' || r.result === filter || r.category === filter
-  );
+  const records = (scanHistory?.length > 0 ? scanHistory : defaultRecords).filter(r => {
+    const matchesCategory = filter === 'All' || r.result === filter || r.category === filter;
+    const q = (searchQuery || '').toLowerCase();
+    const matchesSearch = !q ||
+      r.input?.toLowerCase().includes(q) ||
+      r.type?.toLowerCase().includes(q) ||
+      r.result?.toLowerCase().includes(q);
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px', maxWidth: '1080px', margin: '0 auto' }}>

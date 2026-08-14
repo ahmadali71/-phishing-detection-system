@@ -37,7 +37,7 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
     setErrorMessage(null);
     const target = typeof urlToScan === 'string' ? urlToScan.trim() : '';
     if (!target) {
-      setErrorMessage('Please enter or paste a valid URL to analyze.');
+      setErrorMessage(t.urlScanError || 'Please enter or paste a valid URL to analyze.');
       return;
     }
 
@@ -60,18 +60,20 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
   const isPhishing = scanResult.verdict?.includes('Phishing');
 
   const detailItems = [
-    { label: 'Domain Age', value: det.domainAge || '2 months' },
-    { label: 'IP Address', value: det.ipAddress || '165.199.108.153', mono: true },
+    { labelKey: 'domainAge', label: t.domainAge || 'Domain Age', value: det.domainAge || '2 months' },
+    { labelKey: 'ipAddress', label: t.ipAddress || 'IP Address', value: det.ipAddress || '165.199.108.153', mono: true },
     {
-      label: 'SSL Certificate',
+      labelKey: 'sslCertificate',
+      label: t.sslCertificate || 'SSL Certificate',
       value: det.sslCertificate || 'Invalid',
       icon: (det.sslCertificate === 'Valid' || (det.sslCertificate && det.sslCertificate.includes('Valid'))) ? <Check size={15} color="#10b981" /> : <X size={15} color="#ef4444" />,
       color: (det.sslCertificate === 'Valid' || (det.sslCertificate && det.sslCertificate.includes('Valid'))) ? '#10b981' : '#ef4444'
     },
-    { label: 'Redirect Count', value: det.redirectCount || '3' },
-    { label: 'Blacklist Status', value: det.blacklistStatus || 'Blacklisted', color: '#ef4444' },
+    { labelKey: 'redirectCount', label: t.redirectCount || 'Redirect Count', value: det.redirectCount || '3' },
+    { labelKey: 'blacklistStatus', label: t.blacklistStatus || 'Blacklist Status', value: det.blacklistStatus || 'Blacklisted', color: '#ef4444' },
     {
-      label: 'Hosting',
+      labelKey: 'hostingRisk',
+      label: t.hostingRisk || 'Hosting',
       value: det.hostingRisk || det.hostingCountry || 'High Risk',
       icon: <X size={15} color="#ef4444" />,
       color: '#ef4444'
@@ -83,14 +85,14 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
       {/* Header (Exact Match to PDF Page 62 Screen 5) */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
         <div>
-          <h2 style={{ fontSize: 'clamp(1.4rem, 4vw, 1.85rem)', fontWeight: '800' }}>URL Detection</h2>
+          <h2 style={{ fontSize: 'clamp(1.4rem, 4vw, 1.85rem)', fontWeight: '800' }}>{t.urlScannerTitle || 'URL Detection'}</h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-            Analyze any URL for potential threats
+            {t.urlScannerDesc || 'Analyze any URL for potential threats'}
           </p>
         </div>
         <div style={{ display: 'flex', gap: '8px', color: 'var(--text-muted)' }}>
-          <button className="btn-icon" title="Scan History"><Clock size={16} /></button>
-          <button className="btn-icon" title="Export Results"><Download size={16} /></button>
+          <button className="btn-icon" title={t.scanHistory || 'Scan History'}><Clock size={16} /></button>
+          <button className="btn-icon" title={t.exportPdf || 'Export Results'}><Download size={16} /></button>
           <button className="btn-icon" title="Documentation"><Info size={16} /></button>
         </div>
       </div>
@@ -112,7 +114,7 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
             className="btn-primary"
             style={{ padding: '12px 28px', fontSize: '0.95rem' }}
           >
-            {isScanning ? 'Analyzing...' : 'Analyze'}
+            {isScanning ? (t.scanningBtn || 'Analyzing...') : (t.analyzeBtn || 'Analyze')}
           </button>
         </div>
 
@@ -124,7 +126,7 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
 
         {/* Preset sample links */}
         <div style={{ marginTop: '12px', display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '700' }}>Test Presets:</span>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '700' }}>{t.testPresets || 'Test Presets:'}</span>
           <button onClick={() => { setInputUrl('https://paypal-secure-login.com'); handleScan('https://paypal-secure-login.com'); }} className="btn-secondary" style={{ fontSize: '0.73rem', padding: '4px 10px' }}>
             paypal-secure-login.com
           </button>
@@ -153,7 +155,7 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
               justifyContent: 'center'
             }}>
               <div style={{ fontSize: '0.8rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '6px', letterSpacing: '0.05em' }}>
-                Result
+                {t.result || 'Result'}
               </div>
               <div style={{
                 fontSize: '1.45rem',
@@ -168,8 +170,8 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
               </div>
               <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', marginTop: '8px', lineHeight: '1.45' }}>
                 {isPhishing
-                  ? 'This URL is malicious and may harm your device or steal your information.'
-                  : 'This URL passed security validation checks and appears clean.'}
+                  ? (t.urlPhishingMsg || 'This URL is malicious and may harm your device or steal your information.')
+                  : (t.urlSafeMsg || 'This URL passed security validation checks and appears clean.')}
               </p>
             </div>
 
@@ -182,7 +184,7 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
 
           {/* Middle Section: URL Analysis Details Grid (Exact 6 items from PDF Page 62) */}
           <div>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: '800', marginBottom: '14px' }}>URL Analysis Details</h3>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: '800', marginBottom: '14px' }}>{t.urlAnalysisTitle || 'URL Analysis Details'}</h3>
             <div className="responsive-grid-3">
               {detailItems.map((item, idx) => (
                 <div key={idx} style={{ padding: '14px', background: 'var(--bg-input)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
@@ -217,9 +219,9 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
           }}>
             <AlertTriangle size={22} color="#f59e0b" style={{ flexShrink: 0 }} />
             <div>
-              <div style={{ fontSize: '0.76rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Recommendation</div>
+              <div style={{ fontSize: '0.76rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)' }}>{t.recommendation || 'Recommendation'}</div>
               <div style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-primary)', marginTop: '2px' }}>
-                {scanResult.recommendation || 'Do not visit this URL. Report to your administrator.'}
+                {scanResult.recommendation || (t.urlRecommendation || 'Do not visit this URL. Report to your administrator.')}
               </div>
             </div>
           </div>

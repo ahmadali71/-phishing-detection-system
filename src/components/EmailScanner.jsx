@@ -36,12 +36,12 @@ export default function EmailScanner({ onScanComplete, t }) {
   const handleScan = () => {
     setErrorMessage(null);
     if (activeTab === 'text' && (!emailContent || emailContent.trim().length === 0)) {
-      setErrorMessage('Please enter email content to analyze.');
+      setErrorMessage(t.emailScanError || 'Please enter email content to analyze.');
       return;
     }
 
     if (activeTab === 'file' && !selectedFile) {
-      setErrorMessage('Please upload a valid .eml file to analyze.');
+      setErrorMessage(t.fileScanError || 'Please upload a valid .eml file to analyze.');
       return;
     }
 
@@ -77,14 +77,14 @@ export default function EmailScanner({ onScanComplete, t }) {
       {/* Header (Exact Match to PDF Page 63 Screen 6) */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
         <div>
-          <h2 style={{ fontSize: 'clamp(1.4rem, 4vw, 1.85rem)', fontWeight: '800' }}>Email Detection</h2>
+          <h2 style={{ fontSize: 'clamp(1.4rem, 4vw, 1.85rem)', fontWeight: '800' }}>{t.emailScannerTitle || 'Email Detection'}</h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-            Analyze email content for phishing threats
+            {t.emailScannerDesc || 'Analyze email content for phishing threats'}
           </p>
         </div>
         <div style={{ display: 'flex', gap: '8px', color: 'var(--text-muted)' }}>
-          <button className="btn-icon" title="Scan History"><Clock size={16} /></button>
-          <button className="btn-icon" title="Export Results"><Download size={16} /></button>
+          <button className="btn-icon" title={t.scanHistory || 'Scan History'}><Clock size={16} /></button>
+          <button className="btn-icon" title={t.exportPdf || 'Export Results'}><Download size={16} /></button>
           <button className="btn-icon" title="Documentation"><Info size={16} /></button>
         </div>
       </div>
@@ -103,11 +103,10 @@ export default function EmailScanner({ onScanComplete, t }) {
               fontWeight: '700',
               fontSize: '0.85rem',
               cursor: 'pointer',
-              transition: 'all 0.2s',
-              fontFamily: 'var(--font-display)'
+              transition: 'all 0.2s'
             }}
           >
-            Paste Email Content
+            {t.pasteTab || 'Paste Email Content'}
           </button>
           <button
             onClick={() => setActiveTab('file')}
@@ -120,11 +119,10 @@ export default function EmailScanner({ onScanComplete, t }) {
               fontWeight: '700',
               fontSize: '0.85rem',
               cursor: 'pointer',
-              transition: 'all 0.2s',
-              fontFamily: 'var(--font-display)'
+              transition: 'all 0.2s'
             }}
           >
-            Upload .eml File
+            {t.uploadTab || 'Upload .eml File'}
           </button>
         </div>
 
@@ -167,9 +165,9 @@ export default function EmailScanner({ onScanComplete, t }) {
           </div>
         )}
 
-        <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end' }}>
+          <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end' }}>
           <button onClick={handleScan} disabled={isScanning} className="btn-primary" style={{ padding: '11px 28px', fontSize: '0.92rem' }}>
-            {isScanning ? 'Analyzing...' : 'Analyze Email'}
+            {isScanning ? (t.scanningBtn || 'Analyzing...') : (t.analyzeEmailBtn || 'Analyze Email')}
           </button>
         </div>
       </div>
@@ -190,7 +188,7 @@ export default function EmailScanner({ onScanComplete, t }) {
               justifyContent: 'center'
             }}>
               <div style={{ fontSize: '0.8rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '6px', letterSpacing: '0.05em' }}>
-                Result
+                {t.result || 'Result'}
               </div>
               <div style={{
                 fontSize: '1.45rem',
@@ -204,7 +202,7 @@ export default function EmailScanner({ onScanComplete, t }) {
                 {scanResult.verdict}
               </div>
               <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', marginTop: '8px', lineHeight: '1.45' }}>
-                This email contains suspicious patterns and links.
+                {scanResult.recommendation || (t.emailResultDesc || 'This email contains suspicious patterns and links.')}
               </p>
             </div>
 
@@ -217,7 +215,7 @@ export default function EmailScanner({ onScanComplete, t }) {
 
           {/* Email Analysis Details Grid (Exact 7 tiles from PDF Page 63) */}
           <div>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: '800', marginBottom: '14px' }}>Email Analysis</h3>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: '800', marginBottom: '14px' }}>{t.emailAnalysisTitle || 'Email Analysis'}</h3>
             <div className="responsive-grid-4">
               <div style={{ padding: '14px', background: 'var(--bg-input)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
                 <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: '700' }}>Suspicious Keywords</div>
@@ -268,9 +266,9 @@ export default function EmailScanner({ onScanComplete, t }) {
           }}>
             <AlertTriangle size={22} color="#f59e0b" style={{ flexShrink: 0 }} />
             <div>
-              <div style={{ fontSize: '0.76rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Recommendation</div>
+              <div style={{ fontSize: '0.76rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)' }}>{t.recommendation || 'Recommendation'}</div>
               <div style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-primary)', marginTop: '2px' }}>
-                {scanResult.recommendation || 'Be cautious. Do not click on links or download attachments.'}
+                {scanResult.recommendation || (t.emailRecommendation || 'Be cautious. Do not click on links or download attachments.')}
               </div>
             </div>
           </div>
