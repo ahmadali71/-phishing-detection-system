@@ -91,7 +91,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
         </button>
 
         {/* ── LEFT COLUMN: FORM SECTION ── */}
-        <div style={{
+        <div className="auth-form-section" style={{
           padding: isRegister ? '36px 40px' : '44px 44px',
           display: 'flex',
           flexDirection: 'column',
@@ -100,10 +100,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
         }}>
 
           {!isRegister ? (
-            /* ========================================================
-               SCREEN 2: LOGIN SCREEN (Exact Match to User Screenshot)
-            ======================================================== */
-            <div>
+            <div className="auth-login-form">
               {/* Badge: [2] LOGIN SCREEN */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '9px', marginBottom: '20px' }}>
                 <div style={{
@@ -154,9 +151,9 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                 Login to your account
               </p>
 
-              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <form className="auth-form" onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {/* Input 1: Email or Username */}
-                <div style={{
+                <div className="auth-input-wrap" style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '12px',
@@ -166,7 +163,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   padding: '13px 16px',
                   transition: 'all 0.2s ease'
                 }}>
-                  <Mail size={19} color="#64748b" style={{ flexShrink: 0 }} />
+                  <Mail size={19} color="#64748b" className="auth-icon" style={{ flexShrink: 0 }} />
                   <input
                     type="text"
                     required
@@ -188,7 +185,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                 </div>
 
                 {/* Input 2: Password with Eye Toggle */}
-                <div style={{
+                <div className="auth-input-wrap" style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '12px',
@@ -199,7 +196,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   position: 'relative',
                   transition: 'all 0.2s ease'
                 }}>
-                  <Lock size={19} color="#64748b" style={{ flexShrink: 0 }} />
+                  <Lock size={19} color="#64748b" className="auth-icon" style={{ flexShrink: 0 }} />
                   <input
                     type={showPw ? 'text' : 'password'}
                     required
@@ -222,6 +219,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   <button
                     type="button"
                     onClick={() => setShowPw(!showPw)}
+                    className="pw-toggle"
                     style={{
                       position: 'absolute',
                       right: '14px',
@@ -240,7 +238,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                 </div>
 
                 {/* Remember Me & Forgot Password */}
-                <div style={{
+                <div className="auth-meta-row" style={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
@@ -270,30 +268,30 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   </a>
                 </div>
 
-                {/* Login Button (Cyan-Blue Gradient matching user screenshot) */}
-                <button
-                  type="submit"
-                  style={{
-                    background: 'linear-gradient(90deg, #1d4ed8 0%, #0284c7 60%, #06b6d4 100%)',
-                    color: '#ffffff',
-                    border: 'none',
-                    borderRadius: '14px',
-                    padding: '14px',
-                    fontWeight: '800',
-                    fontSize: '1.02rem',
- 
-                    cursor: 'pointer',
-                    marginTop: '8px',
-                    boxShadow: '0 8px 24px -4px rgba(2, 132, 199, 0.45)',
-                    transition: 'transform 0.15s, box-shadow 0.15s'
-                  }}
-                >
-                  Login
-                </button>
+                 {/* Login Button (Cyan-Blue Gradient matching user screenshot) */}
+                 <button
+                   type="submit"
+                   className="auth-submit-btn"
+                   style={{
+                     background: 'linear-gradient(90deg, #1d4ed8 0%, #0284c7 60%, #06b6d4 100%)',
+                     color: '#ffffff',
+                     border: 'none',
+                     borderRadius: '14px',
+                     padding: '14px',
+                     fontWeight: '800',
+                     fontSize: '1.02rem',
+                     cursor: 'pointer',
+                     marginTop: '8px',
+                     boxShadow: '0 8px 24px -4px rgba(2, 132, 199, 0.45)',
+                     transition: 'transform 0.15s, box-shadow 0.15s'
+                   }}
+                 >
+                   Login
+                 </button>
               </form>
 
               {/* Bottom Switch to Register */}
-              <div style={{
+              <div className="auth-switch" style={{
                 textAlign: 'center',
                 marginTop: '24px',
                 fontSize: '0.9rem',
@@ -373,9 +371,9 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                 Join APDS and stay protected
               </p>
 
-              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '11px' }}>
+              <form className="auth-form auth-register-form" onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '11px' }}>
                 {/* Input 1: Full Name */}
-                <div style={{
+                <div className="auth-input-wrap" style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '10px',
@@ -384,7 +382,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   borderRadius: '12px',
                   padding: '11px 14px'
                 }}>
-                  <User size={18} color="#64748b" style={{ flexShrink: 0 }} />
+                  <User size={18} color="#64748b" className="auth-icon" style={{ flexShrink: 0 }} />
                   <input
                     type="text"
                     required
@@ -406,7 +404,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                 </div>
 
                 {/* Input 2: Email Address */}
-                <div style={{
+                <div className="auth-input-wrap" style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '10px',
@@ -415,7 +413,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   borderRadius: '12px',
                   padding: '11px 14px'
                 }}>
-                  <Mail size={18} color="#64748b" style={{ flexShrink: 0 }} />
+                  <Mail size={18} color="#64748b" className="auth-icon" style={{ flexShrink: 0 }} />
                   <input
                     type="email"
                     required
@@ -437,7 +435,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                 </div>
 
                 {/* Input 3: Username */}
-                <div style={{
+                <div className="auth-input-wrap" style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '10px',
@@ -446,7 +444,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   borderRadius: '12px',
                   padding: '11px 14px'
                 }}>
-                  <User size={18} color="#64748b" style={{ flexShrink: 0 }} />
+                  <User size={18} color="#64748b" className="auth-icon" style={{ flexShrink: 0 }} />
                   <input
                     type="text"
                     required
@@ -468,7 +466,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                 </div>
 
                 {/* Input 4: Password */}
-                <div style={{
+                <div className="auth-input-wrap" style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '10px',
@@ -478,7 +476,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   padding: '11px 14px',
                   position: 'relative'
                 }}>
-                  <User size={18} color="#64748b" style={{ flexShrink: 0 }} />
+                  <User size={18} color="#64748b" className="auth-icon" style={{ flexShrink: 0 }} />
                   <input
                     type={showPw ? 'text' : 'password'}
                     required
@@ -501,6 +499,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   <button
                     type="button"
                     onClick={() => setShowPw(!showPw)}
+                    className="pw-toggle"
                     style={{
                       position: 'absolute',
                       right: '12px',
@@ -518,7 +517,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                 </div>
 
                 {/* Input 5: Confirm Password */}
-                <div style={{
+                <div className="auth-input-wrap" style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '10px',
@@ -528,7 +527,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   padding: '11px 14px',
                   position: 'relative'
                 }}>
-                  <User size={18} color="#64748b" style={{ flexShrink: 0 }} />
+                  <User size={18} color="#64748b" className="auth-icon" style={{ flexShrink: 0 }} />
                   <input
                     type={showConfirmPw ? 'text' : 'password'}
                     required
@@ -551,6 +550,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   <button
                     type="button"
                     onClick={() => setShowConfirmPw(!showConfirmPw)}
+                    className="pw-toggle"
                     style={{
                       position: 'absolute',
                       right: '12px',
@@ -591,26 +591,26 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   </span>
                 </label>
 
-                {/* Create Account Button (Purple to Cyan Gradient) */}
-                <button
-                  type="submit"
-                  style={{
-                    background: 'linear-gradient(90deg, #7c3aed 0%, #2563eb 55%, #06b6d4 100%)',
-                    color: '#ffffff',
-                    border: 'none',
-                    borderRadius: '14px',
-                    padding: '13px',
-                    fontWeight: '800',
-                    fontSize: '1rem',
- 
-                    cursor: 'pointer',
-                    marginTop: '4px',
-                    boxShadow: '0 8px 24px -4px rgba(124, 58, 237, 0.4)',
-                    transition: 'transform 0.15s, box-shadow 0.15s'
-                  }}
-                >
-                  Create Account
-                </button>
+                 {/* Create Account Button (Purple to Cyan Gradient) */}
+                 <button
+                   type="submit"
+                   className="auth-submit-btn"
+                   style={{
+                     background: 'linear-gradient(90deg, #7c3aed 0%, #2563eb 55%, #06b6d4 100%)',
+                     color: '#ffffff',
+                     border: 'none',
+                     borderRadius: '14px',
+                     padding: '13px',
+                     fontWeight: '800',
+                     fontSize: '1rem',
+                     cursor: 'pointer',
+                     marginTop: '4px',
+                     boxShadow: '0 8px 24px -4px rgba(124, 58, 237, 0.4)',
+                     transition: 'transform 0.15s, box-shadow 0.15s'
+                   }}
+                 >
+                   Create Account
+                 </button>
               </form>
 
               {/* Bottom Switch to Login */}
