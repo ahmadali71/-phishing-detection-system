@@ -1,25 +1,29 @@
 const OPENROUTER_API_KEY = (import.meta.env.VITE_OPENROUTER_API_KEY || '').trim();
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
-export async function getOpenRouterResponse(messages, options = {}) {
-  const rawKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-  console.log('[OpenRouter] Raw env value:', rawKey);
-  console.log('[OpenRouter] Trimmed key present:', !!OPENROUTER_API_KEY, 'key prefix:', OPENROUTER_API_KEY ? OPENROUTER_API_KEY.slice(0, 12) + '...' : 'none');
-  console.log('[OpenRouter] All env keys starting with VITE_', Object.keys(import.meta.env).filter(k => k.startsWith('VITE_')));
+const FALLBACK_MODELS = [
+  'mistralai/mistral-7b-instruct',
+  'google/gemini-2.0-flash-exp:free',
+  'meta-llama/llama-3.1-8b-instruct',
+  'huggingfaceh4/zephyr-7b-beta'
+];
 
+export async function getOpenRouterResponse(messages, options = {}) {
   if (!OPENROUTER_API_KEY || OPENROUTER_API_KEY === '' || OPENROUTER_API_KEY.includes('YOUR_OPENROUTER_API_KEY')) {
-    console.error('[OpenRouter] API key missing or placeholder detected. Check .env file for VITE_OPENROUTER_API_KEY and restart the dev server after any .env change.');
+    console.error('[OpenRouter] API key missing. Check .env for VITE_OPENROUTER_API_KEY and restart the dev server.');
     return {
-      text: 'AI service is not configured. Add your OpenRouter API key to the .env file as VITE_OPENROUTER_API_KEY, then restart the dev server.',
+      text: 'AI service is not configured. Add your OpenRouter API key to .env as VITE_OPENROUTER_API_KEY, then restart the dev server.',
       suggestions: ['Scan a URL', 'Scan an email', 'What is phishing?']
     };
   }
 
   const systemPrompt = options.systemPrompt || `You are APDS AI Cyber Defense Assistant, a cybersecurity expert. You help users with phishing detection, email security, URL analysis, and cybersecurity best practices. Be concise, professional, and use markdown formatting. If users share URLs or email content, suggest they use the scanner tools.`;
 
+  const selectedModel = options.model || FALLBACK_MODELS[0];
+
   try {
     const requestBody = {
-      model: options.model || 'mistralai/mistral-7b-instruct',
+      model: selectedModel,
       messages: [
         { role: 'system', content: systemPrompt },
         ...messages.map(m => ({
@@ -32,7 +36,7 @@ export async function getOpenRouterResponse(messages, options = {}) {
       top_p: options.topP || 0.9
     };
 
-    console.log('[OpenRouter] Sending request to:', OPENROUTER_API_URL, 'with model:', requestBody.model);
+    console.log('[OpenRouter] Request model:', selectedModel);
 
     const response = await fetch(OPENROUTER_API_URL, {
       method: 'POST',
@@ -48,17 +52,21 @@ export async function getOpenRouterResponse(messages, options = {}) {
     console.log('[OpenRouter] Response status:', response.status, response.statusText);
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('[OpenRouter] API error:', response.status, errorData);
-      const errorMessage = errorData?.error?.message || errorData?.message || 'Unknown error';
+      let errorMessage = `HTTP ${response.status}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData?.error?.message || errorData?.message || errorMessage;
+      } catch {
+        // keep default errorMessage
+      }
+      console.error('[OpenRouter] API error:', response.status, errorMessage);
       return {
-        text: `AI service error (${response.status}): ${errorMessage}. Please try again later or use the built-in scanners.`,
+        text: `AI service error (${response.status}): ${errorMessage}. You can still use the built-in URL and email scanners.`,
         suggestions: ['Scan a URL', 'Scan an email', 'What is phishing?']
       };
     }
 
     const data = await response.json();
-    console.log('[OpenRouter] Response data:', data);
     const aiMessage = data.choices?.[0]?.message?.content?.trim();
 
     if (!aiMessage) {
@@ -76,7 +84,7 @@ export async function getOpenRouterResponse(messages, options = {}) {
   } catch (error) {
     console.error('[OpenRouter] Request failed:', error);
     return {
-      text: 'Could not connect to AI service. Please check your internet connection and try again. Error: ' + error.message,
+      text: 'Could not connect to AI service. Please check your internet connection and try again.',
       suggestions: ['Scan a URL', 'Scan an email', 'What is phishing?']
     };
   }
