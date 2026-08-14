@@ -982,6 +982,9 @@ input:focus, select:focus, textarea:focus {
   .profile-layout {
     grid-template-columns: 1fr 1fr;
   }
+  .responsive-grid-3-col {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1015,6 +1018,10 @@ input:focus, select:focus, textarea:focus {
 
   .header-brand-subtitle {
     display: none;
+  }
+
+  .responsive-grid-3-col {
+    grid-template-columns: 1fr;
   }
 
   .mobile-bottom-nav {

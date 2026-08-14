@@ -53,7 +53,7 @@ function Toggle({ checked, onChange }) {
   );
 }
 
-export default function ProfileSettings({ currentUser, onUpdateProfile, theme, setTheme, language, onLanguageChange }) {
+export default function ProfileSettings({ currentUser, onUpdateProfile, theme, setTheme, language, onLanguageChange, t }) {
   const [activeTab, setActiveTab] = useState('Profile');
   const [fullName, setFullName] = useState(currentUser?.name ?? 'Amna Najam');
   const [email, setEmail] = useState(currentUser?.email ?? 'amnanajam2003@gmail.com');
@@ -75,12 +75,12 @@ export default function ProfileSettings({ currentUser, onUpdateProfile, theme, s
   };
 
   const tabs = [
-    { id: 'Profile', label: 'Profile', icon: User },
-    { id: 'Change Password', label: 'Change Password', icon: Lock },
-    { id: 'Two Factor Auth', label: 'Two Factor Auth', icon: Smartphone },
-    { id: 'Notifications', label: 'Notifications', icon: Bell },
-    { id: 'Privacy Settings', label: 'Privacy Settings', icon: Shield },
-    { id: 'Theme Settings', label: 'Theme Settings', icon: Palette },
+    { id: 'Profile', label: t.profileTab || 'Profile', icon: User },
+    { id: 'Change Password', label: t.changePasswordTab || 'Change Password', icon: Lock },
+    { id: 'Two Factor Auth', label: t.twoFactorTab || 'Two Factor Auth', icon: Smartphone },
+    { id: 'Notifications', label: t.notificationsTab || 'Notifications', icon: Bell },
+    { id: 'Privacy Settings', label: t.privacyTab || 'Privacy Settings', icon: Shield },
+    { id: 'Theme Settings', label: t.themeTab || 'Theme Settings', icon: Palette },
   ];
 
   return (
@@ -109,13 +109,13 @@ export default function ProfileSettings({ currentUser, onUpdateProfile, theme, s
           color: 'var(--accent-blue)',
           fontFamily: 'var(--font-display)'
         }}>
-          PROFILE &amp; SETTINGS
+          {t.profileSettings || 'PROFILE & SETTINGS'}
         </span>
       </div>
 
       {saved && (
         <div style={{ padding: '10px 18px', background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', borderRadius: '12px', color: '#10b981', fontSize: '0.88rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Check size={16} /> Profile settings updated successfully!
+          <Check size={16} /> {t.savedMessage || 'Profile settings updated successfully!'}
         </div>
       )}
 
@@ -165,7 +165,7 @@ export default function ProfileSettings({ currentUser, onUpdateProfile, theme, s
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Card 1: Profile Information */}
           <div className="glass-panel" style={{ padding: '24px' }}>
-            <h3 style={{ fontSize: '1.05rem', fontWeight: '800', marginBottom: '18px' }}>Profile Information</h3>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: '800', marginBottom: '18px' }}>{t.personalInfo || 'Profile Information'}</h3>
 
             <div style={{ display: 'flex', gap: '18px', alignItems: 'center', flexWrap: 'wrap' }}>
               <div style={{
@@ -188,9 +188,9 @@ export default function ProfileSettings({ currentUser, onUpdateProfile, theme, s
               <div style={{ flex: 1, minWidth: '160px' }}>
                 {isEditing ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Full Name" />
-                    <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" />
-                    <button onClick={save} className="btn-primary" style={{ padding: '7px 16px', fontSize: '0.82rem', width: 'fit-content' }}>Save</button>
+                    <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder={t.fullName || 'Full Name'} />
+                    <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder={t.emailAddr || 'Email Address'} />
+                    <button onClick={save} className="btn-primary" style={{ padding: '7px 16px', fontSize: '0.82rem', width: 'fit-content' }}>{t.saveChanges || 'Save'}</button>
                   </div>
                 ) : (
                   <>
@@ -202,7 +202,7 @@ export default function ProfileSettings({ currentUser, onUpdateProfile, theme, s
                       className="btn-primary"
                       style={{ marginTop: '12px', padding: '7px 18px', fontSize: '0.82rem', borderRadius: '10px' }}
                     >
-                      <Edit2 size={13} /> Edit Profile
+                      <Edit2 size={13} /> {t.editProfile || 'Edit Profile'}
                     </button>
                   </>
                 )}
@@ -212,7 +212,7 @@ export default function ProfileSettings({ currentUser, onUpdateProfile, theme, s
 
           {/* Card 2: Security Settings */}
           <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <h3 style={{ fontSize: '1.05rem', fontWeight: '800' }}>Security Settings</h3>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: '800' }}>{t.securityControls || 'Security Settings'}</h3>
 
             {/* Item 1: Change Password */}
             <div
@@ -231,8 +231,8 @@ export default function ProfileSettings({ currentUser, onUpdateProfile, theme, s
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <Lock size={18} color="#3b82f6" />
                 <div>
-                  <div style={{ fontWeight: '700', fontSize: '0.88rem' }}>Change Password</div>
-                  <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>Update your account password</div>
+                  <div style={{ fontWeight: '700', fontSize: '0.88rem' }}>{t.changePassword || 'Change Password'}</div>
+                  <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>{t.changePasswordDesc || 'Update your account password'}</div>
                 </div>
               </div>
               <ChevronRight size={18} color="var(--text-muted)" style={{ transform: showPwChange ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
@@ -240,9 +240,9 @@ export default function ProfileSettings({ currentUser, onUpdateProfile, theme, s
 
             {showPwChange && (
               <div style={{ padding: '14px', background: 'var(--bg-input)', borderRadius: '12px', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <input type="password" placeholder="Current Password" value={oldPw} onChange={e => setOldPw(e.target.value)} />
-                <input type="password" placeholder="New Password" value={newPw} onChange={e => setNewPw(e.target.value)} />
-                <button onClick={save} className="btn-primary" style={{ padding: '8px 18px', fontSize: '0.82rem', width: 'fit-content' }}>Update Password</button>
+                <input type="password" placeholder={t.currentPassword || 'Current Password'} value={oldPw} onChange={e => setOldPw(e.target.value)} />
+                <input type="password" placeholder={t.newPassword || 'New Password'} value={newPw} onChange={e => setNewPw(e.target.value)} />
+                <button onClick={save} className="btn-primary" style={{ padding: '8px 18px', fontSize: '0.82rem', width: 'fit-content' }}>{t.updatePassword || 'Update Password'}</button>
               </div>
             )}
 
@@ -257,10 +257,10 @@ export default function ProfileSettings({ currentUser, onUpdateProfile, theme, s
               alignItems: 'center'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <Lock size={18} color="#a855f7" />
+                <Smartphone size={18} color="#a855f7" />
                 <div>
-                  <div style={{ fontWeight: '700', fontSize: '0.88rem' }}>Two Factor Authentication</div>
-                  <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>Add an extra layer of security</div>
+                  <div style={{ fontWeight: '700', fontSize: '0.88rem' }}>{t.twoFactor || 'Two Factor Authentication'}</div>
+                  <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>{t.twoFactorDesc || 'Add an extra layer of security'}</div>
                 </div>
               </div>
               <Toggle checked={twoFA} onChange={() => setTwoFA(!twoFA)} />
@@ -277,10 +277,10 @@ export default function ProfileSettings({ currentUser, onUpdateProfile, theme, s
               alignItems: 'center'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <Lock size={18} color="#f59e0b" />
+                <Bell size={18} color="#f59e0b" />
                 <div>
-                  <div style={{ fontWeight: '700', fontSize: '0.88rem' }}>Login Alerts</div>
-                  <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>Get notified about new sign-ins</div>
+                  <div style={{ fontWeight: '700', fontSize: '0.88rem' }}>{t.loginAlerts || 'Login Alerts'}</div>
+                  <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>{t.loginAlertsDesc || 'Get notified about new sign-ins'}</div>
                 </div>
               </div>
               <Toggle checked={loginAlerts} onChange={() => setLoginAlerts(!loginAlerts)} />
@@ -292,21 +292,21 @@ export default function ProfileSettings({ currentUser, onUpdateProfile, theme, s
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Card 1: Preferences */}
           <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <h3 style={{ fontSize: '1.05rem', fontWeight: '800' }}>Preferences</h3>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: '800' }}>{t.systemPrefs || 'Preferences'}</h3>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.86rem', fontWeight: '700' }}>Email Notifications</span>
+              <span style={{ fontSize: '0.86rem', fontWeight: '700' }}>{t.emailNotifications || 'Email Notifications'}</span>
               <Toggle checked={emailNotif} onChange={() => setEmailNotif(!emailNotif)} />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.86rem', fontWeight: '700' }}>Dark Mode</span>
+              <span style={{ fontSize: '0.86rem', fontWeight: '700' }}>{t.darkTheme || 'Dark Mode'}</span>
               <Toggle checked={theme === 'dark'} onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
             </div>
 
             <div>
               <label style={{ fontSize: '0.72rem', fontWeight: '800', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', letterSpacing: '0.06em' }}>
-                LANGUAGE
+                {t.languageLabel || 'LANGUAGE'}
               </label>
               <select value={language || 'English'} onChange={e => onLanguageChange?.(e.target.value)}>
                 <option value="English">English</option>
@@ -318,7 +318,7 @@ export default function ProfileSettings({ currentUser, onUpdateProfile, theme, s
           {/* Card 2: Account Status (Green Shield Checkmark) */}
           <div className="glass-panel" style={{ padding: '28px 20px', textAlign: 'center' }}>
             <div style={{ fontSize: '0.82rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '14px', letterSpacing: '0.06em' }}>
-              Account Status
+              {t.accountStatus || 'Account Status'}
             </div>
 
             <div style={{
@@ -337,7 +337,7 @@ export default function ProfileSettings({ currentUser, onUpdateProfile, theme, s
             </div>
 
             <div style={{ fontSize: '0.98rem', fontWeight: '800', color: '#10b981' }}>
-              Your account is secure
+              {t.accountSecure || 'Your account is secure'}
             </div>
           </div>
         </div>

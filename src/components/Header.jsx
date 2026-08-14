@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Shield, Bell, Moon, Sun, Search, GraduationCap, X, Trash2, Menu } from 'lucide-react';
 
 export default function Header({
@@ -10,6 +10,21 @@ export default function Header({
   t
 }) {
   const unreadCount = notifications.filter(n => !n.read).length;
+  const searchRef = useRef(null);
+  const notifRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setShowSearch(false);
+      }
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setShowNotifications(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [setShowSearch, setShowNotifications]);
 
   const getScreenBadge = () => {
     switch (activeTab) {
@@ -74,30 +89,59 @@ export default function Header({
       {/* Right Controls */}
       <div className="header-controls">
         {/* Search */}
-        <div className={`header-search-bar${showSearch ? ' mobile-visible' : ''}`} style={{ position: 'relative' }}>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 8,
-            background: 'var(--bg-input)', padding: '7px 14px',
-            borderRadius: 20, border: '1px solid var(--border-color)', width: 220
-          }}>
-            <Search size={15} color="var(--text-muted)" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => { setSearchQuery(e.target.value); setShowSearch(e.target.value.trim().length > 0); }}
-              placeholder="Search scans..."
-              style={{
-                background: 'transparent !important', border: 'none !important',
-                outline: 'none', color: 'var(--text-primary)', fontSize: '0.84rem', width: '100%', padding: '0 !important'
-              }}
-            />
-            {searchQuery && (
-              <button onClick={() => { setSearchQuery(''); setShowSearch(false); }}
-                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex' }}>
-                <X size={13} />
-              </button>
-            )}
-          </div>
+        <div ref={searchRef} style={{ position: 'relative' }}>
+          <button
+            onClick={() => setShowSearch(v => !v)}
+            className="btn-icon"
+            title="Search"
+            aria-label="Search"
+            style={{ position: 'relative' }}
+          >
+            <Search size={17} />
+          </button>
+          {showSearch && (
+            <div className="glass-panel" style={{
+              position: 'absolute',
+              top: 'calc(100% + 8px)',
+              right: 0,
+              width: 280,
+              background: 'var(--bg-secondary)',
+              borderRadius: 14,
+              padding: 12,
+              zIndex: 200,
+              border: '1px solid var(--border-color)',
+              boxShadow: '0 8px 30px rgba(0,0,0,0.4)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--bg-input)', padding: '8px 12px', borderRadius: 10, border: '1px solid var(--border-color)' }}>
+                <Search size={15} color="var(--text-muted)" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => { setSearchQuery(e.target.value); }}
+                  placeholder={t.searchPlaceholder || 'Search scans...'}
+                  autoFocus
+                  style={{
+                    background: 'transparent', border: 'none', outline: 'none',
+                    color: 'var(--text-primary)', fontSize: '0.84rem', width: '100%', padding: 0
+                  }}
+                />
+                {searchQuery && (
+                  <button onClick={() => { setSearchQuery(''); setShowSearch(false); }} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex' }}>
+                    <X size={13} />
+                  </button>
+                )}
+              </div>
+              {searchQuery && (
+                <button
+                  onClick={() => { onSelectSearchResult(searchQuery); setShowSearch(false); }}
+                  className="btn-secondary"
+                  style={{ width: '100%', justifyContent: 'flex-start', fontSize: '0.78rem', marginTop: 8 }}
+                >
+                  Filter Scan History for &quot;{searchQuery}&quot;
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Theme Toggle */}
@@ -106,7 +150,7 @@ export default function Header({
         </button>
 
         {/* Notifications */}
-        <div style={{ position: 'relative' }}>
+        <div ref={notifRef} style={{ position: 'relative' }}>
           <button onClick={() => setShowNotifications(v => !v)} className="btn-icon" title="Notifications" aria-label="Notifications" style={{ position: 'relative' }}>
             <Bell size={17} />
             {unreadCount > 0 && (
@@ -117,6 +161,47 @@ export default function Header({
               }} />
             )}
           </button>
+          {showNotifications && (
+            <div className="glass-panel" style={{
+              position: 'absolute',
+              top: 'calc(100% + 8px)',
+              right: 0,
+              width: 320,
+              background: 'var(--bg-secondary)',
+              borderRadius: 14,
+              padding: 14,
+              zIndex: 200,
+              border: '1px solid var(--border-color)',
+              boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
+              maxHeight: '60vh',
+              overflowY: 'auto'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                <div style={{ fontWeight: 800, fontSize: '0.92rem', display: 'flex', alignItems: 'center', gap: 7 }}>
+                  Notifications
+                  {unreadCount > 0 && <span className="badge badge-danger" style={{ fontSize: '0.62rem' }}>{unreadCount} New</span>}
+                </div>
+                <button onClick={onClearNotifications} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '0.72rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 3 }}>
+                  <Trash2 size={11} /> Clear
+                </button>
+              </div>
+              {notifications.length === 0 ? (
+                <div style={{ padding: 16, textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.83rem' }}>No notifications.</div>
+              ) : notifications.map(n => (
+                <div key={n.id} onClick={() => onMarkNotificationRead(n.id)} style={{
+                  padding: '10px 12px', borderRadius: 9, cursor: 'pointer', marginBottom: 6,
+                  background: n.read ? 'var(--bg-input)' : 'rgba(59,130,246,0.1)',
+                  borderLeft: `3px solid ${n.type === 'THREAT' ? '#ef4444' : '#3b82f6'}`
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 700 }}>
+                    <span style={{ color: n.type === 'THREAT' ? '#ef4444' : 'var(--text-primary)' }}>{n.title}</span>
+                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', flexShrink: 0, marginLeft: 6 }}>{n.time}</span>
+                  </div>
+                  <p style={{ fontSize: '0.73rem', color: 'var(--text-secondary)', marginTop: 2 }}>{n.message}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* User Card matching PDF Page 61 Screen 4 (Ayesha Khan / Amna Najam + Premium User) */}
