@@ -480,6 +480,12 @@ h1, h2, h3, h4, h5, h6 {
   gap: 6px;
 }
 
+.profile-tabs-sidebar .sidebar-nav-item,
+.profile-tabs-sidebar button {
+  min-width: 120px;
+  justify-content: flex-start;
+}
+
 .profile-tab-btn {
   display: flex;
   align-items: center;
@@ -1153,6 +1159,12 @@ input:focus, select:focus, textarea:focus {
     overflow-x: auto;
     gap: 8px;
     padding-bottom: 4px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .rtl-layout .profile-tabs-sidebar {
+    direction: ltr;
   }
 
   .profile-tab-btn {

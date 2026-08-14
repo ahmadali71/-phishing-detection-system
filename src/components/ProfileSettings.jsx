@@ -40,12 +40,12 @@ function Toggle({ checked, onChange }) {
         style={{
           position: 'absolute',
           top: '2px',
-          left: checked ? '22px' : '2px',
+          insetInlineStart: checked ? '22px' : '2px',
           width: '20px',
           height: '20px',
           background: '#ffffff',
           borderRadius: '50%',
-          transition: 'left 0.25s',
+          transition: 'insetInlineStart 0.25s',
           boxShadow: '0 1px 4px rgba(0,0,0,0.3)'
         }}
       />
@@ -126,32 +126,33 @@ export default function ProfileSettings({ currentUser, onUpdateProfile, theme, s
       }} className="responsive-grid-3-col">
 
         {/* ── COLUMN 1: LEFT TAB NAVIGATION (Page 64) ── */}
-        <div className="glass-panel profile-tabs-sidebar" style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        <div className="glass-panel profile-tabs-sidebar" style={{ padding: '14px', display: 'flex' }}>
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const active = activeTab === tab.id;
             return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  padding: '11px 14px',
-                  borderRadius: '10px',
-                  border: 'none',
-                  background: active ? '#2563eb' : 'transparent',
-                  color: active ? '#ffffff' : 'var(--text-secondary)',
-                  fontWeight: active ? '800' : '600',
-                  fontSize: '0.86rem',
-                  fontFamily: 'var(--font-display)',
-                  cursor: 'pointer',
-                  textAlign: 'start',
-                  transition: 'all 0.2s',
-                  width: '100%'
-                }}
-              >
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '11px 14px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    background: active ? '#2563eb' : 'transparent',
+                    color: active ? '#ffffff' : 'var(--text-secondary)',
+                    fontWeight: active ? '800' : '600',
+                    fontSize: '0.86rem',
+                    fontFamily: 'var(--font-display)',
+                    cursor: 'pointer',
+                    textAlign: 'start',
+                    transition: 'all 0.2s',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0
+                  }}
+                >
                 <Icon size={16} color={active ? '#ffffff' : 'var(--text-muted)'} />
                 <span>{tab.label}</span>
               </button>
