@@ -37,12 +37,7 @@ function AppInner() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [currentUser, setCurrentUser] = useState({
-    name: 'Amna Najam',
-    email: 'amnanajam2003@gmail.com',
-    username: 'amna_najam',
-    role: 'Premium User'
-  });
+  const [currentUser, setCurrentUser] = useState(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
 
