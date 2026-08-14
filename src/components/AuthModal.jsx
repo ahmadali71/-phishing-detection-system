@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { X, Shield, Lock, Mail, User, Eye, EyeOff } from 'lucide-react';
+import { X, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import loginArt from '../assets/login_art.png';
+import registerArt from '../assets/register_art.png';
 
 export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
   const [isRegister, setIsRegister] = useState(false);
@@ -8,24 +10,30 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
+  const [regEmail, setRegEmail] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showPw, setShowPw] = useState(false);
+  const [showConfirmPw, setShowConfirmPw] = useState(false);
 
   if (!isOpen) return null;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (onLoginSuccess) {
-      onLoginSuccess({
-        name: isRegister && fullName ? fullName : (emailOrUser ? emailOrUser.split('@')[0] : 'Amna Najam'),
-        email: isRegister && email ? email : (emailOrUser.includes('@') ? emailOrUser : 'amnanajam2003@gmail.com'),
-        role: 'BS IT Student / Security Analyst',
-        username: isRegister && username ? username : (emailOrUser ? emailOrUser : 'amna_najam')
-      });
-    }
+    const user = isRegister
+      ? {
+          name: fullName || 'Amna Najam',
+          email: regEmail || 'amnanajam2003@gmail.com',
+          username: username || 'amna_najam',
+          role: 'BS IT Student / Security Analyst'
+        }
+      : {
+          name: emailOrUser.includes('@') ? emailOrUser.split('@')[0] : (emailOrUser || 'Amna Najam'),
+          email: emailOrUser.includes('@') ? emailOrUser : 'amnanajam2003@gmail.com',
+          username: emailOrUser || 'amna_najam',
+          role: 'BS IT Student / Security Analyst'
+        };
+    if (onLoginSuccess) onLoginSuccess(user);
     onClose();
   };
 
@@ -33,260 +41,631 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
     <div style={{
       position: 'fixed',
       inset: 0,
-      background: 'rgba(0,0,0,0.75)',
-      backdropFilter: 'blur(5px)',
-      zIndex: 300,
+      background: 'rgba(15, 23, 42, 0.72)',
+      backdropFilter: 'blur(10px)',
+      WebkitBackdropFilter: 'blur(10px)',
+      zIndex: 1000,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '16px'
+      padding: '20px',
+      animation: 'authFadeIn 0.25s ease-out'
     }}>
-      <div className="glass-panel" style={{
+      {/* ── CARD CONTAINER (Exact 1:1 Match to User Documentation Screenshot) ── */}
+      <div style={{
         width: '100%',
-        maxWidth: isRegister ? '780px' : '720px',
-        display: 'grid',
-        gridTemplateColumns: '1.2fr 1fr',
+        maxWidth: isRegister ? '860px' : '820px',
+        background: '#ffffff',
+        borderRadius: '24px',
+        boxShadow: '0 25px 65px -12px rgba(15, 23, 42, 0.4), 0 0 0 1px rgba(226, 232, 240, 0.8)',
         overflow: 'hidden',
-        background: 'var(--bg-secondary)',
-        borderRadius: '16px',
-        boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
-        position: 'relative'
-      }}>
-        {/* Close Button */}
+        position: 'relative',
+        display: 'grid',
+        gridTemplateColumns: '1.18fr 1fr',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+      }} className="auth-modal-card">
+
+        {/* Floating Close Button */}
         <button
           onClick={onClose}
           style={{
             position: 'absolute',
-            top: '16px',
-            right: '16px',
-            background: 'transparent',
-            border: 'none',
-            color: 'var(--text-muted)',
+            top: '18px',
+            right: '18px',
+            background: 'rgba(255, 255, 255, 0.9)',
+            border: '1px solid #e2e8f0',
+            borderRadius: '50%',
+            width: '36px',
+            height: '36px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#64748b',
             cursor: 'pointer',
-            zIndex: 10
+            zIndex: 30,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+            transition: 'all 0.2s'
           }}
+          title="Close Modal"
         >
-          <X size={20} />
+          <X size={18} />
         </button>
 
-        {/* Left Column: Form Section (Exact Match to PDF Page 60 Screens 2 & 3) */}
-        <div style={{ padding: '36px 32px' }}>
+        {/* ── LEFT COLUMN: FORM SECTION ── */}
+        <div style={{
+          padding: isRegister ? '36px 40px' : '44px 44px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          background: '#ffffff'
+        }}>
+
           {!isRegister ? (
-            /* Screen 2: Login Form */
+            /* ========================================================
+               SCREEN 2: LOGIN SCREEN (Exact Match to User Screenshot)
+            ======================================================== */
             <div>
-              <div style={{ display: 'inline-flex', padding: '2px 8px', background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', borderRadius: '6px', fontSize: '0.72rem', fontWeight: '800', marginBottom: '8px' }}>
-                LOGIN SCREEN
+              {/* Badge: [2] LOGIN SCREEN */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '9px', marginBottom: '20px' }}>
+                <div style={{
+                  background: 'linear-gradient(135deg, #1d4ed8, #2563eb)',
+                  color: '#ffffff',
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: '900',
+                  fontSize: '0.92rem',
+                  boxShadow: '0 3px 8px rgba(37, 99, 235, 0.4)'
+                }}>
+                  2
+                </div>
+                <span style={{
+                  fontWeight: '900',
+                  fontSize: '0.86rem',
+                  letterSpacing: '0.08em',
+                  color: '#0f172a',
+                  fontFamily: 'var(--font-display)',
+                  textTransform: 'uppercase'
+                }}>
+                  LOGIN SCREEN
+                </span>
               </div>
-              <h3 style={{ fontSize: '1.6rem', fontWeight: '800', marginBottom: '4px' }}>Welcome Back!</h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '22px' }}>
+
+              {/* Title & Subtitle */}
+              <h2 style={{
+                fontSize: '2rem',
+                fontWeight: '900',
+                color: '#0f172a',
+                fontFamily: 'var(--font-display)',
+                letterSpacing: '-0.03em',
+                marginBottom: '4px',
+                lineHeight: '1.2'
+              }}>
+                Welcome Back!
+              </h2>
+              <p style={{
+                color: '#64748b',
+                fontSize: '0.94rem',
+                marginBottom: '28px',
+                fontWeight: '500'
+              }}>
                 Login to your account
               </p>
 
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'var(--bg-input)', padding: '10px 14px', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
-                    <Mail size={16} color="var(--text-muted)" />
-                    <input
-                      type="text"
-                      required
-                      placeholder="Email or Username"
-                      value={emailOrUser}
-                      onChange={(e) => setEmailOrUser(e.target.value)}
-                      style={{ background: 'transparent', border: 'none', outline: 'none', width: '100%', padding: 0 }}
-                    />
-                  </div>
+                {/* Input 1: Email or Username */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  background: '#ffffff',
+                  border: '1.5px solid #cbd5e1',
+                  borderRadius: '14px',
+                  padding: '13px 16px',
+                  transition: 'all 0.2s ease'
+                }}>
+                  <Mail size={19} color="#64748b" style={{ flexShrink: 0 }} />
+                  <input
+                    type="text"
+                    required
+                    placeholder="Email or Username"
+                    value={emailOrUser}
+                    onChange={(e) => setEmailOrUser(e.target.value)}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      outline: 'none',
+                      width: '100%',
+                      color: '#0f172a',
+                      fontSize: '0.95rem',
+                      fontFamily: 'var(--font-sans)',
+                      padding: 0,
+                      fontWeight: '500'
+                    }}
+                  />
                 </div>
 
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'var(--bg-input)', padding: '10px 14px', borderRadius: '10px', border: '1px solid var(--border-color)', position: 'relative' }}>
-                    <Lock size={16} color="var(--text-muted)" />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      required
-                      placeholder="Password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      style={{ background: 'transparent', border: 'none', outline: 'none', width: '100%', padding: 0, paddingRight: '28px' }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      style={{ position: 'absolute', right: '12px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
-                    >
-                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
-                  </div>
+                {/* Input 2: Password with Eye Toggle */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  background: '#ffffff',
+                  border: '1.5px solid #cbd5e1',
+                  borderRadius: '14px',
+                  padding: '13px 16px',
+                  position: 'relative',
+                  transition: 'all 0.2s ease'
+                }}>
+                  <Lock size={19} color="#64748b" style={{ flexShrink: 0 }} />
+                  <input
+                    type={showPw ? 'text' : 'password'}
+                    required
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      outline: 'none',
+                      width: '100%',
+                      color: '#0f172a',
+                      fontSize: '0.95rem',
+                      fontFamily: 'var(--font-sans)',
+                      padding: 0,
+                      paddingRight: '32px',
+                      fontWeight: '500'
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPw(!showPw)}
+                    style={{
+                      position: 'absolute',
+                      right: '14px',
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#64748b',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '4px'
+                    }}
+                    title={showPw ? "Hide password" : "Show password"}
+                  >
+                    {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', color: 'var(--text-secondary)' }}>
-                    <input type="checkbox" checked={rememberMe} onChange={() => setRememberMe(!rememberMe)} />
+                {/* Remember Me & Forgot Password */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  fontSize: '0.86rem',
+                  marginTop: '2px'
+                }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: '#475569', fontWeight: '500' }}>
+                    <input
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={() => setRememberMe(!rememberMe)}
+                      style={{ cursor: 'pointer', accentColor: '#2563eb', width: '16px', height: '16px', borderRadius: '4px' }}
+                    />
                     Remember me
                   </label>
-                  <a href="#forgot" onClick={(e) => e.preventDefault()} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '600' }}>
+                  <a
+                    href="#forgot"
+                    onClick={(e) => e.preventDefault()}
+                    style={{
+                      color: '#2563eb',
+                      fontWeight: '700',
+                      textDecoration: 'none',
+                      fontSize: '0.86rem'
+                    }}
+                  >
                     Forgot Password?
                   </a>
                 </div>
 
-                <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '12px', marginTop: '6px' }}>
+                {/* Login Button (Cyan-Blue Gradient matching user screenshot) */}
+                <button
+                  type="submit"
+                  style={{
+                    background: 'linear-gradient(90deg, #1d4ed8 0%, #0284c7 60%, #06b6d4 100%)',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '14px',
+                    padding: '14px',
+                    fontWeight: '800',
+                    fontSize: '1.02rem',
+                    fontFamily: 'var(--font-display)',
+                    cursor: 'pointer',
+                    marginTop: '8px',
+                    boxShadow: '0 8px 24px -4px rgba(2, 132, 199, 0.45)',
+                    transition: 'transform 0.15s, box-shadow 0.15s'
+                  }}
+                >
                   Login
                 </button>
               </form>
 
-              <div style={{ textAlign: 'center', marginTop: '20px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+              {/* Bottom Switch to Register */}
+              <div style={{
+                textAlign: 'center',
+                marginTop: '24px',
+                fontSize: '0.9rem',
+                color: '#64748b',
+                fontWeight: '500'
+              }}>
                 Don't have an account?{' '}
                 <button
                   type="button"
                   onClick={() => setIsRegister(true)}
-                  style={{ background: 'transparent', border: 'none', color: '#3b82f6', fontWeight: '700', cursor: 'pointer' }}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#2563eb',
+                    fontWeight: '800',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    padding: 0
+                  }}
                 >
                   Register here
                 </button>
               </div>
             </div>
           ) : (
-            /* Screen 3: Register Form */
+            /* ========================================================
+               SCREEN 3: REGISTER SCREEN (Exact Match to User Screenshot)
+            ======================================================== */
             <div>
-              <div style={{ display: 'inline-flex', padding: '2px 8px', background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', borderRadius: '6px', fontSize: '0.72rem', fontWeight: '800', marginBottom: '8px' }}>
-                REGISTER SCREEN
+              {/* Badge: [3] REGISTER SCREEN */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '9px', marginBottom: '14px' }}>
+                <div style={{
+                  background: 'linear-gradient(135deg, #6366f1, #7c3aed)',
+                  color: '#ffffff',
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: '900',
+                  fontSize: '0.92rem',
+                  boxShadow: '0 3px 8px rgba(99, 102, 241, 0.4)'
+                }}>
+                  3
+                </div>
+                <span style={{
+                  fontWeight: '900',
+                  fontSize: '0.86rem',
+                  letterSpacing: '0.08em',
+                  color: '#0f172a',
+                  fontFamily: 'var(--font-display)',
+                  textTransform: 'uppercase'
+                }}>
+                  REGISTER SCREEN
+                </span>
               </div>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '4px' }}>Create Your Account</h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '18px' }}>
+
+              {/* Title & Subtitle */}
+              <h2 style={{
+                fontSize: '1.85rem',
+                fontWeight: '900',
+                color: '#0f172a',
+                fontFamily: 'var(--font-display)',
+                letterSpacing: '-0.03em',
+                marginBottom: '4px',
+                lineHeight: '1.2'
+              }}>
+                Create Your Account
+              </h2>
+              <p style={{
+                color: '#64748b',
+                fontSize: '0.9rem',
+                marginBottom: '18px',
+                fontWeight: '500'
+              }}>
                 Join APDS and stay protected
               </p>
 
-              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'var(--bg-input)', padding: '9px 12px', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
-                  <User size={16} color="var(--text-muted)" />
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '11px' }}>
+                {/* Input 1: Full Name */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  background: '#ffffff',
+                  border: '1.5px solid #cbd5e1',
+                  borderRadius: '12px',
+                  padding: '11px 14px'
+                }}>
+                  <User size={18} color="#64748b" style={{ flexShrink: 0 }} />
                   <input
                     type="text"
                     required
                     placeholder="Full Name"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    style={{ background: 'transparent', border: 'none', outline: 'none', width: '100%', padding: 0 }}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      outline: 'none',
+                      width: '100%',
+                      color: '#0f172a',
+                      fontSize: '0.9rem',
+                      fontFamily: 'var(--font-sans)',
+                      padding: 0,
+                      fontWeight: '500'
+                    }}
                   />
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'var(--bg-input)', padding: '9px 12px', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
-                  <Mail size={16} color="var(--text-muted)" />
+                {/* Input 2: Email Address */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  background: '#ffffff',
+                  border: '1.5px solid #cbd5e1',
+                  borderRadius: '12px',
+                  padding: '11px 14px'
+                }}>
+                  <Mail size={18} color="#64748b" style={{ flexShrink: 0 }} />
                   <input
                     type="email"
                     required
                     placeholder="Email Address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    style={{ background: 'transparent', border: 'none', outline: 'none', width: '100%', padding: 0 }}
+                    value={regEmail}
+                    onChange={(e) => setRegEmail(e.target.value)}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      outline: 'none',
+                      width: '100%',
+                      color: '#0f172a',
+                      fontSize: '0.9rem',
+                      fontFamily: 'var(--font-sans)',
+                      padding: 0,
+                      fontWeight: '500'
+                    }}
                   />
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'var(--bg-input)', padding: '9px 12px', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
-                  <User size={16} color="var(--text-muted)" />
+                {/* Input 3: Username */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  background: '#ffffff',
+                  border: '1.5px solid #cbd5e1',
+                  borderRadius: '12px',
+                  padding: '11px 14px'
+                }}>
+                  <User size={18} color="#64748b" style={{ flexShrink: 0 }} />
                   <input
                     type="text"
                     required
                     placeholder="Username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    style={{ background: 'transparent', border: 'none', outline: 'none', width: '100%', padding: 0 }}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      outline: 'none',
+                      width: '100%',
+                      color: '#0f172a',
+                      fontSize: '0.9rem',
+                      fontFamily: 'var(--font-sans)',
+                      padding: 0,
+                      fontWeight: '500'
+                    }}
                   />
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'var(--bg-input)', padding: '9px 12px', borderRadius: '10px', border: '1px solid var(--border-color)', position: 'relative' }}>
-                  <Lock size={16} color="var(--text-muted)" />
+                {/* Input 4: Password */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  background: '#ffffff',
+                  border: '1.5px solid #cbd5e1',
+                  borderRadius: '12px',
+                  padding: '11px 14px',
+                  position: 'relative'
+                }}>
+                  <User size={18} color="#64748b" style={{ flexShrink: 0 }} />
                   <input
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPw ? 'text' : 'password'}
                     required
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    style={{ background: 'transparent', border: 'none', outline: 'none', width: '100%', padding: 0, paddingRight: '28px' }}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      outline: 'none',
+                      width: '100%',
+                      color: '#0f172a',
+                      fontSize: '0.9rem',
+                      fontFamily: 'var(--font-sans)',
+                      padding: 0,
+                      paddingRight: '30px',
+                      fontWeight: '500'
+                    }}
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    style={{ position: 'absolute', right: '10px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+                    onClick={() => setShowPw(!showPw)}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#64748b',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}
+                    title={showPw ? "Hide password" : "Show password"}
                   >
-                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                    {showPw ? <EyeOff size={17} /> : <Eye size={17} />}
                   </button>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'var(--bg-input)', padding: '9px 12px', borderRadius: '10px', border: '1px solid var(--border-color)', position: 'relative' }}>
-                  <Lock size={16} color="var(--text-muted)" />
+                {/* Input 5: Confirm Password */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  background: '#ffffff',
+                  border: '1.5px solid #cbd5e1',
+                  borderRadius: '12px',
+                  padding: '11px 14px',
+                  position: 'relative'
+                }}>
+                  <User size={18} color="#64748b" style={{ flexShrink: 0 }} />
                   <input
-                    type={showConfirmPassword ? 'text' : 'password'}
+                    type={showConfirmPw ? 'text' : 'password'}
                     required
                     placeholder="Confirm Password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    style={{ background: 'transparent', border: 'none', outline: 'none', width: '100%', padding: 0, paddingRight: '28px' }}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      outline: 'none',
+                      width: '100%',
+                      color: '#0f172a',
+                      fontSize: '0.9rem',
+                      fontFamily: 'var(--font-sans)',
+                      padding: 0,
+                      paddingRight: '30px',
+                      fontWeight: '500'
+                    }}
                   />
                   <button
                     type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    style={{ position: 'absolute', right: '10px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+                    onClick={() => setShowConfirmPw(!showConfirmPw)}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#64748b',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}
+                    title={showConfirmPw ? "Hide password" : "Show password"}
                   >
-                    {showConfirmPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                    {showConfirmPw ? <EyeOff size={17} /> : <Eye size={17} />}
                   </button>
                 </div>
 
-                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                  <input type="checkbox" required checked={agreeTerms} onChange={() => setAgreeTerms(!agreeTerms)} />
-                  I agree to the Terms & Conditions
+                {/* Terms & Conditions Checkbox */}
+                <label style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  cursor: 'pointer',
+                  fontSize: '0.84rem',
+                  color: '#475569',
+                  marginTop: '2px',
+                  fontWeight: '500'
+                }}>
+                  <input
+                    type="checkbox"
+                    required
+                    checked={agreeTerms}
+                    onChange={() => setAgreeTerms(!agreeTerms)}
+                    style={{ cursor: 'pointer', accentColor: '#6366f1', width: '16px', height: '16px', borderRadius: '4px' }}
+                  />
+                  <span>
+                    I agree to the{' '}
+                    <strong style={{ color: '#4f46e5' }}>Terms & Conditions</strong>
+                  </span>
                 </label>
 
-                <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '11px', marginTop: '4px' }}>
+                {/* Create Account Button (Purple to Cyan Gradient) */}
+                <button
+                  type="submit"
+                  style={{
+                    background: 'linear-gradient(90deg, #7c3aed 0%, #2563eb 55%, #06b6d4 100%)',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '14px',
+                    padding: '13px',
+                    fontWeight: '800',
+                    fontSize: '1rem',
+                    fontFamily: 'var(--font-display)',
+                    cursor: 'pointer',
+                    marginTop: '4px',
+                    boxShadow: '0 8px 24px -4px rgba(124, 58, 237, 0.4)',
+                    transition: 'transform 0.15s, box-shadow 0.15s'
+                  }}
+                >
                   Create Account
                 </button>
               </form>
 
-              <div style={{ textAlign: 'center', marginTop: '14px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+              {/* Bottom Switch to Login */}
+              <div style={{
+                textAlign: 'center',
+                marginTop: '18px',
+                fontSize: '0.88rem',
+                color: '#64748b',
+                fontWeight: '500'
+              }}>
                 Already have an account?{' '}
                 <button
                   type="button"
                   onClick={() => setIsRegister(false)}
-                  style={{ background: 'transparent', border: 'none', color: '#3b82f6', fontWeight: '700', cursor: 'pointer' }}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#4f46e5',
+                    fontWeight: '800',
+                    cursor: 'pointer',
+                    fontSize: '0.88rem',
+                    padding: 0
+                  }}
                 >
                   Login here
                 </button>
               </div>
             </div>
           )}
+
         </div>
 
-        {/* Right Column: Visual Shield Graphic (Exact Match to PDF Page 60) */}
+        {/* ── RIGHT COLUMN: EXACT ARTWORK FROM USER DOCUMENTATION SCREENSHOT ── */}
         <div style={{
-          background: 'linear-gradient(135deg, #1e3a8a, #4338ca)',
-          padding: '36px 24px',
+          background: '#f8fafc',
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          color: 'white',
-          textAlign: 'center'
-        }}>
-          <div style={{
-            width: '90px',
-            height: '90px',
-            borderRadius: '24px',
-            background: 'rgba(255, 255, 255, 0.15)',
-            border: '2px solid rgba(255, 255, 255, 0.3)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: '20px',
-            boxShadow: '0 0 30px rgba(59, 130, 246, 0.5)'
-          }}>
-            <Shield size={46} color="#ffffff" />
-          </div>
-
-          <h4 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '8px', color: 'white' }}>
-            APDS Security Shield
-          </h4>
-          <p style={{ fontSize: '0.82rem', opacity: 0.9, lineHeight: '1.5', maxWidth: '220px' }}>
-            Real-time phishing & social engineering defense system
-          </p>
+          overflow: 'hidden',
+          position: 'relative',
+          borderLeft: '1px solid #f1f5f9'
+        }} className="auth-modal-banner">
+          <img
+            src={isRegister ? registerArt : loginArt}
+            alt="Cybersecurity Protection Storyboard"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              display: 'block'
+            }}
+          />
         </div>
+
       </div>
     </div>
   );

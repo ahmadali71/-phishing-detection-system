@@ -1,89 +1,126 @@
 import React, { useState } from 'react';
-import { Download, Search, Filter, Trash2, ExternalLink } from 'lucide-react';
+import { Download, ExternalLink } from 'lucide-react';
 
-export default function ScanHistory({ scanHistory, onViewDetail, onDeleteScan, onExportPdf, t }) {
-  const [filterCategory, setFilterCategory] = useState('All');
+export default function ScanHistory({ scanHistory, onViewDetail, onExportPdf, t }) {
+  const [filter, setFilter] = useState('All');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
 
   const defaultRecords = [
     { id: 1, type: 'URL', input: 'paypal-secure-login.com', result: 'Phishing', riskScore: '90/100', date: '2024-05-15 10:30 AM', category: 'Phishing' },
     { id: 2, type: 'Email', input: 'Verify your account.eml', result: 'Suspicious', riskScore: '65/100', date: '2024-05-15 10:15 AM', category: 'Suspicious' },
     { id: 3, type: 'URL', input: 'microsoft.com', result: 'Safe', riskScore: '10/100', date: '2024-05-15 09:45 AM', category: 'Safe' },
     { id: 4, type: 'Email', input: 'Meeting schedule.eml', result: 'Safe', riskScore: '15/100', date: '2024-05-14 04:20 PM', category: 'Safe' },
-    { id: 5, type: 'URL', input: 'secure-login.bank.com', result: 'Phishing', riskScore: '95/100', date: '2024-05-14 03:10 PM', category: 'Phishing' }
+    { id: 5, type: 'URL', input: 'secure-login.bank.com', result: 'Phishing', riskScore: '95/100', date: '2024-05-14 03:10 PM', category: 'Phishing' },
   ];
 
-  const recordsToDisplay = scanHistory && scanHistory.length > 0 ? scanHistory : defaultRecords;
-
-  const filtered = recordsToDisplay.filter(item => {
-    if (filterCategory === 'All') return true;
-    return item.category === filterCategory || item.result === filterCategory;
-  });
+  const records = (scanHistory?.length > 0 ? scanHistory : defaultRecords).filter(r =>
+    filter === 'All' || r.result === filter || r.category === filter
+  );
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '22px', maxWidth: '1000px', margin: '0 auto' }}>
-      {/* Title */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '22px', maxWidth: '1080px', margin: '0 auto' }}>
+      {/* ── Badge & Title (Exact Match to PDF Page 63 Screen 8) ── */}
       <div>
-        <h2 style={{ fontSize: '1.8rem', fontWeight: '800' }}>SCAN HISTORY & REPORTS</h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #1d4ed8, #2563eb)',
+            color: '#ffffff',
+            width: '28px',
+            height: '28px',
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontWeight: '900',
+            fontSize: '0.92rem',
+            boxShadow: '0 3px 8px rgba(37, 99, 235, 0.4)'
+          }}>
+            8
+          </div>
+          <span style={{
+            fontWeight: '900',
+            fontSize: '0.9rem',
+            letterSpacing: '0.08em',
+            color: 'var(--accent-blue)',
+            fontFamily: 'var(--font-display)'
+          }}>
+            SCAN HISTORY &amp; REPORTS
+          </span>
+        </div>
+
+        <h2 style={{ fontSize: '1.85rem', fontWeight: '800' }}>Scan History</h2>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
           View and manage your scan history
         </p>
       </div>
 
-      {/* Filter Bar with Date Selectors & Export PDF (Exact Match to PDF Page 63 Screen 8) */}
-      <div className="glass-panel" style={{ padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
+      {/* ── Filter Bar with Date Selectors & Export PDF (Exact Match to PDF Page 63 Screen 8) ── */}
+      <div className="glass-panel"
+        style={{
+          padding: '16px 20px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '14px'
+        }}>
+
         {/* Filter Pills */}
-        <div style={{ display: 'flex', gap: '8px' }}>
-          {['All', 'Phishing', 'Suspicious', 'Safe'].map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setFilterCategory(cat)}
-              style={{
-                padding: '7px 18px',
-                borderRadius: '20px',
-                border: 'none',
-                background: filterCategory === cat ? '#3b82f6' : 'var(--bg-input)',
-                color: filterCategory === cat ? '#ffffff' : 'var(--text-secondary)',
-                fontSize: '0.82rem',
-                fontWeight: '700',
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
-            >
-              {cat}
-            </button>
-          ))}
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          {[
+            { id: 'All', label: 'All', activeBg: '#2563eb', activeColor: '#ffffff', inactiveBg: 'var(--bg-input)' },
+            { id: 'Phishing', label: 'Phishing', activeBg: '#ef4444', activeColor: '#ffffff', inactiveBg: 'rgba(239, 68, 68, 0.12)' },
+            { id: 'Suspicious', label: 'Suspicious', activeBg: '#f59e0b', activeColor: '#ffffff', inactiveBg: 'rgba(245, 158, 11, 0.12)' },
+            { id: 'Safe', label: 'Safe', activeBg: '#10b981', activeColor: '#ffffff', inactiveBg: 'rgba(16, 185, 129, 0.12)' },
+          ].map(cat => {
+            const isSelected = filter === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setFilter(cat.id)}
+                style={{
+                  padding: '7px 18px',
+                  borderRadius: '20px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  background: isSelected ? cat.activeBg : cat.inactiveBg,
+                  color: isSelected ? cat.activeColor : (cat.id === 'All' ? 'var(--text-secondary)' : cat.activeBg),
+                  fontWeight: '700',
+                  fontSize: '0.84rem',
+                  transition: 'all 0.2s',
+                  fontFamily: 'var(--font-display)'
+                }}
+              >
+                {cat.label}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Date Pickers */}
+        {/* Date Pickers + Export Button */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700' }}>From</span>
+          <span style={{ fontSize: '0.82rem', fontWeight: '700', color: 'var(--text-muted)' }}>From</span>
           <input
             type="date"
             value={fromDate}
-            onChange={(e) => setFromDate(e.target.value)}
-            style={{ padding: '6px 10px', fontSize: '0.8rem', width: '130px' }}
+            onChange={e => setFromDate(e.target.value)}
+            style={{ width: '135px', padding: '7px 10px', fontSize: '0.82rem' }}
           />
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700' }}>To</span>
+          <span style={{ fontSize: '0.82rem', fontWeight: '700', color: 'var(--text-muted)' }}>To</span>
           <input
             type="date"
             value={toDate}
-            onChange={(e) => setToDate(e.target.value)}
-            style={{ padding: '6px 10px', fontSize: '0.8rem', width: '130px' }}
+            onChange={e => setToDate(e.target.value)}
+            style={{ width: '135px', padding: '7px 10px', fontSize: '0.82rem' }}
           />
-          <button
-            onClick={onExportPdf}
-            className="btn-primary"
-            style={{ padding: '8px 18px', fontSize: '0.85rem' }}
-          >
+          <button onClick={onExportPdf} className="btn-primary" style={{ padding: '8px 18px', fontSize: '0.86rem' }}>
             <Download size={15} /> Export PDF
           </button>
         </div>
       </div>
 
-      {/* History Table (Exact Match to PDF Page 63 Screen 8) */}
+      {/* ── Table (Exact Match to PDF Page 63 Screen 8) ── */}
       <div className="glass-panel" style={{ padding: '20px' }}>
         <div className="table-wrapper">
           <table>
@@ -94,45 +131,54 @@ export default function ScanHistory({ scanHistory, onViewDetail, onDeleteScan, o
                 <th>Input</th>
                 <th>Result</th>
                 <th>Risk Score</th>
-                <th>Date & Time</th>
+                <th>Date &amp; Time</th>
                 <th style={{ textAlign: 'right' }}>Action</th>
               </tr>
             </thead>
             <tbody>
-              {filtered.map((item, idx) => (
-                <tr key={item.id || idx}>
+              {records.map((item, idx) => (
+                <tr key={item.id ?? idx}>
                   <td style={{ fontWeight: '700', color: 'var(--text-muted)' }}>{idx + 1}</td>
                   <td><span className="badge badge-blue">{item.type}</span></td>
-                  <td style={{ fontFamily: 'var(--font-mono)', fontWeight: '600' }}>{item.input}</td>
+                  <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.86rem', maxWidth: '240px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {item.input}
+                  </td>
                   <td>
-                    <span className={`badge badge-${item.result === 'Phishing' ? 'danger' : (item.result === 'Suspicious' ? 'warning' : 'emerald')}`}>
+                    <span style={{
+                      fontWeight: '800',
+                      color: item.result === 'Phishing' ? '#ef4444' : (item.result === 'Suspicious' ? '#f59e0b' : '#10b981')
+                    }}>
                       {item.result}
                     </span>
                   </td>
                   <td style={{ fontWeight: '800' }}>{item.riskScore}</td>
-                  <td style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>{item.date}</td>
+                  <td style={{ fontSize: '0.82rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{item.date}</td>
                   <td style={{ textAlign: 'right' }}>
                     <button
-                      onClick={() => onViewDetail(item)}
+                      onClick={() => onViewDetail?.(item)}
                       className="btn-secondary"
-                      style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+                      style={{ padding: '5px 12px', fontSize: '0.76rem' }}
                     >
-                      <ExternalLink size={12} />
+                      <ExternalLink size={13} />
                     </button>
                   </td>
                 </tr>
               ))}
+              {records.length === 0 && (
+                <tr><td colSpan={7} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '36px' }}>No records found.</td></tr>
+              )}
             </tbody>
           </table>
         </div>
 
-        {/* Pagination (Exact Match to PDF Page 63 Screen 8) */}
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '20px' }}>
-          <button className="btn-secondary" style={{ padding: '5px 12px', fontSize: '0.8rem' }}>&lt;</button>
-          <button className="btn-primary" style={{ padding: '5px 12px', fontSize: '0.8rem' }}>1</button>
-          <button className="btn-secondary" style={{ padding: '5px 12px', fontSize: '0.8rem' }}>2</button>
-          <button className="btn-secondary" style={{ padding: '5px 12px', fontSize: '0.8rem' }}>3</button>
-          <button className="btn-secondary" style={{ padding: '5px 12px', fontSize: '0.8rem' }}>Next &gt;</button>
+        {/* ── Pagination: < 1 2 3 Next > (Exact Match to PDF Page 63 Screen 8) ── */}
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '22px', flexWrap: 'wrap' }}>
+          <button className="btn-secondary" style={{ padding: '6px 12px', fontSize: '0.82rem' }}>&lt;</button>
+          <button className="btn-primary" style={{ padding: '6px 14px', fontSize: '0.82rem', minWidth: '36px' }}>1</button>
+          <button className="btn-secondary" style={{ padding: '6px 14px', fontSize: '0.82rem', minWidth: '36px' }}>2</button>
+          <button className="btn-secondary" style={{ padding: '6px 14px', fontSize: '0.82rem', minWidth: '36px' }}>3</button>
+          <button className="btn-secondary" style={{ padding: '6px 16px', fontSize: '0.82rem' }}>Next</button>
+          <button className="btn-secondary" style={{ padding: '6px 12px', fontSize: '0.82rem' }}>&gt;</button>
         </div>
       </div>
     </div>

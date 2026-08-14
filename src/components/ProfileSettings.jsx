@@ -1,241 +1,347 @@
 import React, { useState } from 'react';
 import {
   User,
-  ShieldCheck,
   Lock,
   Bell,
   ChevronRight,
   Smartphone,
-  Save,
   Check,
-  Eye,
-  EyeOff,
-  Key,
   Shield,
   Palette,
   Edit2
 } from 'lucide-react';
 
-export default function ProfileSettings({ currentUser, onUpdateProfile, theme, setTheme, language, onLanguageChange, t }) {
-  const [activeProfileTab, setActiveProfileTab] = useState('Profile');
-  const [fullName, setFullName] = useState(currentUser ? currentUser.name : 'Amna');
-  const [email, setEmail] = useState(currentUser ? currentUser.email : 'amna.najam@email.com');
-  const [role, setRole] = useState(currentUser ? currentUser.role : 'Premium User');
-  const [username, setUsername] = useState(currentUser ? currentUser.username : 'amna_najam');
+function Toggle({ checked, onChange }) {
+  return (
+    <label
+      className="toggle-wrap"
+      onClick={onChange}
+      style={{
+        position: 'relative',
+        width: '44px',
+        height: '24px',
+        display: 'inline-flex',
+        cursor: 'pointer',
+        flexShrink: 0,
+        verticalAlign: 'middle'
+      }}
+    >
+      <input type="checkbox" checked={checked} onChange={onChange} style={{ opacity: 0, width: 0, height: 0, position: 'absolute' }} />
+      <span
+        style={{
+          position: 'absolute',
+          inset: 0,
+          borderRadius: '12px',
+          background: checked ? '#10b981' : '#334155',
+          transition: 'background 0.25s'
+        }}
+      />
+      <span
+        style={{
+          position: 'absolute',
+          top: '2px',
+          left: checked ? '22px' : '2px',
+          width: '20px',
+          height: '20px',
+          background: '#ffffff',
+          borderRadius: '50%',
+          transition: 'left 0.25s',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.3)'
+        }}
+      />
+    </label>
+  );
+}
 
-  const [twoFactorAuth, setTwoFactorAuth] = useState(currentUser ? currentUser.twoFactorAuth !== false : true);
-  const [loginAlerts, setLoginAlerts] = useState(currentUser ? currentUser.loginAlerts !== false : true);
-  const [emailNotifications, setEmailNotifications] = useState(true);
-
-  const selectedLanguage = language || 'English';
-
-  const [showPasswordChange, setShowPasswordChange] = useState(false);
-  const [oldPassword, setOldPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
+export default function ProfileSettings({ currentUser, onUpdateProfile, theme, setTheme, language, onLanguageChange }) {
+  const [activeTab, setActiveTab] = useState('Profile');
+  const [fullName, setFullName] = useState(currentUser?.name ?? 'Amna Najam');
+  const [email, setEmail] = useState(currentUser?.email ?? 'amnanajam2003@gmail.com');
+  const [role, setRole] = useState(currentUser?.role ?? 'Premium User');
+  const [twoFA, setTwoFA] = useState(currentUser?.twoFactorAuth !== false);
+  const [loginAlerts, setLoginAlerts] = useState(currentUser?.loginAlerts !== false);
+  const [emailNotif, setEmailNotif] = useState(true);
+  const [showPwChange, setShowPwChange] = useState(false);
+  const [oldPw, setOldPw] = useState('');
+  const [newPw, setNewPw] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const [saveMsg, setSaveMsg] = useState(null);
+  const [saved, setSaved] = useState(false);
 
-  const handleSaveProfile = () => {
-    if (onUpdateProfile) {
-      onUpdateProfile({ name: fullName, email, role, username, twoFactorAuth, loginAlerts });
-    }
+  const save = () => {
+    if (onUpdateProfile) onUpdateProfile({ name: fullName, email, role, twoFactorAuth: twoFA, loginAlerts });
     setIsEditing(false);
-    setSaveMsg(true);
-    setTimeout(() => setSaveMsg(null), 3000);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
   };
 
-  const navTabs = [
+  const tabs = [
     { id: 'Profile', label: 'Profile', icon: User },
     { id: 'Change Password', label: 'Change Password', icon: Lock },
     { id: 'Two Factor Auth', label: 'Two Factor Auth', icon: Smartphone },
     { id: 'Notifications', label: 'Notifications', icon: Bell },
     { id: 'Privacy Settings', label: 'Privacy Settings', icon: Shield },
-    { id: 'Theme Settings', label: 'Theme Settings', icon: Palette }
+    { id: 'Theme Settings', label: 'Theme Settings', icon: Palette },
   ];
 
   return (
-    <div className="profile-layout">
-      {/* Title */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-        <div>
-          <h2 style={{ fontSize: '1.6rem', fontWeight: '800' }}>PROFILE & SETTINGS</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
-            Manage and update your account details, security controls, and system preferences.
-          </p>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '22px', maxWidth: '1080px', margin: '0 auto' }}>
+      {/* ── Top Badge (Exact Match to PDF Page 64 Screen 9) ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{
+          background: 'linear-gradient(135deg, #1d4ed8, #2563eb)',
+          color: '#ffffff',
+          width: '28px',
+          height: '28px',
+          borderRadius: '8px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontWeight: '900',
+          fontSize: '0.92rem',
+          boxShadow: '0 3px 8px rgba(37, 99, 235, 0.4)'
+        }}>
+          9
         </div>
-        {saveMsg && (
-          <div className="profile-save-msg">
-            <Check size={16} /> Settings saved successfully!
-          </div>
-        )}
+        <span style={{
+          fontWeight: '900',
+          fontSize: '0.9rem',
+          letterSpacing: '0.08em',
+          color: 'var(--accent-blue)',
+          fontFamily: 'var(--font-display)'
+        }}>
+          PROFILE &amp; SETTINGS
+        </span>
       </div>
 
-      {/* Column 1: Left Tab Navigation */}
-      <div className="glass-panel profile-tabs-sidebar" style={{ padding: '14px', height: 'fit-content' }}>
-        {navTabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeProfileTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveProfileTab(tab.id)}
-              className={`profile-tab-btn ${isActive ? 'active' : ''}`}
-            >
-              <Icon size={16} />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Column 2: Center Profile Information & Security Settings */}
-      <div className="profile-content-area">
-        {/* Profile Information Card */}
-        <div className="glass-panel profile-card">
-          <h3 className="profile-card-title">Profile Information</h3>
-
-          <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
-            <div className="profile-avatar">
-              {fullName ? fullName.charAt(0).toUpperCase() : 'A'}
-            </div>
-
-            <div style={{ flex: 1, minWidth: 0, lineHeight: '1.4' }}>
-              {isEditing ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Full Name" className="profile-password-input" />
-                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="profile-password-input" />
-                  <button onClick={handleSaveProfile} className="btn-primary" style={{ padding: '6px 14px', fontSize: '0.78rem', width: 'fit-content' }}>
-                    Save Profile
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <div className="profile-info-name">{fullName}</div>
-                  <div className="profile-info-role">{role}</div>
-                  <div className="profile-info-email">{email}</div>
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="btn-primary"
-                    style={{ marginTop: '10px', padding: '6px 14px', fontSize: '0.78rem' }}
-                  >
-                    <Edit2 size={12} /> Edit Profile
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
+      {saved && (
+        <div style={{ padding: '10px 18px', background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', borderRadius: '12px', color: '#10b981', fontSize: '0.88rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Check size={16} /> Profile settings updated successfully!
         </div>
+      )}
 
-        {/* Security Settings Card */}
-        <div className="glass-panel profile-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <h3 className="profile-card-title" style={{ marginBottom: 0 }}>Security Settings</h3>
+      {/* ── 3-Column Layout (Exact Match to PDF Page 64 Screen 9) ── */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '210px 1fr 280px',
+        gap: '20px',
+        alignItems: 'start'
+      }} className="responsive-grid-3-col">
 
-          {/* Change Password Item */}
-          <div
-            onClick={() => setShowPasswordChange(!showPasswordChange)}
-            className="profile-security-item"
-          >
-            <div className="profile-security-item-left">
-              <Lock size={18} color="#3b82f6" />
-              <div>
-                <div className="profile-security-item-title">Change Password</div>
-                <div className="profile-security-item-desc">Update your account password</div>
-              </div>
-            </div>
-            <ChevronRight size={18} color="var(--text-muted)" style={{ transform: showPasswordChange ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }} />
-          </div>
-
-          {showPasswordChange && (
-            <div className="profile-password-fields">
-              <input type="password" placeholder="Current Password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} className="profile-password-input" />
-              <input type="password" placeholder="New Password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="profile-password-input" />
-              <button onClick={handleSaveProfile} className="btn-primary" style={{ padding: '8px 16px', fontSize: '0.82rem', width: 'fit-content' }}>
-                Update Password
+        {/* ── COLUMN 1: LEFT TAB NAVIGATION (Page 64) ── */}
+        <div className="glass-panel" style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const active = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '11px 14px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  background: active ? '#2563eb' : 'transparent',
+                  color: active ? '#ffffff' : 'var(--text-secondary)',
+                  fontWeight: active ? '800' : '600',
+                  fontSize: '0.86rem',
+                  fontFamily: 'var(--font-display)',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'all 0.2s',
+                  width: '100%'
+                }}
+              >
+                <Icon size={16} color={active ? '#ffffff' : 'var(--text-muted)'} />
+                <span>{tab.label}</span>
               </button>
-            </div>
-          )}
+            );
+          })}
+        </div>
 
-          {/* Two Factor Authentication Toggle */}
-          <div className="profile-security-item">
-            <div className="profile-security-item-left">
-              <Smartphone size={18} color="#a855f7" />
-              <div>
-                <div className="profile-security-item-title">Two Factor Authentication</div>
-                <div className="profile-security-item-desc">Add an extra layer of security</div>
+        {/* ── COLUMN 2: CENTER PROFILE & SECURITY SETTINGS (Page 64) ── */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Card 1: Profile Information */}
+          <div className="glass-panel" style={{ padding: '24px' }}>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: '800', marginBottom: '18px' }}>Profile Information</h3>
+
+            <div style={{ display: 'flex', gap: '18px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <div style={{
+                width: '68px',
+                height: '68px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#ffffff',
+                fontSize: '1.7rem',
+                fontWeight: '900',
+                boxShadow: '0 4px 16px rgba(59, 130, 246, 0.4)',
+                flexShrink: 0
+              }}>
+                {fullName ? fullName.charAt(0).toUpperCase() : 'A'}
+              </div>
+
+              <div style={{ flex: 1, minWidth: '160px' }}>
+                {isEditing ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Full Name" />
+                    <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" />
+                    <button onClick={save} className="btn-primary" style={{ padding: '7px 16px', fontSize: '0.82rem', width: 'fit-content' }}>Save</button>
+                  </div>
+                ) : (
+                  <>
+                    <div style={{ fontSize: '1.15rem', fontWeight: '800', color: 'var(--text-primary)' }}>{fullName}</div>
+                    <div style={{ fontSize: '0.82rem', color: '#2563eb', fontWeight: '700', marginTop: '2px' }}>{role}</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>{email}</div>
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="btn-primary"
+                      style={{ marginTop: '12px', padding: '7px 18px', fontSize: '0.82rem', borderRadius: '10px' }}
+                    >
+                      <Edit2 size={13} /> Edit Profile
+                    </button>
+                  </>
+                )}
               </div>
             </div>
-            <label className="profile-toggle">
-              <input type="checkbox" checked={twoFactorAuth} onChange={() => setTwoFactorAuth(!twoFactorAuth)} />
-              <span className="profile-toggle-track" style={{ background: twoFactorAuth ? '#10b981' : '#334155' }} />
-              <span className="profile-toggle-thumb" style={{ left: twoFactorAuth ? '22px' : '2px' }} />
-            </label>
           </div>
 
-          {/* Login Alerts Toggle */}
-          <div className="profile-security-item">
-            <div className="profile-security-item-left">
-              <Bell size={18} color="#f59e0b" />
-              <div>
-                <div className="profile-security-item-title">Login Alerts</div>
-                <div className="profile-security-item-desc">Get notified about new sign-ins</div>
+          {/* Card 2: Security Settings */}
+          <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: '800' }}>Security Settings</h3>
+
+            {/* Item 1: Change Password */}
+            <div
+              onClick={() => setShowPwChange(!showPwChange)}
+              style={{
+                padding: '14px 16px',
+                background: 'var(--bg-input)',
+                borderRadius: '12px',
+                border: '1px solid var(--border-color)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                cursor: 'pointer'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <Lock size={18} color="#3b82f6" />
+                <div>
+                  <div style={{ fontWeight: '700', fontSize: '0.88rem' }}>Change Password</div>
+                  <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>Update your account password</div>
+                </div>
               </div>
+              <ChevronRight size={18} color="var(--text-muted)" style={{ transform: showPwChange ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
             </div>
-            <label className="profile-toggle">
-              <input type="checkbox" checked={loginAlerts} onChange={() => setLoginAlerts(!loginAlerts)} />
-              <span className="profile-toggle-track" style={{ background: loginAlerts ? '#10b981' : '#334155' }} />
-              <span className="profile-toggle-thumb" style={{ left: loginAlerts ? '22px' : '2px' }} />
-            </label>
+
+            {showPwChange && (
+              <div style={{ padding: '14px', background: 'var(--bg-input)', borderRadius: '12px', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <input type="password" placeholder="Current Password" value={oldPw} onChange={e => setOldPw(e.target.value)} />
+                <input type="password" placeholder="New Password" value={newPw} onChange={e => setNewPw(e.target.value)} />
+                <button onClick={save} className="btn-primary" style={{ padding: '8px 18px', fontSize: '0.82rem', width: 'fit-content' }}>Update Password</button>
+              </div>
+            )}
+
+            {/* Item 2: Two Factor Authentication */}
+            <div style={{
+              padding: '14px 16px',
+              background: 'var(--bg-input)',
+              borderRadius: '12px',
+              border: '1px solid var(--border-color)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <Lock size={18} color="#a855f7" />
+                <div>
+                  <div style={{ fontWeight: '700', fontSize: '0.88rem' }}>Two Factor Authentication</div>
+                  <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>Add an extra layer of security</div>
+                </div>
+              </div>
+              <Toggle checked={twoFA} onChange={() => setTwoFA(!twoFA)} />
+            </div>
+
+            {/* Item 3: Login Alerts */}
+            <div style={{
+              padding: '14px 16px',
+              background: 'var(--bg-input)',
+              borderRadius: '12px',
+              border: '1px solid var(--border-color)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <Lock size={18} color="#f59e0b" />
+                <div>
+                  <div style={{ fontWeight: '700', fontSize: '0.88rem' }}>Login Alerts</div>
+                  <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>Get notified about new sign-ins</div>
+                </div>
+              </div>
+              <Toggle checked={loginAlerts} onChange={() => setLoginAlerts(!loginAlerts)} />
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Column 3: Right Preferences & Account Status */}
-      <div className="profile-sidebar-area">
-        {/* Preferences Card */}
-        <div className="glass-panel profile-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <h3 className="profile-card-title" style={{ marginBottom: 0 }}>Preferences</h3>
+        {/* ── COLUMN 3: RIGHT PREFERENCES & ACCOUNT STATUS (Page 64) ── */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Card 1: Preferences */}
+          <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: '800' }}>Preferences</h3>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ fontSize: '0.85rem', fontWeight: '700' }}>Email Notifications</div>
-            <label className="profile-toggle">
-              <input type="checkbox" checked={emailNotifications} onChange={() => setEmailNotifications(v => !v)} />
-              <span className="profile-toggle-track" style={{ background: emailNotifications ? '#10b981' : '#334155' }} />
-              <span className="profile-toggle-thumb" style={{ left: emailNotifications ? '22px' : '2px' }} />
-            </label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.86rem', fontWeight: '700' }}>Email Notifications</span>
+              <Toggle checked={emailNotif} onChange={() => setEmailNotif(!emailNotif)} />
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.86rem', fontWeight: '700' }}>Dark Mode</span>
+              <Toggle checked={theme === 'dark'} onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '0.72rem', fontWeight: '800', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', letterSpacing: '0.06em' }}>
+                LANGUAGE
+              </label>
+              <select value={language || 'English'} onChange={e => onLanguageChange?.(e.target.value)}>
+                <option value="English">English</option>
+                <option value="Urdu">Urdu (اردو)</option>
+              </select>
+            </div>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ fontSize: '0.85rem', fontWeight: '700' }}>Dark Mode</div>
-            <label className="profile-toggle">
-              <input type="checkbox" checked={theme === 'dark'} onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
-              <span className="profile-toggle-track" style={{ background: theme === 'dark' ? '#10b981' : '#334155' }} />
-              <span className="profile-toggle-thumb" style={{ left: theme === 'dark' ? '22px' : '2px' }} />
-            </label>
-          </div>
+          {/* Card 2: Account Status (Green Shield Checkmark) */}
+          <div className="glass-panel" style={{ padding: '28px 20px', textAlign: 'center' }}>
+            <div style={{ fontSize: '0.82rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '14px', letterSpacing: '0.06em' }}>
+              Account Status
+            </div>
 
-          <div>
-            <label style={{ fontSize: '0.75rem', fontWeight: '800', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>LANGUAGE</label>
-            <select value={selectedLanguage} onChange={(e) => onLanguageChange && onLanguageChange(e.target.value)} style={{ width: '100%', padding: '8px 12px', fontSize: '0.85rem' }}>
-              <option value="English">English</option>
-              <option value="Urdu">Urdu (اردو)</option>
-            </select>
+            <div style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              margin: '0 auto 12px auto',
+              background: 'rgba(16, 185, 129, 0.15)',
+              border: '2px solid #10b981',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#10b981'
+            }}>
+              <Check size={32} />
+            </div>
+
+            <div style={{ fontSize: '0.98rem', fontWeight: '800', color: '#10b981' }}>
+              Your account is secure
+            </div>
           </div>
         </div>
 
-        {/* Account Status Card */}
-        <div className="profile-account-status">
-          <div style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '12px' }}>
-            Account Status
-          </div>
-
-          <div className="profile-account-status-icon">
-            <Check size={28} />
-          </div>
-
-          <div className="profile-account-status-text">
-            Your account is secure
-          </div>
-        </div>
       </div>
     </div>
   );

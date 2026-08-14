@@ -4,7 +4,6 @@ import {
   Search,
   AlertTriangle,
   CheckCircle2,
-  ShieldAlert,
   Clock,
   Download,
   Info,
@@ -12,6 +11,7 @@ import {
   Check
 } from 'lucide-react';
 import { analyzeUrl } from '../utils/urlAnalyzer';
+import RadialGauge from './RadialGauge';
 
 export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
   const [inputUrl, setInputUrl] = useState('');
@@ -27,7 +27,7 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
       sslCertificate: 'Invalid',
       redirectCount: '3',
       blacklistStatus: 'Blacklisted',
-      hostingCountry: 'High Risk'
+      hostingRisk: 'High Risk'
     },
     recommendation: 'Do not visit this URL. Report to your administrator.'
   });
@@ -56,13 +56,35 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
     }, 600);
   };
 
+  const det = scanResult.details || {};
+  const isPhishing = scanResult.verdict?.includes('Phishing');
+
+  const detailItems = [
+    { label: 'Domain Age', value: det.domainAge || '2 months' },
+    { label: 'IP Address', value: det.ipAddress || '165.199.108.153', mono: true },
+    {
+      label: 'SSL Certificate',
+      value: det.sslCertificate || 'Invalid',
+      icon: (det.sslCertificate === 'Valid' || (det.sslCertificate && det.sslCertificate.includes('Valid'))) ? <Check size={15} color="#10b981" /> : <X size={15} color="#ef4444" />,
+      color: (det.sslCertificate === 'Valid' || (det.sslCertificate && det.sslCertificate.includes('Valid'))) ? '#10b981' : '#ef4444'
+    },
+    { label: 'Redirect Count', value: det.redirectCount || '3' },
+    { label: 'Blacklist Status', value: det.blacklistStatus || 'Blacklisted', color: '#ef4444' },
+    {
+      label: 'Hosting',
+      value: det.hostingRisk || det.hostingCountry || 'High Risk',
+      icon: <X size={15} color="#ef4444" />,
+      color: '#ef4444'
+    },
+  ];
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px', maxWidth: '950px', margin: '0 auto' }}>
-      {/* Header */}
+      {/* Header (Exact Match to PDF Page 62 Screen 5) */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
         <div>
-          <h2 style={{ fontSize: 'clamp(1.3rem, 4vw, 1.8rem)', fontWeight: '800' }}>URL Detection</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
+          <h2 style={{ fontSize: 'clamp(1.4rem, 4vw, 1.85rem)', fontWeight: '800' }}>URL Detection</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
             Analyze any URL for potential threats
           </p>
         </div>
@@ -73,7 +95,7 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
         </div>
       </div>
 
-      {/* Input Panel */}
+      {/* Input Panel (Exact Match to PDF Page 62 Screen 5) */}
       <div className="glass-panel" style={{ padding: '20px' }}>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <input
@@ -115,107 +137,77 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
         </div>
       </div>
 
-      {/* Result Section */}
+      {/* Result Section (Exact Match to PDF Page 62 Screen 5) */}
       {scanResult && (
         <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {/* Top Row: Result Banner & Risk Score Radial Gauge */}
+          {/* Top Row: Result Banner & Exact Semicircle Arc Radial Gauge */}
           <div className="responsive-grid-2-1" style={{ alignItems: 'stretch' }}>
             {/* Result Box */}
             <div style={{
-              padding: '20px',
-              borderRadius: '14px',
-              background: scanResult.verdict.includes('Phishing') ? 'rgba(239, 68, 68, 0.12)' : (scanResult.verdict.includes('Suspicious') ? 'rgba(245, 158, 11, 0.12)' : 'rgba(16, 185, 129, 0.12)'),
-              border: `1px solid ${scanResult.verdict.includes('Phishing') ? 'rgba(239, 68, 68, 0.4)' : (scanResult.verdict.includes('Suspicious') ? 'rgba(245, 158, 11, 0.4)' : 'rgba(16, 185, 129, 0.4)')}`,
+              padding: '22px',
+              borderRadius: '16px',
+              background: isPhishing ? 'rgba(239, 68, 68, 0.12)' : (scanResult.verdict.includes('Suspicious') ? 'rgba(245, 158, 11, 0.12)' : 'rgba(16, 185, 129, 0.12)'),
+              border: `1.5px solid ${isPhishing ? 'rgba(239, 68, 68, 0.45)' : (scanResult.verdict.includes('Suspicious') ? 'rgba(245, 158, 11, 0.45)' : 'rgba(16, 185, 129, 0.45)')}`,
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center'
             }}>
-              <div style={{ fontSize: '0.78rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '4px' }}>Result</div>
+              <div style={{ fontSize: '0.8rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '6px', letterSpacing: '0.05em' }}>
+                Result
+              </div>
               <div style={{
-                fontSize: '1.4rem',
+                fontSize: '1.45rem',
                 fontWeight: '900',
-                color: scanResult.verdict.includes('Phishing') ? '#ef4444' : (scanResult.verdict.includes('Suspicious') ? '#f59e0b' : '#10b981'),
+                color: isPhishing ? '#ef4444' : (scanResult.verdict.includes('Suspicious') ? '#f59e0b' : '#10b981'),
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px'
               }}>
-                {scanResult.verdict.includes('Phishing') ? <AlertTriangle size={24} /> : <CheckCircle2 size={24} />}
+                {isPhishing ? <AlertTriangle size={24} /> : <CheckCircle2 size={24} />}
                 {scanResult.verdict}
               </div>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '6px' }}>
-                {scanResult.verdict.includes('Phishing')
+              <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', marginTop: '8px', lineHeight: '1.45' }}>
+                {isPhishing
                   ? 'This URL is malicious and may harm your device or steal your information.'
                   : 'This URL passed security validation checks and appears clean.'}
               </p>
             </div>
 
-            {/* Risk Score Half-Circle Gauge */}
-            <div style={{
-              padding: '20px',
-              borderRadius: '14px',
-              background: 'var(--bg-input)',
-              border: '1px solid var(--border-color)',
-              textAlign: 'center',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <div style={{ fontSize: '0.78rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '6px' }}>Risk Score</div>
-              <div style={{ fontSize: '2.6rem', fontWeight: '900', lineHeight: '1', color: scanResult.riskScore >= 65 ? '#ef4444' : (scanResult.riskScore >= 35 ? '#f59e0b' : '#10b981') }}>
-                {scanResult.riskScore}<span style={{ fontSize: '1.1rem', color: 'var(--text-muted)' }}>/100</span>
-              </div>
-              <div style={{ fontSize: '0.82rem', fontWeight: '800', marginTop: '4px', color: scanResult.riskScore >= 65 ? '#ef4444' : (scanResult.riskScore >= 35 ? '#f59e0b' : '#10b981') }}>
-                {scanResult.riskScore >= 65 ? 'High Risk' : (scanResult.riskScore >= 35 ? 'Medium Risk' : 'Low Risk')}
-              </div>
-            </div>
+            {/* Risk Score Semicircle Arc Radial Gauge (Exact Match to User Screenshot) */}
+            <RadialGauge
+              score={scanResult.riskScore}
+              label={scanResult.riskScore >= 65 ? 'High Risk' : (scanResult.riskScore >= 35 ? 'Medium Risk' : 'Low Risk')}
+            />
           </div>
 
-          {/* Middle Section: URL Analysis Details Grid */}
+          {/* Middle Section: URL Analysis Details Grid (Exact 6 items from PDF Page 62) */}
           <div>
-            <h3 style={{ fontSize: '1.05rem', fontWeight: '800', marginBottom: '14px' }}>URL Analysis Details</h3>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: '800', marginBottom: '14px' }}>URL Analysis Details</h3>
             <div className="responsive-grid-3">
-              <div style={{ padding: '14px', background: 'var(--bg-input)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
-                <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: '700' }}>Domain Age</div>
-                <div style={{ fontSize: '0.92rem', fontWeight: '800', marginTop: '3px' }}>{scanResult.details?.domainAge || '2 months'}</div>
-              </div>
-
-              <div style={{ padding: '14px', background: 'var(--bg-input)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
-                <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: '700' }}>IP Address</div>
-                <div style={{ fontSize: '0.92rem', fontWeight: '800', fontFamily: 'var(--font-mono)', marginTop: '3px' }}>{scanResult.details?.ipAddress || '165.199.108.153'}</div>
-              </div>
-
-              <div style={{ padding: '14px', background: 'var(--bg-input)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
-                <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: '700' }}>SSL Certificate</div>
-                <div style={{ fontSize: '0.92rem', fontWeight: '800', marginTop: '3px', color: scanResult.details?.sslCertificate === 'Invalid' ? '#ef4444' : '#10b981', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  {scanResult.details?.sslCertificate === 'Invalid' ? <X size={15} color="#ef4444" /> : <Check size={15} color="#10b981" />}
-                  {scanResult.details?.sslCertificate || 'Invalid'}
+              {detailItems.map((item, idx) => (
+                <div key={idx} style={{ padding: '14px', background: 'var(--bg-input)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                  <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: '700' }}>{item.label}</div>
+                  <div style={{
+                    fontSize: '0.92rem',
+                    fontWeight: '800',
+                    marginTop: '4px',
+                    color: item.color || 'var(--text-primary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontFamily: item.mono ? 'var(--font-mono)' : 'inherit'
+                  }}>
+                    {item.icon}
+                    <span>{item.value}</span>
+                  </div>
                 </div>
-              </div>
-
-              <div style={{ padding: '14px', background: 'var(--bg-input)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
-                <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: '700' }}>Redirect Count</div>
-                <div style={{ fontSize: '0.92rem', fontWeight: '800', marginTop: '3px' }}>{scanResult.details?.redirectCount || '3'}</div>
-              </div>
-
-              <div style={{ padding: '14px', background: 'var(--bg-input)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
-                <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: '700' }}>Blacklist Status</div>
-                <div style={{ fontSize: '0.92rem', fontWeight: '800', marginTop: '3px', color: '#ef4444' }}>{scanResult.details?.blacklistStatus || 'Blacklisted'}</div>
-              </div>
-
-              <div style={{ padding: '14px', background: 'var(--bg-input)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
-                <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: '700' }}>Hosting</div>
-                <div style={{ fontSize: '0.92rem', fontWeight: '800', marginTop: '3px', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <X size={15} color="#ef4444" />
-                  {scanResult.details?.hostingCountry || 'High Risk'}
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 
-          {/* Bottom Section: Recommendation Banner */}
+          {/* Bottom Section: Recommendation Banner (Exact Match to PDF Page 62) */}
           <div style={{
-            padding: '16px',
+            padding: '16px 20px',
             borderRadius: '12px',
             background: 'var(--bg-input)',
             border: '1px solid var(--border-color)',
@@ -223,10 +215,10 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
             alignItems: 'center',
             gap: '12px'
           }}>
-            <AlertTriangle size={20} color="#f59e0b" style={{ flexShrink: 0 }} />
+            <AlertTriangle size={22} color="#f59e0b" style={{ flexShrink: 0 }} />
             <div>
               <div style={{ fontSize: '0.76rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Recommendation</div>
-              <div style={{ fontSize: '0.88rem', fontWeight: '600', color: 'var(--text-primary)', marginTop: '2px' }}>
+              <div style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-primary)', marginTop: '2px' }}>
                 {scanResult.recommendation || 'Do not visit this URL. Report to your administrator.'}
               </div>
             </div>

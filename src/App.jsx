@@ -37,7 +37,12 @@ function AppInner() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState({
+    name: 'Amna Najam',
+    email: 'amnanajam2003@gmail.com',
+    username: 'amna_najam',
+    role: 'Premium User'
+  });
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
 
@@ -135,6 +140,7 @@ function AppInner() {
       ) : (
         <div className="app-layout">
           <Header
+            activeTab={activeTab}
             theme={theme} setTheme={setTheme}
             currentUser={currentUser}
             onOpenAuth={() => setIsAuthOpen(true)}
@@ -157,6 +163,8 @@ function AppInner() {
               activeTab={activeTab}
               setActiveTab={setActiveTab}
               currentUser={currentUser}
+              onLogout={() => setCurrentUser(null)}
+              onOpenAuth={() => setIsAuthOpen(true)}
               isOpen={sidebarOpen}
               onClose={() => setSidebarOpen(false)}
               t={t}

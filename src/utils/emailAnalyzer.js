@@ -199,6 +199,7 @@ export function analyzeEmailText(text, fileName = null) {
       deceptiveLinksCount,
       attachmentsCount,
       phishingIntentionsCount,
+      phishingIndicatorsCount: urgencyCount + harvestingCount,
       spamProbability: `${spamProbability}%`,
       senderReputation,
       wordCount,

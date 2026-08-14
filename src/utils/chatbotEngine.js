@@ -50,7 +50,7 @@ export async function generateChatbotResponse(userMessage, chatHistory = [], lan
     reply += `• **Target URL:** \`${analysis.fullUrl || targetUrl}\`\n`;
     reply += `• **Security Verdict:** **${analysis.verdict}** (${analysis.riskScore}/100 Threat Index)\n`;
     reply += `• **SSL/TLS Encryption:** ${analysis.details.sslCertificate}\n`;
-    reply += `• **Hosting Host / IP:** \`${analysis.details.ipAddress}\` (${analysis.details.hostingCountry})\n`;
+    reply += `• **Hosting Risk:** \`${analysis.details.ipAddress}\` — ${analysis.details.hostingRisk ?? analysis.details.hostingCountry ?? 'Unknown'}\n`;
     reply += `• **Domain Age & Status:** ${analysis.details.domainAge} | ${analysis.details.blacklistStatus}\n\n`;
 
     if (analysis.indicators && analysis.indicators.length > 0) {

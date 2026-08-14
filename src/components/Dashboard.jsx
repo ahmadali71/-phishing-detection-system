@@ -1,158 +1,207 @@
 import React from 'react';
 import {
   Search,
-  ExternalLink,
   Zap,
-  TrendingUp,
-  AlertTriangle,
-  CheckCircle2,
-  Activity
+  ExternalLink
 } from 'lucide-react';
 
 export default function Dashboard({ stats, recentActivity, onNavigateScan, onViewDetail, t }) {
-  const weeklyData = [
-    { day: 'Mon', count: 50, height: 25 },
-    { day: 'Tue', count: 100, height: 50 },
-    { day: 'Wed', count: 80, height: 40 },
-    { day: 'Thu', count: 120, height: 60 },
-    { day: 'Fri', count: 110, height: 55 },
-    { day: 'Sat', count: 150, height: 75 },
-    { day: 'Sun', count: 200, height: 100 }
+  // Weekly points matching Page 61 line chart:
+  // Mon: 50, Tue: 100, Wed: 75, Thu: 125, Fri: 110, Sat: 140, Sun: 190
+  const points = [
+    { day: 'Mon', val: 50, x: 40, y: 150 },
+    { day: 'Tue', val: 100, x: 90, y: 110 },
+    { day: 'Wed', val: 75, x: 140, y: 130 },
+    { day: 'Thu', val: 125, x: 190, y: 90 },
+    { day: 'Fri', val: 110, x: 240, y: 100 },
+    { day: 'Sat', val: 140, x: 290, y: 75 },
+    { day: 'Sun', val: 190, x: 340, y: 35 }
   ];
 
-  const threatCategories = [
-    { label: 'Phishing', pct: 45, color: '#ef4444' },
-    { label: 'Malware', pct: 25, color: '#f59e0b' },
-    { label: 'Suspicious', pct: 18, color: '#3b82f6' },
-    { label: 'Other', pct: 12, color: '#10b981' }
+  const polylineStr = points.map(p => `${p.x},${p.y}`).join(' ');
+
+  const defaultActivity = [
+    { type: 'URL', input: 'paypal-secure-login.com', result: 'Phishing', riskScore: '90/100', time: '2 min ago' },
+    { type: 'Email', input: 'Verify your account.eml', result: 'Suspicious', riskScore: '65/100', time: '15 min ago' },
+    { type: 'URL', input: 'microsoft.com', result: 'Safe', riskScore: '10/100', time: '1 hour ago' }
   ];
+
+  const activityList = recentActivity && recentActivity.length > 0 ? recentActivity : defaultActivity;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
-      {/* Title */}
+      {/* Title & Quick Actions */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
         <div>
-          <h2 style={{ fontSize: 'clamp(1.3rem, 4vw, 1.8rem)', fontWeight: '800' }}>Dashboard</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
+          <h2 style={{ fontSize: 'clamp(1.4rem, 4vw, 1.85rem)', fontWeight: '800' }}>Dashboard</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
             Overview of your security activity
           </p>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
-          <button onClick={() => onNavigateScan('url-detection')} className="btn-primary" style={{ padding: '9px 18px' }}>
-            <Search size={16} /> Scan URL
+          <button onClick={() => onNavigateScan('url-detection')} className="btn-primary" style={{ padding: '10px 20px', fontSize: '0.88rem' }}>
+            <Search size={16} /> Scan URL Now
           </button>
-          <button onClick={() => onNavigateScan('email-detection')} className="btn-secondary" style={{ padding: '9px 18px' }}>
-            <Zap size={16} /> Scan Email
+          <button onClick={() => onNavigateScan('email-detection')} className="btn-secondary" style={{ padding: '10px 20px', fontSize: '0.88rem' }}>
+            <Zap size={16} /> Analyze Email
           </button>
         </div>
       </div>
 
-      {/* 4 Stat Metric Cards (Responsive Grid) */}
+      {/* ── 4 Stat Metric Cards (Exact Match to PDF Page 61 Screen 4) ── */}
       <div className="responsive-grid-4">
         {/* Total Scans */}
         <div className="glass-panel" style={{ padding: '22px 24px', background: 'var(--bg-card)' }}>
-          <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: '600' }}>Total Scans</div>
-          <div style={{ fontSize: '2.4rem', fontWeight: '800', margin: '6px 0', color: 'var(--text-primary)' }}>
+          <div style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', fontWeight: '700' }}>Total Scans</div>
+          <div style={{ fontSize: '2.4rem', fontWeight: '900', margin: '4px 0', color: '#2563eb', fontFamily: 'var(--font-display)' }}>
             {stats.totalScans ? stats.totalScans.toLocaleString() : '2,568'}
           </div>
         </div>
 
         {/* Phishing Detected */}
         <div className="glass-panel" style={{ padding: '22px 24px', background: 'var(--bg-card)' }}>
-          <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: '600' }}>Phishing Detected</div>
-          <div style={{ fontSize: '2.4rem', fontWeight: '800', margin: '6px 0', color: '#ef4444' }}>
+          <div style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', fontWeight: '700' }}>Phishing Detected</div>
+          <div style={{ fontSize: '2.4rem', fontWeight: '900', margin: '4px 0', color: '#ef4444', fontFamily: 'var(--font-display)' }}>
             {stats.phishingDetected ? stats.phishingDetected.toLocaleString() : '642'}
           </div>
         </div>
 
         {/* Safe Items */}
         <div className="glass-panel" style={{ padding: '22px 24px', background: 'var(--bg-card)' }}>
-          <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: '600' }}>Safe Items</div>
-          <div style={{ fontSize: '2.4rem', fontWeight: '800', margin: '6px 0', color: '#10b981' }}>
+          <div style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', fontWeight: '700' }}>Safe Items</div>
+          <div style={{ fontSize: '2.4rem', fontWeight: '900', margin: '4px 0', color: '#10b981', fontFamily: 'var(--font-display)' }}>
             {stats.safeItems ? stats.safeItems.toLocaleString() : '1,926'}
           </div>
         </div>
 
         {/* Accuracy */}
         <div className="glass-panel" style={{ padding: '22px 24px', background: 'var(--bg-card)' }}>
-          <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: '600' }}>Accuracy</div>
-          <div style={{ fontSize: '2.4rem', fontWeight: '800', margin: '6px 0', color: '#3b82f6' }}>
+          <div style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', fontWeight: '700' }}>Accuracy</div>
+          <div style={{ fontSize: '2.4rem', fontWeight: '900', margin: '4px 0', color: '#3b82f6', fontFamily: 'var(--font-display)' }}>
             {stats.accuracyRate ? `${stats.accuracyRate}%` : '94.6%'}
           </div>
         </div>
       </div>
 
-      {/* Middle Row: Threats Detected Line Chart & Threat Categories Donut (Responsive Grid) */}
+      {/* ── Middle Row: Line Chart & Donut Chart (Exact Match to PDF Page 61 Screen 4) ── */}
       <div className="responsive-grid-2-1">
-        {/* Left Card: Threats Detected (This Week) */}
+        {/* Left Card: Threats Detected (This Week) with Connected Line Chart */}
         <div className="glass-panel" style={{ padding: '24px' }}>
-          <h3 style={{ fontSize: '1.1rem', fontWeight: '800', marginBottom: '18px' }}>Threats Detected (This Week)</h3>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: '800', marginBottom: '16px' }}>Threats Detected (This Week)</h3>
 
-          <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-end', height: '180px', padding: '10px 10px 0 10px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-              <span>200</span>
-              <span>150</span>
-              <span>100</span>
-              <span>50</span>
-              <span>0</span>
-            </div>
+          <div style={{ width: '100%', height: '200px', position: 'relative' }}>
+            <svg viewBox="0 0 380 200" style={{ width: '100%', height: '100%' }}>
+              {/* Y-axis grid labels */}
+              <text x="10" y="38" fill="var(--text-muted)" fontSize="11" fontWeight="600">200</text>
+              <text x="10" y="78" fill="var(--text-muted)" fontSize="11" fontWeight="600">150</text>
+              <text x="10" y="118" fill="var(--text-muted)" fontSize="11" fontWeight="600">100</text>
+              <text x="10" y="158" fill="var(--text-muted)" fontSize="11" fontWeight="600">50</text>
+              <text x="10" y="195" fill="var(--text-muted)" fontSize="11" fontWeight="600">0</text>
 
-            <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', height: '100%', gap: '12px' }}>
-              {weeklyData.map((d, idx) => (
-                <div key={idx} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', height: '100%', justifyContent: 'flex-end' }}>
-                  <div style={{
-                    width: '100%',
-                    maxWidth: '32px',
-                    height: `${d.height}%`,
-                    background: 'linear-gradient(180deg, #3b82f6 0%, rgba(59, 130, 246, 0.25) 100%)',
-                    borderRadius: '6px 6px 0 0',
-                    transition: 'height 0.4s ease'
-                  }} />
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: '700' }}>{d.day}</span>
-                </div>
+              {/* Horizontal grid lines */}
+              <line x1="35" y1="35" x2="370" y2="35" stroke="var(--border-color)" strokeDasharray="3 3" />
+              <line x1="35" y1="75" x2="370" y2="75" stroke="var(--border-color)" strokeDasharray="3 3" />
+              <line x1="35" y1="115" x2="370" y2="115" stroke="var(--border-color)" strokeDasharray="3 3" />
+              <line x1="35" y1="155" x2="370" y2="155" stroke="var(--border-color)" strokeDasharray="3 3" />
+              <line x1="35" y1="190" x2="370" y2="190" stroke="var(--border-color)" />
+
+              {/* Connecting Blue Line matching Page 61 */}
+              <polyline
+                fill="none"
+                stroke="#2563eb"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                points={polylineStr}
+              />
+
+              {/* Circular Dots & Day Labels on X-axis */}
+              {points.map((p, i) => (
+                <g key={i}>
+                  <circle
+                    cx={p.x}
+                    cy={p.y}
+                    r="4.5"
+                    fill="#2563eb"
+                    stroke="#ffffff"
+                    strokeWidth="2"
+                  />
+                  <text
+                    x={p.x}
+                    y="198"
+                    textAnchor="middle"
+                    fill="var(--text-secondary)"
+                    fontSize="11"
+                    fontWeight="700"
+                  >
+                    {p.day}
+                  </text>
+                </g>
               ))}
-            </div>
+            </svg>
           </div>
         </div>
 
-        {/* Right Card: Threat Categories Donut Chart */}
+        {/* Right Card: Threat Categories Donut Chart matching Page 61 */}
         <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <h3 style={{ fontSize: '1.1rem', fontWeight: '800', marginBottom: '14px' }}>Threat Categories</h3>
 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '10px 0' }}>
-            <div style={{
-              width: '120px',
-              height: '120px',
-              borderRadius: '50%',
-              background: 'conic-gradient(#ef4444 0% 45%, #f59e0b 45% 70%, #3b82f6 70% 88%, #10b981 88% 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 0 15px rgba(0,0,0,0.2)'
-            }}>
-              <div style={{ width: '70px', height: '70px', borderRadius: '50%', background: 'var(--bg-card)' }} />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', gap: '16px', flexWrap: 'wrap' }}>
+            {/* SVG Donut Chart */}
+            <div style={{ width: '130px', height: '130px', position: 'relative' }}>
+              <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+                {/* Phishing (45%) -> Red */}
+                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#ef4444" strokeWidth="16" strokeDasharray="107.44 238.76" strokeDashoffset="0" />
+                {/* Malware (25%) -> Orange */}
+                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#f97316" strokeWidth="16" strokeDasharray="59.69 238.76" strokeDashoffset="-107.44" />
+                {/* Suspicious (18%) -> Yellow */}
+                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#eab308" strokeWidth="16" strokeDasharray="42.98 238.76" strokeDashoffset="-167.13" />
+                {/* Other (12%) -> Green/Blue */}
+                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#06b6d4" strokeWidth="16" strokeDasharray="28.65 238.76" strokeDashoffset="-210.11" />
+              </svg>
             </div>
-          </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '10px' }}>
-            {threatCategories.map((cat, idx) => (
-              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', fontWeight: '700' }}>
-                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: cat.color }} />
-                <span>{cat.label}</span>
-                <span style={{ color: 'var(--text-muted)' }}>{cat.pct}%</span>
+            {/* Legend (Exact percentages from PDF Page 61) */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.85rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ef4444', display: 'inline-block' }} />
+                <span style={{ fontWeight: '600', color: 'var(--text-secondary)' }}>Phishing</span>
+                <span style={{ fontWeight: '800', marginLeft: 'auto', color: 'var(--text-primary)' }}>45%</span>
               </div>
-            ))}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#f97316', display: 'inline-block' }} />
+                <span style={{ fontWeight: '600', color: 'var(--text-secondary)' }}>Malware</span>
+                <span style={{ fontWeight: '800', marginLeft: 'auto', color: 'var(--text-primary)' }}>25%</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#eab308', display: 'inline-block' }} />
+                <span style={{ fontWeight: '600', color: 'var(--text-secondary)' }}>Suspicious</span>
+                <span style={{ fontWeight: '800', marginLeft: 'auto', color: 'var(--text-primary)' }}>18%</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#06b6d4', display: 'inline-block' }} />
+                <span style={{ fontWeight: '600', color: 'var(--text-secondary)' }}>Other</span>
+                <span style={{ fontWeight: '800', marginLeft: 'auto', color: 'var(--text-primary)' }}>12%</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Bottom Row: Recent Activity Table */}
+      {/* ── Bottom Card: Recent Activity (Exact Match to PDF Page 61 Screen 4) ── */}
       <div className="glass-panel" style={{ padding: '24px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <h3 style={{ fontSize: '1.1rem', fontWeight: '800' }}>Recent Activity</h3>
           <button
             onClick={() => onNavigateScan('scan-history')}
-            style={{ background: 'transparent', border: 'none', color: '#3b82f6', fontWeight: '700', fontSize: '0.85rem', cursor: 'pointer' }}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#2563eb',
+              fontWeight: '700',
+              fontSize: '0.85rem',
+              cursor: 'pointer'
+            }}
           >
             View All
           </button>
@@ -166,62 +215,28 @@ export default function Dashboard({ stats, recentActivity, onNavigateScan, onVie
                 <th>Input</th>
                 <th>Result</th>
                 <th>Risk Score</th>
-                <th>Time</th>
-                <th style={{ textAlign: 'right' }}>Action</th>
+                <th style={{ textAlign: 'right' }}>Time</th>
               </tr>
             </thead>
             <tbody>
-              {recentActivity && recentActivity.length > 0 ? (
-                recentActivity.map((item) => (
-                  <tr key={item.id}>
-                    <td style={{ fontWeight: '700' }}>{item.type}</td>
-                    <td style={{ fontFamily: 'var(--font-mono)', fontWeight: '600' }}>{item.input}</td>
-                    <td>
-                      <span className={`badge badge-${item.badgeColor || (item.result === 'Phishing' ? 'danger' : (item.result === 'Suspicious' ? 'warning' : 'emerald'))}`}>
-                        {item.result}
-                      </span>
-                    </td>
-                    <td style={{ fontWeight: '700' }}>{item.riskScore}/100</td>
-                    <td style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{item.time || '2 min ago'}</td>
-                    <td style={{ textAlign: 'right' }}>
-                      <button
-                        onClick={() => onViewDetail(item)}
-                        className="btn-secondary"
-                        style={{ padding: '4px 10px', fontSize: '0.75rem' }}
-                      >
-                        Inspect
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <>
-                  <tr>
-                    <td style={{ fontWeight: '700' }}>URL</td>
-                    <td style={{ fontFamily: 'var(--font-mono)' }}>paypal-secure-login.com</td>
-                    <td><span className="badge badge-danger">Phishing</span></td>
-                    <td style={{ fontWeight: '700' }}>90/100</td>
-                    <td style={{ color: 'var(--text-muted)' }}>2 min ago</td>
-                    <td style={{ textAlign: 'right' }}><button className="btn-secondary" style={{ padding: '4px 10px', fontSize: '0.75rem' }}>Inspect</button></td>
-                  </tr>
-                  <tr>
-                    <td style={{ fontWeight: '700' }}>Email</td>
-                    <td style={{ fontFamily: 'var(--font-mono)' }}>Verify your account.eml</td>
-                    <td><span className="badge badge-warning">Suspicious</span></td>
-                    <td style={{ fontWeight: '700' }}>65/100</td>
-                    <td style={{ color: 'var(--text-muted)' }}>15 min ago</td>
-                    <td style={{ textAlign: 'right' }}><button className="btn-secondary" style={{ padding: '4px 10px', fontSize: '0.75rem' }}>Inspect</button></td>
-                  </tr>
-                  <tr>
-                    <td style={{ fontWeight: '700' }}>URL</td>
-                    <td style={{ fontFamily: 'var(--font-mono)' }}>microsoft.com</td>
-                    <td><span className="badge badge-emerald">Safe</span></td>
-                    <td style={{ fontWeight: '700' }}>10/100</td>
-                    <td style={{ color: 'var(--text-muted)' }}>1 hour ago</td>
-                    <td style={{ textAlign: 'right' }}><button className="btn-secondary" style={{ padding: '4px 10px', fontSize: '0.75rem' }}>Inspect</button></td>
-                  </tr>
-                </>
-              )}
+              {activityList.slice(0, 5).map((item, idx) => (
+                <tr key={idx}>
+                  <td style={{ fontWeight: '700' }}>{item.type}</td>
+                  <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>{item.input}</td>
+                  <td>
+                    <span style={{
+                      fontWeight: '800',
+                      color: item.result === 'Phishing' ? '#ef4444' : (item.result === 'Suspicious' ? '#f59e0b' : '#10b981')
+                    }}>
+                      {item.result}
+                    </span>
+                  </td>
+                  <td style={{ fontWeight: '800' }}>{item.riskScore}</td>
+                  <td style={{ textAlign: 'right', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
+                    {item.time || item.date || 'Just now'}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
