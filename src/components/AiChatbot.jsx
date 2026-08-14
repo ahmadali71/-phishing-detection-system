@@ -27,23 +27,23 @@ export default function AiChatbot({ t, language = 'English' }) {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const handleSendMessage = (textToSend = inputText) => {
+  const handleSendMessage = async (textToSend = inputText) => {
     const query = typeof textToSend === 'string' ? textToSend.trim() : '';
     if (!query || isTyping) return;
 
     const userMsgId = Date.now();
-    setMessages(prev => [...prev, {
+    const userMessage = {
       id: userMsgId,
       sender: 'user',
       text: query,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    }]);
+    };
+    setMessages(prev => [...prev, userMessage]);
     setInputText('');
     setIsTyping(true);
 
-    // Simulate realistic AI reasoning & parsing latency
-    setTimeout(() => {
-      const response = generateChatbotResponse(query, messages, language);
+    try {
+      const response = await generateChatbotResponse(query, [...messages, userMessage], language);
       setIsTyping(false);
 
       setMessages(prev => [...prev, {
@@ -56,7 +56,15 @@ export default function AiChatbot({ t, language = 'English' }) {
       if (response.suggestions) {
         setActiveSuggestions(response.suggestions);
       }
-    }, 600);
+    } catch (error) {
+      setIsTyping(false);
+      setMessages(prev => [...prev, {
+        id: Date.now() + 1,
+        sender: 'bot',
+        text: '⚠️ **Connection Error**\n\nCould not reach the AI service. Please check your internet connection and try again. You can still use the built-in URL and email scanners!',
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }]);
+    }
   };
 
   const handleCopyText = (text, id) => {

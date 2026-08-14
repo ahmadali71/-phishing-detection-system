@@ -8,6 +8,7 @@
 
 import { analyzeUrl } from './urlAnalyzer';
 import { analyzeEmailText } from './emailAnalyzer';
+import { getOpenRouterResponse } from './openRouter';
 
 // Academic Project Metadata
 const PROJECT_CONTEXT = {
@@ -21,7 +22,7 @@ const PROJECT_CONTEXT = {
   features: '25+ lexical, host-based, DNS, SSL, and NLP semantic features'
 };
 
-export function generateChatbotResponse(userMessage, chatHistory = [], language = 'English') {
+export async function generateChatbotResponse(userMessage, chatHistory = [], language = 'English') {
   if (!userMessage || typeof userMessage !== 'string' || userMessage.trim().length === 0) {
     return {
       text: language === 'Urdu' 
@@ -293,16 +294,14 @@ export function generateChatbotResponse(userMessage, chatHistory = [], language 
   }
 
   // =========================================================================
-  // 10. COMPREHENSIVE DYNAMIC REASONING FALLBACK
+  // 10. COMPREHENSIVE DYNAMIC REASONING FALLBACK via OPENROUTER
   // =========================================================================
-  return {
-    text: `🤖 **APDS Cyber Security Intelligence Engine**\n\n` +
-      `Regarding your inquiry: *"_${query}_"*\n\n` +
-      `Our Automated Phishing Detection System is trained to evaluate both **lexical URL vectors** (entropy, typosquatting, raw IP hosting, brand spoofing) and **NLP text semantics** (manufactured urgency, credential harvesting, social engineering).\n\n` +
-      `**How to test:**\n` +
-      `• Paste any website link (e.g. \`https://paypal-secure-login.com\`) for an instant multi-parameter scan.\n` +
-      `• Paste suspicious email text to analyze spam probability.\n` +
-      `• Ask specific cybersecurity questions regarding attack vectors, defense protocols, or Python ML implementations!`,
-    suggestions: ['What is typosquatting?', 'How does URL scanner work?', 'Explain email phishing tactics']
-  };
+  return getOpenRouterResponse(chatHistory, {
+    systemPrompt: `You are APDS AI Cyber Defense Assistant, a cybersecurity expert for the Automated Phishing Detection System (APDS). 
+    You help users with phishing detection, email security, URL analysis, and cybersecurity best practices. 
+    Be concise, professional, and use markdown formatting. 
+    If users share URLs or email content, suggest they use the scanner tools.
+    Project: APDS by Amna Najam & Alisha Noor, supervised by Mam Shaista Ghafoor, Govt Graduate College for Women & Dept of CS & IT, University of Sargodha (2022-2026).
+    Accuracy: 94.6% using Random Forest, SVM, and NLP DistilBERT.`
+  });
 }
