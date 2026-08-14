@@ -47,7 +47,12 @@ function AppInner() {
   const [selectedRecord, setSelectedRecord] = useState(null);
 
   useEffect(() => {
-    document.body.classList.toggle('light-theme', theme === 'light');
+    const themeClasses = ['light-theme', 'theme-ocean', 'theme-purple', 'theme-emerald'];
+    themeClasses.forEach(cls => document.body.classList.remove(cls));
+    if (theme !== 'dark') {
+      const map = { light: 'light-theme', ocean: 'theme-ocean', purple: 'theme-purple', emerald: 'theme-emerald' };
+      if (map[theme]) document.body.classList.add(map[theme]);
+    }
   }, [theme]);
 
   useEffect(() => {

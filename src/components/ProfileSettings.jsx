@@ -15,7 +15,6 @@ function Toggle({ checked, onChange }) {
   return (
     <label
       className="toggle-wrap"
-      onClick={onChange}
       style={{
         position: 'relative',
         width: '44px',
@@ -301,6 +300,52 @@ export default function ProfileSettings({ currentUser, onUpdateProfile, theme, s
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '0.86rem', fontWeight: '700' }}>{t.darkTheme || 'Dark Mode'}</span>
               <Toggle checked={theme === 'dark'} onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '0.72rem', fontWeight: '800', color: 'var(--text-muted)', display: 'block', marginBottom: '10px', letterSpacing: '0.06em' }}>
+                {t.languageLabel ? t.languageLabel.replace('LANGUAGE', 'THEME') : 'THEME'}
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: '10px' }}>
+                {[
+                  { id: 'light', label: t.lightTheme || 'Light', color: '#f8fafc', border: '#e2e8f0', dot: '#3b82f6' },
+                  { id: 'dark', label: t.darkThemeLabel || 'Dark', color: '#0f172a', border: '#334155', dot: '#f8fafc' },
+                  { id: 'ocean', label: t.oceanTheme || 'Ocean', color: '#0f2140', border: '#38bdf8', dot: '#38bdf8' },
+                  { id: 'purple', label: t.purpleTheme || 'Purple', color: '#1a102d', border: '#a78bfa', dot: '#c084fc' },
+                  { id: 'emerald', label: t.emeraldTheme || 'Emerald', color: '#0a1f12', border: '#34d399', dot: '#6ee7b7' },
+                ].map(opt => {
+                  const active = theme === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      onClick={() => setTheme(opt.id)}
+                      style={{
+                        padding: '10px 8px',
+                        borderRadius: '12px',
+                        border: active ? '2px solid var(--accent-blue)' : '1px solid var(--border-color)',
+                        background: opt.color,
+                        color: opt.dot,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '6px',
+                        transition: 'all 0.2s',
+                        boxShadow: active ? '0 0 0 2px rgba(59,130,246,0.3)' : 'none'
+                      }}
+                    >
+                      <span style={{
+                        width: '18px',
+                        height: '18px',
+                        borderRadius: '50%',
+                        background: opt.dot,
+                        boxShadow: `0 0 8px ${opt.dot}44`
+                      }} />
+                      <span style={{ fontSize: '0.72rem', fontWeight: '700' }}>{opt.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             <div>

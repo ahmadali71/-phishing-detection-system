@@ -94,6 +94,138 @@
   --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
+/* OCEAN THEME */
+.theme-ocean {
+  --bg-primary: #0a1628;
+  --bg-secondary: #0f2140;
+  --bg-card: #132b4f;
+  --bg-card-header: #0f2140;
+  --bg-card-hover: #1a3a66;
+  --bg-input: #0c1b33;
+  --border-color: rgba(56, 189, 248, 0.15);
+  --border-card: rgba(56, 189, 248, 0.25);
+  --border-card-hover: rgba(56, 189, 248, 0.55);
+
+  --text-primary: #e0f2fe;
+  --text-secondary: #bae6fd;
+  --text-muted: #7dd3fc;
+
+  --accent-blue: #38bdf8;
+  --accent-blue-hover: #0ea5e9;
+  --accent-purple: #818cf8;
+  --accent-cyan: #22d3ee;
+
+  --color-danger-bg: rgba(244, 63, 94, 0.18);
+  --color-danger-border: rgba(244, 63, 94, 0.4);
+  --color-warning-bg: rgba(245, 158, 11, 0.18);
+  --color-warning-border: rgba(245, 158, 11, 0.4);
+  --color-emerald-bg: rgba(16, 185, 129, 0.18);
+  --color-emerald-border: rgba(16, 185, 129, 0.4);
+
+  --hero-bg: linear-gradient(135deg, #0a1628 0%, #0f2140 50%, #0c1f3a 100%);
+  --hero-text: #e0f2fe;
+  --hero-subtitle: #bae6fd;
+
+  --chat-bubble-bot-bg: #132b4f;
+  --chat-bubble-bot-text: #e0f2fe;
+  --chat-bubble-user-bg: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+  --chat-bubble-user-text: #ffffff;
+  --chat-bar-bg: #0c1b33;
+
+  --academic-card-bg: linear-gradient(135deg, rgba(19, 43, 79, 0.95), rgba(15, 33, 64, 0.95));
+  --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.55);
+  --shadow-glow: 0 0 25px rgba(56, 189, 248, 0.25);
+  --shadow-danger: 0 0 25px rgba(244, 63, 94, 0.3);
+}
+
+/* PURPLE THEME */
+.theme-purple {
+  --bg-primary: #0f0a1a;
+  --bg-secondary: #1a102d;
+  --bg-card: #24153d;
+  --bg-card-header: #1a102d;
+  --bg-card-hover: #2e1f52;
+  --bg-input: #150d24;
+  --border-color: rgba(167, 139, 250, 0.15);
+  --border-card: rgba(167, 139, 250, 0.25);
+  --border-card-hover: rgba(167, 139, 250, 0.55);
+
+  --text-primary: #f3e8ff;
+  --text-secondary: #d8b4fe;
+  --text-muted: #a78bfa;
+
+  --accent-blue: #a78bfa;
+  --accent-blue-hover: #8b5cf6;
+  --accent-purple: #c084fc;
+  --accent-cyan: #e879f9;
+
+  --color-danger-bg: rgba(244, 63, 94, 0.18);
+  --color-danger-border: rgba(244, 63, 94, 0.4);
+  --color-warning-bg: rgba(245, 158, 11, 0.18);
+  --color-warning-border: rgba(245, 158, 11, 0.4);
+  --color-emerald-bg: rgba(16, 185, 129, 0.18);
+  --color-emerald-border: rgba(16, 185, 129, 0.4);
+
+  --hero-bg: linear-gradient(135deg, #0f0a1a 0%, #1a102d 50%, #150d24 100%);
+  --hero-text: #f3e8ff;
+  --hero-subtitle: #d8b4fe;
+
+  --chat-bubble-bot-bg: #24153d;
+  --chat-bubble-bot-text: #f3e8ff;
+  --chat-bubble-user-bg: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+  --chat-bubble-user-text: #ffffff;
+  --chat-bar-bg: #150d24;
+
+  --academic-card-bg: linear-gradient(135deg, rgba(36, 21, 61, 0.95), rgba(26, 16, 45, 0.95));
+  --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.55);
+  --shadow-glow: 0 0 25px rgba(167, 139, 250, 0.25);
+  --shadow-danger: 0 0 25px rgba(244, 63, 94, 0.3);
+}
+
+/* EMERALD THEME */
+.theme-emerald {
+  --bg-primary: #06140a;
+  --bg-secondary: #0a1f12;
+  --bg-card: #0f2d1a;
+  --bg-card-header: #0a1f12;
+  --bg-card-hover: #144024;
+  --bg-input: #081a0e;
+  --border-color: rgba(52, 211, 153, 0.15);
+  --border-card: rgba(52, 211, 153, 0.25);
+  --border-card-hover: rgba(52, 211, 153, 0.55);
+
+  --text-primary: #ecfdf5;
+  --text-secondary: #a7f3d0;
+  --text-muted: #6ee7b7;
+
+  --accent-blue: #34d399;
+  --accent-blue-hover: #10b981;
+  --accent-purple: #a78bfa;
+  --accent-cyan: #6ee7b7;
+
+  --color-danger-bg: rgba(244, 63, 94, 0.18);
+  --color-danger-border: rgba(244, 63, 94, 0.4);
+  --color-warning-bg: rgba(245, 158, 11, 0.18);
+  --color-warning-border: rgba(245, 158, 11, 0.4);
+  --color-emerald-bg: rgba(16, 185, 129, 0.2);
+  --color-emerald-border: rgba(16, 185, 129, 0.45);
+
+  --hero-bg: linear-gradient(135deg, #06140a 0%, #0a1f12 50%, #081a0e 100%);
+  --hero-text: #ecfdf5;
+  --hero-subtitle: #a7f3d0;
+
+  --chat-bubble-bot-bg: #0f2d1a;
+  --chat-bubble-bot-text: #ecfdf5;
+  --chat-bubble-user-bg: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  --chat-bubble-user-text: #ffffff;
+  --chat-bar-bg: #081a0e;
+
+  --academic-card-bg: linear-gradient(135deg, rgba(15, 45, 26, 0.95), rgba(10, 31, 18, 0.95));
+  --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.55);
+  --shadow-glow: 0 0 25px rgba(52, 211, 153, 0.25);
+  --shadow-danger: 0 0 25px rgba(244, 63, 94, 0.3);
+}
+
 .rtl-layout {
   --font-display: 'Noto Nastaliq Urdu', 'Outfit', sans-serif;
   --font-sans: 'Noto Nastaliq Urdu', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
