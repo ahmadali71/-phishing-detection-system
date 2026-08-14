@@ -1,10 +1,11 @@
-const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
+const OPENROUTER_API_KEY = (import.meta.env.VITE_OPENROUTER_API_KEY || '').trim();
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 export async function getOpenRouterResponse(messages, options = {}) {
-  if (!OPENROUTER_API_KEY) {
+  if (!OPENROUTER_API_KEY || OPENROUTER_API_KEY === '' || OPENROUTER_API_KEY.includes('YOUR_OPENROUTER_API_KEY')) {
+    console.error('OpenRouter API key missing. Check .env file for VITE_OPENROUTER_API_KEY and restart the dev server after any .env change.');
     return {
-      text: 'AI service is not configured. Please add your OpenRouter API key in the .env file.',
+      text: 'AI service is not configured. Add your OpenRouter API key to the .env file as VITE_OPENROUTER_API_KEY, then restart the dev server.',
       suggestions: ['Scan a URL', 'Scan an email', 'What is phishing?']
     };
   }
