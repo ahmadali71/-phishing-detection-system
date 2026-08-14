@@ -23,7 +23,7 @@ function AppInner() {
     updateUserRole, addModel, toggleModelStatus, deleteModel
   } = useAppData();
 
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState('light');
   const [language, setLanguage] = useState('English');
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);

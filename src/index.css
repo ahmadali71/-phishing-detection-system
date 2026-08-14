@@ -1029,6 +1029,15 @@ input:focus, select:focus, textarea:focus {
     transform: translateX(0);
   }
 
+  .rtl-layout .app-sidebar {
+    transform: translateX(100%);
+    box-shadow: -6px 0 30px rgba(0,0,0,0.6);
+  }
+
+  .rtl-layout .app-sidebar.sidebar-open {
+    transform: translateX(0);
+  }
+
   .app-main {
     padding: 14px 14px 80px 14px;
   }
