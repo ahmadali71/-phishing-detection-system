@@ -163,6 +163,7 @@ h1, h2, h3, h4, h5, h6 {
   z-index: 100;
   gap: 16px;
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .header-brand {
@@ -816,7 +817,6 @@ h1, h2, h3, h4, h5, h6 {
 ================================================================ */
 .table-wrapper {
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
   border-radius: 14px;
 }
 
@@ -892,6 +892,7 @@ input:focus, select:focus, textarea:focus {
   align-items: flex-start;
   box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   padding-bottom: max(8px, env(safe-area-inset-bottom));
 }
 
@@ -1394,6 +1395,7 @@ input:focus, select:focus, textarea:focus {
   padding: 32px 28px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .auth-card-header {
