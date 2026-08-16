@@ -340,8 +340,8 @@ h1, h2, h3, h4, h5, h6 {
   top: 0;
   z-index: 100;
   gap: 16px;
-  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 
 .header-brand {
@@ -1080,8 +1080,8 @@ input:focus, select:focus, textarea:focus {
   background: var(--bg-secondary);
   border-top: 1px solid var(--border-color);
   box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
   padding: 4px 6px;
   padding-bottom: max(8px, env(safe-area-inset-bottom));
 }
@@ -1113,6 +1113,7 @@ input:focus, select:focus, textarea:focus {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
   user-select: none;
 }
 
@@ -1261,7 +1262,6 @@ input:focus, select:focus, textarea:focus {
     gap: 8px;
     padding-bottom: 4px;
     scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
   }
 
   .rtl-layout .profile-tabs-sidebar {
@@ -1558,8 +1558,8 @@ input:focus, select:focus, textarea:focus {
   border-radius: 20px;
   padding: 32px 28px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
 }
 
 .auth-card-header {
