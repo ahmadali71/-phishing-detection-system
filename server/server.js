@@ -29,6 +29,24 @@ app.use('/api/logs', logRoutes);
 app.use('/api/stats', statRoutes);
 app.use('/api/models', modelRoutes);
 
+// API info endpoint
+app.get('/api', (req, res) => {
+  res.json({
+    name: 'APDS Phishing Detection API',
+    version: '1.0.0',
+    status: 'running',
+    database: getConnectionStatus() ? 'connected' : 'disconnected',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      scans: '/api/scans',
+      logs: '/api/logs',
+      stats: '/api/stats',
+      models: '/api/models'
+    }
+  });
+});
+
 // Health check endpoint
 app.get('/', (req, res) => {
   res.json({
