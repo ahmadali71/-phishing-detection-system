@@ -6,7 +6,7 @@ const { connectDB, getConnectionStatus } = require('./config/db');
 // Load env vars
 dotenv.config();
 
-// Connect to database (non-blocking — server starts even if DB fails)
+// Connect to database (non-blocking)
 connectDB();
 
 const app = express();
@@ -64,10 +64,15 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
+// Start server when run locally
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`\n🚀 Server running on port ${PORT}`);
+    console.log(`   API:    http://localhost:${PORT}/api`);
+    console.log(`   Health: http://localhost:${PORT}/api/health\n`);
+  });
+}
 
-app.listen(PORT, () => {
-  console.log(`\n🚀 Server running on port ${PORT}`);
-  console.log(`   API:    http://localhost:${PORT}/api`);
-  console.log(`   Health: http://localhost:${PORT}/api/health\n`);
-});
+// Export app for Vercel Serverless Functions
+module.exports = app;
