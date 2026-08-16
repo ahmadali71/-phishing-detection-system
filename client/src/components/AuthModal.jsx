@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { X, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { X, Mail, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react';
 import loginArt from '../assets/login_art.png';
 import registerArt from '../assets/register_art.png';
+import { usersService } from './../firebase/services';
 
 export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
   const [isRegister, setIsRegister] = useState(false);
@@ -15,26 +16,43 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [showPw, setShowPw] = useState(false);
   const [showConfirmPw, setShowConfirmPw] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const user = isRegister
-      ? {
-          name: fullName || 'Amna Najam',
-          email: regEmail || 'amnanajam2003@gmail.com',
-          username: username || 'amna_najam',
-          role: 'BS IT Student / Security Analyst'
+    setIsLoading(true);
+    setErrorMsg('');
+
+    try {
+      if (isRegister) {
+        if (password !== confirmPassword) {
+          setErrorMsg('Passwords do not match');
+          setIsLoading(false);
+          return;
         }
-      : {
-          name: emailOrUser.includes('@') ? emailOrUser.split('@')[0] : (emailOrUser || 'Amna Najam'),
-          email: emailOrUser.includes('@') ? emailOrUser : 'amnanajam2003@gmail.com',
-          username: emailOrUser || 'amna_najam',
-          role: 'BS IT Student / Security Analyst'
-        };
-    if (onLoginSuccess) onLoginSuccess(user);
-    onClose();
+        const user = await usersService.register({
+          name: fullName,
+          email: regEmail,
+          password: password,
+        });
+        if (onLoginSuccess) onLoginSuccess(user);
+        onClose();
+      } else {
+        const user = await usersService.login({
+          email: emailOrUser,
+          password: password,
+        });
+        if (onLoginSuccess) onLoginSuccess(user);
+        onClose();
+      }
+    } catch (error) {
+      setErrorMsg(error.response?.data?.message || 'Authentication failed');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -152,6 +170,11 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
               </p>
 
               <form className="auth-form" onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {errorMsg && (
+                  <div style={{ padding: '10px', background: '#fee2e2', color: '#991b1b', borderRadius: '8px', fontSize: '0.85rem' }}>
+                    {errorMsg}
+                  </div>
+                )}
                 {/* Input 1: Email or Username */}
                 <div className="auth-input-wrap" style={{
                   display: 'flex',
@@ -268,9 +291,9 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   </a>
                 </div>
 
-                 {/* Login Button (Cyan-Blue Gradient matching user screenshot) */}
                  <button
                    type="submit"
+                   disabled={isLoading}
                    className="auth-submit-btn"
                    style={{
                      background: 'linear-gradient(90deg, #1d4ed8 0%, #0284c7 60%, #06b6d4 100%)',
@@ -280,13 +303,18 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                      padding: '14px',
                      fontWeight: '800',
                      fontSize: '1.02rem',
-                     cursor: 'pointer',
+                     cursor: isLoading ? 'not-allowed' : 'pointer',
+                     opacity: isLoading ? 0.7 : 1,
                      marginTop: '8px',
                      boxShadow: '0 8px 24px -4px rgba(2, 132, 199, 0.45)',
-                     transition: 'transform 0.15s, box-shadow 0.15s'
+                     transition: 'transform 0.15s, box-shadow 0.15s',
+                     display: 'flex',
+                     justifyContent: 'center',
+                     alignItems: 'center',
+                     gap: '8px'
                    }}
                  >
-                   Login
+                   {isLoading ? <Loader2 size={20} className="animate-spin" /> : 'Login'}
                  </button>
               </form>
 
@@ -372,6 +400,11 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
               </p>
 
               <form className="auth-form auth-register-form" onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '11px' }}>
+                {errorMsg && (
+                  <div style={{ padding: '10px', background: '#fee2e2', color: '#991b1b', borderRadius: '8px', fontSize: '0.85rem' }}>
+                    {errorMsg}
+                  </div>
+                )}
                 {/* Input 1: Full Name */}
                 <div className="auth-input-wrap" style={{
                   display: 'flex',
@@ -591,9 +624,9 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   </span>
                 </label>
 
-                 {/* Create Account Button (Purple to Cyan Gradient) */}
                  <button
                    type="submit"
+                   disabled={isLoading}
                    className="auth-submit-btn"
                    style={{
                      background: 'linear-gradient(90deg, #7c3aed 0%, #2563eb 55%, #06b6d4 100%)',
@@ -603,13 +636,18 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                      padding: '13px',
                      fontWeight: '800',
                      fontSize: '1rem',
-                     cursor: 'pointer',
+                     cursor: isLoading ? 'not-allowed' : 'pointer',
+                     opacity: isLoading ? 0.7 : 1,
                      marginTop: '4px',
                      boxShadow: '0 8px 24px -4px rgba(124, 58, 237, 0.4)',
-                     transition: 'transform 0.15s, box-shadow 0.15s'
+                     transition: 'transform 0.15s, box-shadow 0.15s',
+                     display: 'flex',
+                     justifyContent: 'center',
+                     alignItems: 'center',
+                     gap: '8px'
                    }}
                  >
-                   Create Account
+                   {isLoading ? <Loader2 size={20} className="animate-spin" /> : 'Create Account'}
                  </button>
               </form>
 

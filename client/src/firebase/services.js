@@ -1,349 +1,144 @@
-/**
- * Firebase Services - Firestore CRUD operations
- * Handles data synchronization with Firestore database
- */
+import axios from 'axios';
 
-import {
-  collection,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc,
-  getDocs,
-  query,
-  where,
-  orderBy,
-  limit,
-  Timestamp,
-  writeBatch,
-} from 'firebase/firestore';
-import { getFirebaseServices } from './init';
+const API_URL = 'http://localhost:5000/api';
 
-const COLLECTIONS = {
-  SCANS: 'scans',
-  LOGS: 'system_logs',
-  USERS: 'users',
-  STATS: 'statistics',
-  ML_MODELS: 'ml_models',
-};
+// Create axios instance
+const api = axios.create({
+  baseURL: API_URL,
+});
 
-function getDb() {
-  try {
-    const { db } = getFirebaseServices();
-    return db;
-  } catch (error) {
-    console.error('[Firebase] Not initialized:', error.message);
-    return null;
+// Request interceptor to add token if it exists
+api.interceptors.request.use((config) => {
+  const user = JSON.parse(localStorage.getItem('user'));
+  if (user && user.token) {
+    config.headers.Authorization = `Bearer ${user.token}`;
   }
-}
+  return config;
+});
 
-function guardFirebase(operation) {
-  const dbInstance = getDb();
-  if (!dbInstance) {
-    console.warn(`[Firebase] Skipping ${operation}: Firestore is not initialized`);
-    return null;
-  }
-  return dbInstance;
-}
-
-/**
- * Scans Collection Operations
- */
 export const scansService = {
   async addScan(scanData) {
-    try {
-      const dbInstance = guardFirebase('addScan');
-      if (!dbInstance) return null;
-      const docRef = await addDoc(collection(dbInstance, COLLECTIONS.SCANS), {
-        ...scanData,
-        createdAt: Timestamp.now(),
-        syncedAt: Timestamp.now(),
-      });
-      console.log('Scan added:', docRef.id);
-      return { id: docRef.id, ...scanData };
-    } catch (error) {
-      console.error('Error adding scan:', error);
-      throw error;
-    }
+    const response = await api.post('/scans', scanData);
+    return response.data;
   },
 
   async getScans(limitCount = 100) {
-    try {
-      const dbInstance = guardFirebase('getScans');
-      if (!dbInstance) return [];
-      const q = query(
-        collection(dbInstance, COLLECTIONS.SCANS),
-        orderBy('createdAt', 'desc'),
-        limit(limitCount)
-      );
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    } catch (error) {
-      console.error('Error fetching scans:', error);
-      throw error;
-    }
+    const response = await api.get(`/scans?limit=${limitCount}`);
+    return response.data;
   },
 
   async getScansByType(type) {
-    try {
-      const dbInstance = guardFirebase('getScansByType');
-      if (!dbInstance) return [];
-      const q = query(
-        collection(dbInstance, COLLECTIONS.SCANS),
-        where('type', '==', type),
-        orderBy('createdAt', 'desc')
-      );
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    } catch (error) {
-      console.error('Error fetching scans by type:', error);
-      throw error;
-    }
+    // Requires backend update for query params if needed, mock for now
+    const response = await api.get('/scans');
+    return response.data.filter(scan => scan.type === type);
   },
 
   async deleteScan(scanId) {
-    try {
-      const dbInstance = guardFirebase('deleteScan');
-      if (!dbInstance) return;
-      await deleteDoc(doc(dbInstance, COLLECTIONS.SCANS, scanId));
-      console.log('Scan deleted:', scanId);
-    } catch (error) {
-      console.error('Error deleting scan:', error);
-      throw error;
-    }
+    const response = await api.delete(`/scans/${scanId}`);
+    return response.data;
   },
 };
 
-/**
- * System Logs Collection Operations
- */
 export const logsService = {
   async addLog(logData) {
-    try {
-      const dbInstance = guardFirebase('addLog');
-      if (!dbInstance) return null;
-      const docRef = await addDoc(collection(dbInstance, COLLECTIONS.LOGS), {
-        ...logData,
-        timestamp: Timestamp.now(),
-      });
-      return { id: docRef.id, ...logData };
-    } catch (error) {
-      console.error('Error adding log:', error);
-      throw error;
-    }
+    const response = await api.post('/logs', logData);
+    return response.data;
   },
 
   async getLogs(limitCount = 500) {
-    try {
-      const dbInstance = guardFirebase('getLogs');
-      if (!dbInstance) return [];
-      const q = query(
-        collection(dbInstance, COLLECTIONS.LOGS),
-        orderBy('timestamp', 'desc'),
-        limit(limitCount)
-      );
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    } catch (error) {
-      console.error('Error fetching logs:', error);
-      throw error;
-    }
+    const response = await api.get(`/logs?limit=${limitCount}`);
+    return response.data;
   },
 
   async getLogsByLevel(level) {
-    try {
-      const dbInstance = guardFirebase('getLogsByLevel');
-      if (!dbInstance) return [];
-      const q = query(
-        collection(dbInstance, COLLECTIONS.LOGS),
-        where('level', '==', level),
-        orderBy('timestamp', 'desc')
-      );
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    } catch (error) {
-      console.error('Error fetching logs by level:', error);
-      throw error;
-    }
+    const response = await api.get('/logs');
+    return response.data.filter(log => log.level === level);
   },
 };
 
-/**
- * Users Collection Operations
- */
 export const usersService = {
-  async addUser(userData) {
-    try {
-      const dbInstance = guardFirebase('addUser');
-      if (!dbInstance) return null;
-      const docRef = await addDoc(collection(dbInstance, COLLECTIONS.USERS), {
-        ...userData,
-        createdAt: Timestamp.now(),
-      });
-      return { id: docRef.id, ...userData };
-    } catch (error) {
-      console.error('Error adding user:', error);
-      throw error;
+  // Auth endpoints (replacing old addUser behavior)
+  async register(userData) {
+    const response = await axios.post(`${API_URL}/auth/register`, userData);
+    if (response.data) {
+      localStorage.setItem('user', JSON.stringify(response.data));
     }
+    return response.data;
   },
 
-  async getUsers() {
-    try {
-      const dbInstance = guardFirebase('getUsers');
-      if (!dbInstance) return [];
-      const snapshot = await getDocs(collection(dbInstance, COLLECTIONS.USERS));
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      throw error;
+  async login(userData) {
+    const response = await axios.post(`${API_URL}/auth/login`, userData);
+    if (response.data) {
+      localStorage.setItem('user', JSON.stringify(response.data));
     }
+    return response.data;
+  },
+
+  async logout() {
+    localStorage.removeItem('user');
+  },
+
+  async addUser(userData) {
+    // Alias for register to support older frontend code
+    return this.register(userData);
+  },
+
+  // These might need admin endpoints in backend if actually needed
+  async getUsers() {
+    // We don't have a get all users in backend yet, just getMe
+    // This is mock for now to keep UI from crashing
+    return [];
   },
 
   async updateUser(userId, updates) {
-    try {
-      const dbInstance = guardFirebase('updateUser');
-      if (!dbInstance) return;
-      await updateDoc(doc(dbInstance, COLLECTIONS.USERS, userId), updates);
-      console.log('User updated:', userId);
-    } catch (error) {
-      console.error('Error updating user:', error);
-      throw error;
-    }
+    // MOCK
+    return null;
   },
 
   async getUserByEmail(email) {
-    try {
-      const dbInstance = guardFirebase('getUserByEmail');
-      if (!dbInstance) return null;
-      const q = query(collection(dbInstance, COLLECTIONS.USERS), where('email', '==', email));
-      const snapshot = await getDocs(q);
-      return snapshot.docs.length > 0 ? { id: snapshot.docs[0].id, ...snapshot.docs[0].data() } : null;
-    } catch (error) {
-      console.error('Error fetching user by email:', error);
-      throw error;
-    }
+    // MOCK
+    return null;
   },
 };
 
-/**
- * Statistics Collection Operations
- */
 export const statsService = {
   async updateStats(statsData) {
-    try {
-      const dbInstance = guardFirebase('updateStats');
-      if (!dbInstance) return;
-      const docRef = doc(dbInstance, COLLECTIONS.STATS, 'current');
-      await updateDoc(docRef, {
-        ...statsData,
-        updatedAt: Timestamp.now(),
-      });
-    } catch (error) {
-      console.error('Error updating stats:', error);
-      throw error;
-    }
+    const response = await api.put('/stats', statsData);
+    return response.data;
   },
 
   async getStats() {
-    try {
-      const dbInstance = guardFirebase('getStats');
-      if (!dbInstance) return null;
-      const docRef = doc(dbInstance, COLLECTIONS.STATS, 'current');
-      const docSnap = await getDocs(collection(dbInstance, COLLECTIONS.STATS));
-      if (docSnap.docs.length > 0) {
-        return docSnap.docs[0].data();
-      }
-      return null;
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-      throw error;
-    }
+    const response = await api.get('/stats');
+    return response.data;
   },
 };
 
-/**
- * ML Models Collection Operations
- */
 export const modelsService = {
   async addModel(modelData) {
-    try {
-      const dbInstance = guardFirebase('addModel');
-      if (!dbInstance) return null;
-      const docRef = await addDoc(collection(dbInstance, COLLECTIONS.ML_MODELS), {
-        ...modelData,
-        createdAt: Timestamp.now(),
-      });
-      return { id: docRef.id, ...modelData };
-    } catch (error) {
-      console.error('Error adding model:', error);
-      throw error;
-    }
+    const response = await api.post('/models', modelData);
+    return response.data;
   },
 
   async getModels() {
-    try {
-      const dbInstance = guardFirebase('getModels');
-      if (!dbInstance) return [];
-      const snapshot = await getDocs(collection(dbInstance, COLLECTIONS.ML_MODELS));
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    } catch (error) {
-      console.error('Error fetching models:', error);
-      throw error;
-    }
+    const response = await api.get('/models');
+    return response.data;
   },
 
   async updateModel(modelId, updates) {
-    try {
-      const dbInstance = guardFirebase('updateModel');
-      if (!dbInstance) return;
-      await updateDoc(doc(dbInstance, COLLECTIONS.ML_MODELS, modelId), updates);
-      console.log('Model updated:', modelId);
-    } catch (error) {
-      console.error('Error updating model:', error);
-      throw error;
-    }
+    const response = await api.put(`/models/${modelId}`, updates);
+    return response.data;
   },
 
   async deleteModel(modelId) {
-    try {
-      const dbInstance = guardFirebase('deleteModel');
-      if (!dbInstance) return;
-      await deleteDoc(doc(dbInstance, COLLECTIONS.ML_MODELS, modelId));
-      console.log('Model deleted:', modelId);
-    } catch (error) {
-      console.error('Error deleting model:', error);
-      throw error;
-    }
+    const response = await api.delete(`/models/${modelId}`);
+    return response.data;
   },
 };
 
-/**
- * Batch Operations
- */
 export const batchService = {
   async batchAddScans(scans) {
-    try {
-      const dbInstance = guardFirebase('batchAddScans');
-      if (!dbInstance) return [];
-      const batch = writeBatch(dbInstance);
-      const refs = [];
-      
-      scans.forEach((scan) => {
-        const docRef = doc(collection(dbInstance, COLLECTIONS.SCANS));
-        batch.set(docRef, {
-          ...scan,
-          createdAt: Timestamp.now(),
-        });
-        refs.push(docRef);
-      });
-
-      await batch.commit();
-      console.log(`Batch added ${scans.length} scans`);
-      return refs;
-    } catch (error) {
-      console.error('Error batch adding scans:', error);
-      throw error;
-    }
+    const response = await api.post('/scans/batch', { scans });
+    return response.data;
   },
 };
 
