@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { INITIAL_STATS, INITIAL_SCAN_HISTORY, INITIAL_ML_MODELS, INITIAL_SYSTEM_LOGS } from '../utils/initialData';
-import { scansService, logsService, usersService, modelsService, statsService } from '../firebase/services';
+import { scansService, logsService, modelsService } from '../firebase/services';
 
 const AppDataContext = createContext(null);
 
@@ -37,9 +37,9 @@ try {
 }
 
 export function AppDataProvider({ children }) {
-  // Firebase state
-  const [firebaseReady, setFirebaseReady] = useState(false);
-  const [firebaseError, setFirebaseError] = useState(null);
+  // Backend connection state
+  const [backendReady, setBackendReady] = useState(false);
+  const [backendError, setBackendError] = useState(null);
 
   // Data state
   const [scans, setScans] = useState(() => loadFromStorage(STORAGE_KEYS.scans, INITIAL_SCAN_HISTORY));
@@ -52,56 +52,40 @@ export function AppDataProvider({ children }) {
   const [stats, setStats] = useState(() => loadFromStorage(STORAGE_KEYS.stats, INITIAL_STATS));
   const [mlModels, setMlModels] = useState(() => loadFromStorage(STORAGE_KEYS.mlModels, INITIAL_ML_MODELS));
 
-  // Initialize Firestore data on mount
+  // Load data from backend API on mount
   useEffect(() => {
-    const initFirestoreData = async () => {
+    const loadBackendData = async () => {
       try {
-        console.log('Loading data from Firestore...');
+        console.log('Loading data from backend API...');
         
-        const [firestoreScans, firestoreLogs, firestoreUsers, firestoreModels] = await Promise.all([
+        const [apiScans, apiModels] = await Promise.all([
           scansService.getScans(100).catch(() => []),
-          logsService.getLogs(500).catch(() => []),
-          usersService.getUsers().catch(() => []),
           modelsService.getModels().catch(() => []),
         ]);
 
-        // Update state with Firestore data if available
-        if (firestoreScans.length > 0) {
-          setScans(firestoreScans);
-          saveToStorage(STORAGE_KEYS.scans, firestoreScans);
-          console.log(`✓ Loaded ${firestoreScans.length} scans from Firestore`);
+        if (apiScans.length > 0) {
+          setScans(apiScans);
+          saveToStorage(STORAGE_KEYS.scans, apiScans);
+          console.log(`✓ Loaded ${apiScans.length} scans from backend`);
         }
 
-        if (firestoreLogs.length > 0) {
-          setLogs(firestoreLogs);
-          saveToStorage(STORAGE_KEYS.logs, firestoreLogs);
-          console.log(`✓ Loaded ${firestoreLogs.length} logs from Firestore`);
+        if (apiModels.length > 0) {
+          setMlModels(apiModels);
+          saveToStorage(STORAGE_KEYS.mlModels, apiModels);
+          console.log(`✓ Loaded ${apiModels.length} models from backend`);
         }
 
-        if (firestoreUsers.length > 0) {
-          setUsers(firestoreUsers);
-          saveToStorage(STORAGE_KEYS.users, firestoreUsers);
-          console.log(`✓ Loaded ${firestoreUsers.length} users from Firestore`);
-        }
-
-        if (firestoreModels.length > 0) {
-          setMlModels(firestoreModels);
-          saveToStorage(STORAGE_KEYS.mlModels, firestoreModels);
-          console.log(`✓ Loaded ${firestoreModels.length} models from Firestore`);
-        }
-
-        setFirebaseReady(true);
-        console.log('✓ Firestore data sync complete');
+        setBackendReady(true);
+        console.log('✓ Backend data sync complete');
       } catch (error) {
-        console.warn('Firestore initialization warning:', error.message);
+        console.warn('Backend API warning:', error.message);
         console.log('Continuing with localStorage-only mode');
-        setFirebaseError(error.message);
-        setFirebaseReady(true); // Still mark as ready to not block UI
+        setBackendError(error.message);
+        setBackendReady(true); // Still mark as ready to not block UI
       }
     };
 
-    // Small delay to ensure Firebase is initialized in main.jsx first
-    const timer = setTimeout(initFirestoreData, 500);
+    const timer = setTimeout(loadBackendData, 300);
     return () => clearTimeout(timer);
   }, []);
 
@@ -200,23 +184,23 @@ export function AppDataProvider({ children }) {
 
     broadcast({ type: 'SCAN_ADDED', payload: newScan });
 
-    // Sync to Firestore asynchronously
-    if (firebaseReady && !firebaseError) {
-      scansService.addScan({
-        type: newScan.type,
-        input: newScan.input,
-        result: newScan.result,
+    // Sync to backend API asynchronously
+    scansService.addScan({
+      url: newScan.input || 'unknown',
+      status: newScan.result === 'Phishing' ? 'phishing' : newScan.result === 'Suspicious' ? 'suspicious' : 'safe',
+      type: newScan.type?.toLowerCase() || 'url',
+      details: {
         riskScore: newScan.riskScore,
         badgeColor: newScan.badgeColor,
         date: newScan.date,
         category: newScan.category,
-      }).catch(err => {
-        console.warn('Error syncing scan to Firestore:', err.message);
-      });
-    }
+      },
+    }).catch(err => {
+      console.warn('Error syncing scan to backend:', err.message);
+    });
 
     return newScan;
-  }, [firebaseReady, firebaseError, broadcast]);
+  }, [broadcast]);
 
   const addLog = useCallback((level, module, message) => {
     const newLog = {
@@ -235,19 +219,17 @@ export function AppDataProvider({ children }) {
 
     broadcast({ type: 'LOG_ADDED', payload: newLog });
 
-    // Sync to Firestore asynchronously
-    if (firebaseReady && !firebaseError) {
-      logsService.addLog({
-        level,
-        module,
-        message,
-      }).catch(err => {
-        console.warn('Error syncing log to Firestore:', err.message);
-      });
-    }
+    // Sync to backend API asynchronously
+    logsService.addLog({
+      action: module,
+      level: level.toLowerCase() === 'threat' ? 'error' : level.toLowerCase() === 'warn' ? 'warning' : 'info',
+      message,
+    }).catch(err => {
+      console.warn('Error syncing log to backend:', err.message);
+    });
 
     return newLog;
-  }, [firebaseReady, firebaseError, broadcast]);
+  }, [broadcast]);
 
   const addUser = useCallback((userData) => {
     const newUser = { ...userData, id: userData.email || Date.now().toString() };
@@ -261,16 +243,8 @@ export function AppDataProvider({ children }) {
     });
 
     broadcast({ type: 'USER_ADDED', payload: newUser });
-
-    // Sync to Firestore asynchronously
-    if (firebaseReady && !firebaseError) {
-      usersService.addUser(newUser).catch(err => {
-        console.warn('Error syncing user to Firestore:', err.message);
-      });
-    }
-
     return newUser;
-  }, [firebaseReady, firebaseError, broadcast]);
+  }, [broadcast]);
 
   const updateUserRole = useCallback((email, role) => {
     setUsers(prev => {
@@ -280,20 +254,7 @@ export function AppDataProvider({ children }) {
     });
 
     broadcast({ type: 'USER_UPDATED', payload: { email, role } });
-
-    // Sync to Firestore asynchronously
-    if (firebaseReady && !firebaseError) {
-      usersService.getUserByEmail(email)
-        .then(user => {
-          if (user?.id) {
-            return usersService.updateUser(user.id, { role });
-          }
-        })
-        .catch(err => {
-          console.warn('Error updating user in Firestore:', err.message);
-        });
-    }
-  }, [firebaseReady, firebaseError, broadcast]);
+  }, [broadcast]);
 
   const addModel = useCallback((model) => {
     const newModel = { ...model, id: model.id || `M-${Date.now()}` };
@@ -306,15 +267,13 @@ export function AppDataProvider({ children }) {
 
     broadcast({ type: 'MODEL_ADDED', payload: newModel });
 
-    // Sync to Firestore asynchronously
-    if (firebaseReady && !firebaseError) {
-      modelsService.addModel(newModel).catch(err => {
-        console.warn('Error syncing model to Firestore:', err.message);
-      });
-    }
+    // Sync to backend
+    modelsService.addModel(newModel).catch(err => {
+      console.warn('Error syncing model to backend:', err.message);
+    });
 
     return newModel;
-  }, [firebaseReady, firebaseError, broadcast]);
+  }, [broadcast]);
 
   const toggleModelStatus = useCallback((id) => {
     setMlModels(prev => {
@@ -331,13 +290,11 @@ export function AppDataProvider({ children }) {
     const newStatus = target?.status === 'Active' ? 'Standby' : 'Active';
     broadcast({ type: 'MODEL_TOGGLED', payload: { id, status: newStatus } });
 
-    // Sync to Firestore asynchronously
-    if (firebaseReady && !firebaseError) {
-      modelsService.updateModel(id, { status: newStatus }).catch(err => {
-        console.warn('Error updating model in Firestore:', err.message);
-      });
-    }
-  }, [mlModels, firebaseReady, firebaseError, broadcast]);
+    // Sync to backend
+    modelsService.updateModel(id, { status: newStatus }).catch(err => {
+      console.warn('Error updating model in backend:', err.message);
+    });
+  }, [mlModels, broadcast]);
 
   const deleteModel = useCallback((id) => {
     setMlModels(prev => {
@@ -348,13 +305,11 @@ export function AppDataProvider({ children }) {
 
     broadcast({ type: 'MODEL_DELETED', payload: { id } });
 
-    // Sync to Firestore asynchronously
-    if (firebaseReady && !firebaseError) {
-      modelsService.deleteModel(id).catch(err => {
-        console.warn('Error deleting model from Firestore:', err.message);
-      });
-    }
-  }, [firebaseReady, firebaseError, broadcast]);
+    // Sync to backend
+    modelsService.deleteModel(id).catch(err => {
+      console.warn('Error deleting model from backend:', err.message);
+    });
+  }, [broadcast]);
 
   const refreshAll = useCallback(() => {
     setScans(loadFromStorage(STORAGE_KEYS.scans, INITIAL_SCAN_HISTORY));
@@ -369,14 +324,14 @@ export function AppDataProvider({ children }) {
     addScan, addLog, addUser, updateUserRole,
     addModel, toggleModelStatus, deleteModel,
     refreshAll,
-    // Firebase status
-    firebaseReady,
-    firebaseError,
-    isLocalMode: !firebaseReady || !!firebaseError,
+    // Backend status (kept for FirebaseStatus component compatibility)
+    firebaseReady: backendReady,
+    firebaseError: backendError,
+    isLocalMode: !backendReady || !!backendError,
   }), [scans, logs, users, stats, mlModels,
     addScan, addLog, addUser, updateUserRole,
     addModel, toggleModelStatus, deleteModel, refreshAll,
-    firebaseReady, firebaseError]);
+    backendReady, backendError]);
 
   return (
     <AppDataContext.Provider value={value}>

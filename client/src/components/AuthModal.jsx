@@ -1,25 +1,21 @@
 import React, { useState } from 'react';
-import { X, Mail, Lock, User, Eye, EyeOff, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { X, Mail, Lock, User, Eye, EyeOff, Shield, Loader2, CheckCircle2, AlertCircle, ArrowRight, Sparkles } from 'lucide-react';
 import loginArt from '../assets/login_art.png';
 import registerArt from '../assets/register_art.png';
 import { usersService } from './../firebase/services';
 
 export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
   const [isRegister, setIsRegister] = useState(false);
-  
-  // Login fields
+
+  // Form fields
   const [email, setEmail] = useState('');
-  
-  // Register fields
   const [fullName, setFullName] = useState('');
   const [regEmail, setRegEmail] = useState('');
-  
-  // Shared fields
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
-  
+
   // UI states
   const [showPw, setShowPw] = useState(false);
   const [showConfirmPw, setShowConfirmPw] = useState(false);
@@ -29,6 +25,23 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
 
   if (!isOpen) return null;
 
+  // Password strength calculation
+  const getPasswordStrength = (pass) => {
+    if (!pass) return { score: 0, label: '', color: '#e2e8f0' };
+    let score = 0;
+    if (pass.length >= 6) score++;
+    if (pass.length >= 10) score++;
+    if (/[A-Z]/.test(pass)) score++;
+    if (/[0-9]/.test(pass) || /[^A-Za-z0-9]/.test(pass)) score++;
+
+    if (score <= 1) return { score: 1, label: 'Weak', color: '#ef4444' };
+    if (score === 2) return { score: 2, label: 'Fair', color: '#f59e0b' };
+    if (score === 3) return { score: 3, label: 'Good', color: '#3b82f6' };
+    return { score: 4, label: 'Strong', color: '#10b981' };
+  };
+
+  const pwStrength = getPasswordStrength(password);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -37,13 +50,18 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
 
     try {
       if (isRegister) {
+        if (password.length < 6) {
+          setErrorMsg('Password must be at least 6 characters');
+          setIsLoading(false);
+          return;
+        }
         if (password !== confirmPassword) {
           setErrorMsg('Passwords do not match');
           setIsLoading(false);
           return;
         }
         if (!agreeTerms) {
-          setErrorMsg('You must agree to the Terms & Conditions');
+          setErrorMsg('Please accept the Terms & Conditions');
           setIsLoading(false);
           return;
         }
@@ -53,27 +71,28 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
           email: regEmail,
           password: password,
         });
-        
-        setSuccessMsg('Registration successful! Logging you in...');
+
+        setSuccessMsg('Account created successfully!');
         setTimeout(() => {
           if (onLoginSuccess) onLoginSuccess(user);
           onClose();
-        }, 1500);
+        }, 1000);
 
       } else {
         const user = await usersService.login({
           email: email,
           password: password,
         });
-        
+
         setSuccessMsg('Login successful!');
         setTimeout(() => {
           if (onLoginSuccess) onLoginSuccess(user);
           onClose();
-        }, 1000);
+        }, 800);
       }
     } catch (error) {
-      setErrorMsg(error.response?.data?.message || 'Authentication failed. Please try again.');
+      const msg = error.response?.data?.message || 'Authentication failed. Please check your credentials.';
+      setErrorMsg(msg);
     } finally {
       setIsLoading(false);
     }
@@ -87,540 +106,678 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
     setConfirmPassword('');
   };
 
-  // Custom Input Component for consistent beautiful UI
-  const AuthInput = ({ icon: Icon, type, placeholder, value, onChange, isPassword, showPwState, togglePw }) => (
-    <div className="auth-input-container" style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: '12px',
-      background: '#f8fafc',
-      border: '1px solid #e2e8f0',
-      borderRadius: '16px',
-      padding: '14px 18px',
-      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-      position: 'relative'
-    }}>
-      <Icon size={20} color="#94a3b8" style={{ flexShrink: 0 }} />
-      <input
-        type={isPassword ? (showPwState ? 'text' : 'password') : type}
-        required
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        className="auth-input-field"
-        style={{
-          background: 'transparent',
-          border: 'none',
-          outline: 'none',
-          width: '100%',
-          color: '#0f172a',
-          fontSize: '0.95rem',
-          padding: 0,
-          paddingRight: isPassword ? '36px' : '0',
-          fontWeight: '500'
-        }}
-      />
-      {isPassword && (
-        <button
-          type="button"
-          onClick={togglePw}
-          style={{
-            position: 'absolute',
-            right: '16px',
-            background: 'transparent',
-            border: 'none',
-            color: '#94a3b8',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            padding: '4px',
-            transition: 'color 0.2s'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.color = '#475569'}
-          onMouseLeave={(e) => e.currentTarget.style.color = '#94a3b8'}
-          title={showPwState ? "Hide password" : "Show password"}
-        >
-          {showPwState ? <EyeOff size={18} /> : <Eye size={18} />}
-        </button>
-      )}
-      <style>{`
-        .auth-input-container:focus-within {
-          border-color: #3b82f6 !important;
-          background: #ffffff !important;
-          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
-        }
-        .auth-input-container:focus-within svg:first-child {
-          color: #3b82f6 !important;
-        }
-        .auth-input-field::placeholder {
-          color: #94a3b8;
-          font-weight: 400;
-        }
-      `}</style>
-    </div>
-  );
-
   return (
-    <div style={{
-      position: 'fixed',
-      inset: 0,
-      background: 'rgba(15, 23, 42, 0.65)',
-      backdropFilter: 'blur(12px)',
-      WebkitBackdropFilter: 'blur(12px)',
-      zIndex: 1000,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '24px',
-      animation: 'authFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
-    }}>
-      {/* ── CARD CONTAINER ── */}
-      <div style={{
-        width: '100%',
-        maxWidth: isRegister ? '900px' : '860px',
-        background: '#ffffff',
-        borderRadius: '28px',
-        boxShadow: '0 30px 60px -15px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(226, 232, 240, 0.6)',
-        overflow: 'hidden',
-        position: 'relative',
-        display: 'grid',
-        gridTemplateColumns: '1.1fr 0.9fr',
-        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-        transform: 'translateY(0)',
-        opacity: 1
-      }} className="auth-modal-card">
-
+    <div className="modal-backdrop-overlay" onClick={onClose}>
+      <div className="modal-content-card" onClick={(e) => e.stopPropagation()}>
+        
         {/* Floating Close Button */}
-        <button
-          onClick={onClose}
-          style={{
-            position: 'absolute',
-            top: '20px',
-            right: '20px',
-            background: 'rgba(255, 255, 255, 0.9)',
-            border: '1px solid #e2e8f0',
-            borderRadius: '50%',
-            width: '40px',
-            height: '40px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#64748b',
-            cursor: 'pointer',
-            zIndex: 30,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
-            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'scale(1.05)';
-            e.currentTarget.style.color = '#0f172a';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1)';
-            e.currentTarget.style.color = '#64748b';
-          }}
-          title="Close Modal"
-        >
-          <X size={20} />
+        <button className="modal-close-btn" onClick={onClose} title="Close modal">
+          <X size={18} />
         </button>
 
-        {/* ── LEFT COLUMN: FORM SECTION ── */}
-        <div style={{
-          padding: isRegister ? '40px 48px' : '48px 56px',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          background: '#ffffff',
-          position: 'relative'
-        }}>
-
-          {/* Messages */}
-          <div style={{ position: 'absolute', top: '24px', left: '48px', right: '48px' }}>
-            {errorMsg && (
-              <div style={{ padding: '12px 16px', background: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', borderRadius: '12px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px', animation: 'slideDown 0.3s ease' }}>
-                <AlertCircle size={18} />
-                <span style={{ fontWeight: 500 }}>{errorMsg}</span>
-              </div>
-            )}
-            {successMsg && (
-              <div style={{ padding: '12px 16px', background: '#f0fdf4', border: '1px solid #bbf7d0', color: '#166534', borderRadius: '12px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px', animation: 'slideDown 0.3s ease' }}>
-                <CheckCircle2 size={18} />
-                <span style={{ fontWeight: 500 }}>{successMsg}</span>
-              </div>
-            )}
+        {/* ── LEFT FORM SECTION ── */}
+        <div className="modal-form-pane">
+          
+          {/* Brand Row */}
+          <div className="modal-brand-row">
+            <div className="modal-brand-icon">
+              <Shield size={20} color="#ffffff" />
+            </div>
+            <div>
+              <h3 className="modal-brand-title">APDS CyberShield</h3>
+              <p className="modal-brand-sub">Phishing Defense Console</p>
+            </div>
           </div>
 
-          {!isRegister ? (
-            /* ========================================================
-               LOGIN SCREEN
-            ======================================================== */
-            <div style={{ marginTop: (errorMsg || successMsg) ? '40px' : '0', transition: 'margin 0.3s ease' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
-                <div style={{
-                  background: 'linear-gradient(135deg, #1d4ed8, #3b82f6)',
-                  color: '#ffffff',
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '10px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: '800',
-                  fontSize: '1rem',
-                  boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)'
-                }}>
-                  <Lock size={16} />
+          {/* Segmented Switcher Tabs */}
+          <div className="modal-tabs-wrapper">
+            <button
+              type="button"
+              className={`modal-tab ${!isRegister ? 'active' : ''}`}
+              onClick={() => switchMode(false)}
+            >
+              Sign In
+            </button>
+            <button
+              type="button"
+              className={`modal-tab ${isRegister ? 'active' : ''}`}
+              onClick={() => switchMode(true)}
+            >
+              Sign Up
+            </button>
+          </div>
+
+          {/* Alert Banners */}
+          {errorMsg && (
+            <div className="modal-alert-box error">
+              <AlertCircle size={17} style={{ flexShrink: 0 }} />
+              <span>{errorMsg}</span>
+            </div>
+          )}
+          {successMsg && (
+            <div className="modal-alert-box success">
+              <CheckCircle2 size={17} style={{ flexShrink: 0 }} />
+              <span>{successMsg}</span>
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="modal-form">
+            {!isRegister ? (
+              /* LOGIN */
+              <>
+                <div className="m-input-group">
+                  <label className="m-input-label">Email address</label>
+                  <div className="m-input-box">
+                    <div className="m-icon-slot">
+                      <Mail size={17} />
+                    </div>
+                    <input
+                      type="email"
+                      required
+                      autoFocus
+                      placeholder="name@company.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="m-input-field"
+                    />
+                  </div>
                 </div>
-                <span style={{
-                  fontWeight: '800',
-                  fontSize: '0.85rem',
-                  letterSpacing: '0.1em',
-                  color: '#2563eb',
-                  textTransform: 'uppercase'
-                }}>
-                  Secure Login
-                </span>
-              </div>
 
-              <h2 style={{
-                fontSize: '2.2rem',
-                fontWeight: '900',
-                color: '#0f172a',
-                letterSpacing: '-0.03em',
-                marginBottom: '8px',
-                lineHeight: '1.2'
-              }}>
-                Welcome Back
-              </h2>
-              <p style={{
-                color: '#64748b',
-                fontSize: '0.95rem',
-                marginBottom: '32px',
-                fontWeight: '500'
-              }}>
-                Enter your credentials to access your dashboard.
-              </p>
+                <div className="m-input-group">
+                  <div className="m-label-row">
+                    <label className="m-input-label">Password</label>
+                    <a href="#forgot" onClick={(e) => e.preventDefault()} className="m-forgot-link">
+                      Forgot?
+                    </a>
+                  </div>
+                  <div className="m-input-box">
+                    <div className="m-icon-slot">
+                      <Lock size={17} />
+                    </div>
+                    <input
+                      type={showPw ? 'text' : 'password'}
+                      required
+                      placeholder="Enter password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="m-input-field"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPw(!showPw)}
+                      className="m-pw-btn"
+                    >
+                      {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </div>
 
-              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                
-                <AuthInput
-                  icon={Mail}
-                  type="email"
-                  placeholder="Email Address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-
-                <AuthInput
-                  icon={Lock}
-                  isPassword
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  showPwState={showPw}
-                  togglePw={() => setShowPw(!showPw)}
-                />
-
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginTop: '4px',
-                  marginBottom: '8px'
-                }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: '#475569', fontSize: '0.9rem', fontWeight: '500' }}>
+                <div className="m-remember-row">
+                  <label className="m-checkbox-label">
                     <input
                       type="checkbox"
                       checked={rememberMe}
                       onChange={() => setRememberMe(!rememberMe)}
-                      style={{ cursor: 'pointer', accentColor: '#2563eb', width: '18px', height: '18px', borderRadius: '6px' }}
+                      className="m-checkbox"
                     />
-                    Remember me
+                    <span>Remember me</span>
                   </label>
-                  <a
-                    href="#forgot"
-                    onClick={(e) => e.preventDefault()}
-                    style={{ color: '#2563eb', fontWeight: '600', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s' }}
-                    onMouseEnter={(e) => e.currentTarget.style.color = '#1d4ed8'}
-                    onMouseLeave={(e) => e.currentTarget.style.color = '#2563eb'}
-                  >
-                    Forgot Password?
-                  </a>
                 </div>
 
-                 <button
-                   type="submit"
-                   disabled={isLoading || successMsg}
-                   style={{
-                     background: 'linear-gradient(90deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)',
-                     color: '#ffffff',
-                     border: 'none',
-                     borderRadius: '16px',
-                     padding: '16px',
-                     fontWeight: '700',
-                     fontSize: '1.05rem',
-                     cursor: (isLoading || successMsg) ? 'not-allowed' : 'pointer',
-                     opacity: (isLoading || successMsg) ? 0.8 : 1,
-                     boxShadow: '0 10px 25px -5px rgba(37, 99, 235, 0.4)',
-                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                     display: 'flex',
-                     justifyContent: 'center',
-                     alignItems: 'center',
-                     gap: '10px'
-                   }}
-                   onMouseEnter={(e) => {
-                     if(!isLoading && !successMsg) e.currentTarget.style.transform = 'translateY(-2px)';
-                   }}
-                   onMouseLeave={(e) => {
-                     if(!isLoading && !successMsg) e.currentTarget.style.transform = 'translateY(0)';
-                   }}
-                 >
-                   {isLoading ? <Loader2 size={22} className="animate-spin" /> : 'Sign In'}
-                 </button>
-              </form>
-
-              <div style={{ textAlign: 'center', marginTop: '32px', fontSize: '0.95rem', color: '#64748b', fontWeight: '500' }}>
-                Don't have an account?{' '}
                 <button
-                  type="button"
-                  onClick={() => switchMode(true)}
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    color: '#2563eb',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    fontSize: '0.95rem',
-                    padding: 0,
-                    textDecoration: 'underline',
-                    textUnderlineOffset: '4px'
-                  }}
+                  type="submit"
+                  disabled={isLoading || !!successMsg}
+                  className="m-submit-btn primary"
                 >
-                  Create one now
+                  {isLoading ? (
+                    <Loader2 size={18} className="animate-spin" />
+                  ) : (
+                    <>
+                      <span>Sign in</span>
+                      <ArrowRight size={16} />
+                    </>
+                  )}
                 </button>
-              </div>
-            </div>
-          ) : (
-            /* ========================================================
-               REGISTER SCREEN
-            ======================================================== */
-            <div style={{ marginTop: (errorMsg || successMsg) ? '40px' : '0', transition: 'margin 0.3s ease' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-                <div style={{
-                  background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                  color: '#ffffff',
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '10px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: '800',
-                  fontSize: '1rem',
-                  boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)'
-                }}>
-                  <User size={16} />
-                </div>
-                <span style={{
-                  fontWeight: '800',
-                  fontSize: '0.85rem',
-                  letterSpacing: '0.1em',
-                  color: '#6366f1',
-                  textTransform: 'uppercase'
-                }}>
-                  Join APDS
-                </span>
-              </div>
-
-              <h2 style={{
-                fontSize: '2rem',
-                fontWeight: '900',
-                color: '#0f172a',
-                letterSpacing: '-0.03em',
-                marginBottom: '6px',
-                lineHeight: '1.2'
-              }}>
-                Create Account
-              </h2>
-              <p style={{
-                color: '#64748b',
-                fontSize: '0.9rem',
-                marginBottom: '24px',
-                fontWeight: '500'
-              }}>
-                Sign up to start scanning and protecting your digital assets.
-              </p>
-
-              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                
-                <AuthInput
-                  icon={User}
-                  type="text"
-                  placeholder="Full Name"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                />
-
-                <AuthInput
-                  icon={Mail}
-                  type="email"
-                  placeholder="Email Address"
-                  value={regEmail}
-                  onChange={(e) => setRegEmail(e.target.value)}
-                />
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-                  <AuthInput
-                    icon={Lock}
-                    isPassword
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    showPwState={showPw}
-                    togglePw={() => setShowPw(!showPw)}
-                  />
-
-                  <AuthInput
-                    icon={Lock}
-                    isPassword
-                    placeholder="Confirm"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    showPwState={showConfirmPw}
-                    togglePw={() => setShowConfirmPw(!showConfirmPw)}
-                  />
+              </>
+            ) : (
+              /* REGISTER */
+              <>
+                <div className="m-input-group">
+                  <label className="m-input-label">Full name</label>
+                  <div className="m-input-box">
+                    <div className="m-icon-slot">
+                      <User size={17} />
+                    </div>
+                    <input
+                      type="text"
+                      required
+                      autoFocus
+                      placeholder="Alex Morgan"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="m-input-field"
+                    />
+                  </div>
                 </div>
 
-                <label style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  cursor: 'pointer',
-                  fontSize: '0.88rem',
-                  color: '#475569',
-                  marginTop: '6px',
-                  marginBottom: '6px',
-                  fontWeight: '500'
-                }}>
-                  <input
-                    type="checkbox"
-                    checked={agreeTerms}
-                    onChange={() => setAgreeTerms(!agreeTerms)}
-                    style={{ cursor: 'pointer', accentColor: '#6366f1', width: '18px', height: '18px', borderRadius: '6px' }}
-                  />
-                  <span>
-                    I agree to the <a href="#" style={{ color: '#4f46e5', fontWeight: '600', textDecoration: 'underline', textUnderlineOffset: '2px' }}>Terms of Service</a> & <a href="#" style={{ color: '#4f46e5', fontWeight: '600', textDecoration: 'underline', textUnderlineOffset: '2px' }}>Privacy Policy</a>
-                  </span>
-                </label>
+                <div className="m-input-group">
+                  <label className="m-input-label">Email address</label>
+                  <div className="m-input-box">
+                    <div className="m-icon-slot">
+                      <Mail size={17} />
+                    </div>
+                    <input
+                      type="email"
+                      required
+                      placeholder="alex@company.com"
+                      value={regEmail}
+                      onChange={(e) => setRegEmail(e.target.value)}
+                      className="m-input-field"
+                    />
+                  </div>
+                </div>
 
-                 <button
-                   type="submit"
-                   disabled={isLoading || successMsg}
-                   style={{
-                     background: 'linear-gradient(90deg, #4f46e5 0%, #6366f1 50%, #8b5cf6 100%)',
-                     color: '#ffffff',
-                     border: 'none',
-                     borderRadius: '16px',
-                     padding: '16px',
-                     fontWeight: '700',
-                     fontSize: '1.05rem',
-                     cursor: (isLoading || successMsg) ? 'not-allowed' : 'pointer',
-                     opacity: (isLoading || successMsg) ? 0.8 : 1,
-                     boxShadow: '0 10px 25px -5px rgba(99, 102, 241, 0.4)',
-                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                     display: 'flex',
-                     justifyContent: 'center',
-                     alignItems: 'center',
-                     gap: '10px'
-                   }}
-                   onMouseEnter={(e) => {
-                     if(!isLoading && !successMsg) e.currentTarget.style.transform = 'translateY(-2px)';
-                   }}
-                   onMouseLeave={(e) => {
-                     if(!isLoading && !successMsg) e.currentTarget.style.transform = 'translateY(0)';
-                   }}
-                 >
-                   {isLoading ? <Loader2 size={22} className="animate-spin" /> : 'Create Account'}
-                 </button>
-              </form>
+                <div className="m-grid-two">
+                  <div className="m-input-group">
+                    <label className="m-input-label">Password</label>
+                    <div className="m-input-box">
+                      <div className="m-icon-slot">
+                        <Lock size={17} />
+                      </div>
+                      <input
+                        type={showPw ? 'text' : 'password'}
+                        required
+                        placeholder="Min 6"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="m-input-field"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPw(!showPw)}
+                        className="m-pw-btn"
+                      >
+                        {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
+                      </button>
+                    </div>
+                  </div>
 
-              <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '0.95rem', color: '#64748b', fontWeight: '500' }}>
-                Already have an account?{' '}
+                  <div className="m-input-group">
+                    <label className="m-input-label">Confirm</label>
+                    <div className="m-input-box">
+                      <div className="m-icon-slot">
+                        <Lock size={17} />
+                      </div>
+                      <input
+                        type={showConfirmPw ? 'text' : 'password'}
+                        required
+                        placeholder="Repeat"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="m-input-field"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPw(!showConfirmPw)}
+                        className="m-pw-btn"
+                      >
+                        {showConfirmPw ? <EyeOff size={15} /> : <Eye size={15} />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {password && (
+                  <div className="m-pw-strength-bar">
+                    <div className="m-pw-segments">
+                      {[1, 2, 3, 4].map((step) => (
+                        <div
+                          key={step}
+                          className="m-pw-seg"
+                          style={{
+                            background: step <= pwStrength.score ? pwStrength.color : '#e2e8f0'
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <span style={{ fontSize: '0.74rem', fontWeight: 600, color: pwStrength.color }}>
+                      {pwStrength.label}
+                    </span>
+                  </div>
+                )}
+
+                <div className="m-remember-row">
+                  <label className="m-checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={agreeTerms}
+                      onChange={() => setAgreeTerms(!agreeTerms)}
+                      className="m-checkbox"
+                    />
+                    <span style={{ fontSize: '0.8rem' }}>
+                      I agree to the <a href="#terms" onClick={(e) => e.preventDefault()} style={{ color: '#2563eb', fontWeight: 600 }}>Terms</a> & <a href="#privacy" onClick={(e) => e.preventDefault()} style={{ color: '#2563eb', fontWeight: 600 }}>Privacy</a>
+                    </span>
+                  </label>
+                </div>
+
                 <button
-                  type="button"
-                  onClick={() => switchMode(false)}
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    color: '#4f46e5',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    fontSize: '0.95rem',
-                    padding: 0,
-                    textDecoration: 'underline',
-                    textUnderlineOffset: '4px'
-                  }}
+                  type="submit"
+                  disabled={isLoading || !!successMsg}
+                  className="m-submit-btn register"
                 >
-                  Log in
+                  {isLoading ? (
+                    <Loader2 size={18} className="animate-spin" />
+                  ) : (
+                    <>
+                      <span>Create Account</span>
+                      <ArrowRight size={16} />
+                    </>
+                  )}
                 </button>
-              </div>
-            </div>
-          )}
+              </>
+            )}
+          </form>
+
+          {/* Footer Prompt */}
+          <div className="m-footer-prompt">
+            <span>{isRegister ? 'Already have an account?' : "Don't have an account?"}</span>
+            <button
+              type="button"
+              onClick={() => switchMode(!isRegister)}
+              className="m-switch-btn"
+            >
+              {isRegister ? 'Sign in' : 'Create one'}
+            </button>
+          </div>
 
         </div>
 
-        {/* ── RIGHT COLUMN: ARTWORK ── */}
-        <div style={{
-          background: isRegister ? 'linear-gradient(135deg, #eef2ff, #f5f3ff)' : 'linear-gradient(135deg, #eff6ff, #f0f9ff)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          overflow: 'hidden',
-          position: 'relative',
-          padding: '20px'
-        }}>
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            opacity: 0.5,
-            backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)',
-            backgroundSize: '24px 24px'
-          }}></div>
+        {/* ── RIGHT ARTWORK SECTION ── */}
+        <div className={`modal-art-pane ${isRegister ? 'reg-art' : 'log-art'}`}>
           <img
             src={isRegister ? registerArt : loginArt}
-            alt="Authentication Art"
-            style={{
-              width: '90%',
-              height: 'auto',
-              maxHeight: '90%',
-              objectFit: 'contain',
-              display: 'block',
-              position: 'relative',
-              zIndex: 10,
-              filter: 'drop-shadow(0 20px 30px rgba(0,0,0,0.1))',
-              transition: 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
-              transform: isRegister ? 'scale(1.05)' : 'scale(1)'
-            }}
+            alt="Security Art"
+            className="modal-art-img"
           />
         </div>
 
       </div>
 
       <style>{`
-        @keyframes authFadeIn {
-          from { opacity: 0; backdrop-filter: blur(0px); }
-          to { opacity: 1; backdrop-filter: blur(12px); }
+        .modal-backdrop-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(15, 23, 42, 0.6);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          z-index: 1000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+          animation: modalFade 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        @keyframes slideDown {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
+
+        .modal-content-card {
+          width: 100%;
+          max-width: 820px;
+          background: #ffffff;
+          border-radius: 24px;
+          box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(226, 232, 240, 0.8);
+          overflow: hidden;
+          position: relative;
+          display: grid;
+          grid-template-columns: 1.15fr 0.85fr;
+          animation: modalScale 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
+
+        .modal-close-btn {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          width: 34px;
+          height: 34px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.9);
+          border: 1px solid #e2e8f0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #64748b;
+          cursor: pointer;
+          z-index: 30;
+          transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+          background: #ffffff;
+          color: #0f172a;
+          transform: scale(1.06);
+        }
+
+        .modal-form-pane {
+          padding: 36px 40px;
+          display: flex;
+          flex-direction: column;
+          background: #ffffff;
+        }
+
+        .modal-brand-row {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 20px;
+        }
+
+        .modal-brand-icon {
+          width: 36px;
+          height: 36px;
+          background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .modal-brand-title {
+          font-size: 1.05rem;
+          font-weight: 800;
+          color: #0f172a;
+          margin: 0;
+        }
+
+        .modal-brand-sub {
+          font-size: 0.72rem;
+          color: #64748b;
+          margin: 0;
+          font-weight: 500;
+        }
+
+        .modal-tabs-wrapper {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          background: #f1f5f9;
+          padding: 3px;
+          border-radius: 12px;
+          margin-bottom: 20px;
+          border: 1px solid #e2e8f0;
+        }
+
+        .modal-tab {
+          border: none;
+          background: transparent;
+          padding: 8px 12px;
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: #64748b;
+          border-radius: 9px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .modal-tab.active {
+          background: #ffffff;
+          color: #0f172a;
+          box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+        }
+
+        .modal-alert-box {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 10px 14px;
+          border-radius: 12px;
+          font-size: 0.84rem;
+          font-weight: 500;
+          margin-bottom: 16px;
+        }
+
+        .modal-alert-box.error {
+          background: #fef2f2;
+          border: 1px solid #fee2e2;
+          color: #b91c1c;
+        }
+
+        .modal-alert-box.success {
+          background: #f0fdf4;
+          border: 1px solid #dcfce7;
+          color: #15803d;
+        }
+
+        .modal-form {
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+        }
+
+        .m-input-group {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+        }
+
+        .m-label-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .m-input-label {
+          font-size: 0.82rem;
+          font-weight: 600;
+          color: #334155;
+        }
+
+        .m-forgot-link {
+          font-size: 0.78rem;
+          font-weight: 600;
+          color: #2563eb;
+          text-decoration: none;
+        }
+
+        /* Input Boxes */
+        .m-input-box {
+          display: flex;
+          align-items: center;
+          background: #ffffff;
+          border: 1.5px solid #cbd5e1;
+          border-radius: 12px;
+          padding: 0 12px;
+          height: 44px;
+          box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+          transition: all 0.2s ease;
+        }
+
+        .m-input-box:hover {
+          border-color: #94a3b8;
+        }
+
+        .m-input-box:focus-within {
+          border-color: #2563eb !important;
+          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+        }
+
+        .m-icon-slot {
+          color: #64748b;
+          margin-right: 10px;
+          display: flex;
+          align-items: center;
+          transition: color 0.2s;
+        }
+
+        .m-input-box:focus-within .m-icon-slot {
+          color: #2563eb;
+        }
+
+        .m-input-field {
+          border: none;
+          outline: none;
+          background: transparent;
+          width: 100%;
+          height: 100%;
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: #0f172a;
+          padding: 0;
+        }
+
+        .m-pw-btn {
+          background: transparent;
+          border: none;
+          color: #64748b;
+          cursor: pointer;
+          padding: 4px;
+          display: flex;
+          align-items: center;
+        }
+
+        .m-grid-two {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+        }
+
+        .m-pw-strength-bar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-top: -4px;
+        }
+
+        .m-pw-segments {
+          display: flex;
+          gap: 4px;
+          flex: 1;
+          max-width: 120px;
+        }
+
+        .m-pw-seg {
+          height: 3px;
+          flex: 1;
+          border-radius: 99px;
+        }
+
+        .m-remember-row {
+          display: flex;
+          align-items: center;
+          margin: 2px 0;
+        }
+
+        .m-checkbox-label {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          cursor: pointer;
+          font-size: 0.82rem;
+          font-weight: 500;
+          color: #475569;
+        }
+
+        .m-checkbox {
+          width: 15px;
+          height: 15px;
+          accent-color: #2563eb;
+          cursor: pointer;
+        }
+
+        .m-submit-btn {
+          height: 44px;
+          border-radius: 12px;
+          border: none;
+          color: #ffffff;
+          font-size: 0.92rem;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          cursor: pointer;
+          box-shadow: 0 6px 16px -2px rgba(37, 99, 235, 0.35);
+          transition: all 0.2s ease;
+          margin-top: 4px;
+        }
+
+        .m-submit-btn.primary {
+          background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%);
+        }
+
+        .m-submit-btn.register {
+          background: linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #7c3aed 100%);
+        }
+
+        .m-submit-btn:hover:not(:disabled) {
+          transform: translateY(-1px);
+        }
+
+        .m-submit-btn:disabled {
+          opacity: 0.75;
+          cursor: not-allowed;
+        }
+
+        .m-footer-prompt {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          margin-top: 20px;
+          font-size: 0.84rem;
+          color: #64748b;
+          font-weight: 500;
+        }
+
+        .m-switch-btn {
+          background: transparent;
+          border: none;
+          color: #2563eb;
+          font-weight: 700;
+          cursor: pointer;
+          padding: 0;
+          font-size: 0.84rem;
+          text-decoration: underline;
+        }
+
+        /* Right Artwork Pane */
+        .modal-art-pane {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 24px;
+          border-left: 1px solid #f1f5f9;
+        }
+
+        .modal-art-pane.log-art {
+          background: linear-gradient(145deg, #f0f7ff, #e0effe);
+        }
+
+        .modal-art-pane.reg-art {
+          background: linear-gradient(145deg, #f5f3ff, #ede9fe);
+        }
+
+        .modal-art-img {
+          width: 88%;
+          height: auto;
+          max-height: 380px;
+          object-fit: contain;
+          filter: drop-shadow(0 15px 25px rgba(15, 23, 42, 0.1));
+        }
+
+        @keyframes modalFade {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes modalScale {
+          from { opacity: 0; transform: scale(0.96) translateY(10px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
         @media (max-width: 768px) {
-          .auth-modal-card {
+          .modal-content-card {
             grid-template-columns: 1fr !important;
-            max-width: 450px !important;
+            max-width: 440px !important;
           }
-          .auth-modal-card > div:last-child {
+          .modal-art-pane {
             display: none !important;
           }
         }

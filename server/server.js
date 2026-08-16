@@ -1,12 +1,12 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const connectDB = require('./config/db');
+const { connectDB, getConnectionStatus } = require('./config/db');
 
 // Load env vars
 dotenv.config();
 
-// Connect to database
+// Connect to database (non-blocking — server starts even if DB fails)
 connectDB();
 
 const app = express();
@@ -29,12 +29,27 @@ app.use('/api/logs', logRoutes);
 app.use('/api/stats', statRoutes);
 app.use('/api/models', modelRoutes);
 
+// Health check endpoint
 app.get('/', (req, res) => {
-  res.send('API is running...');
+  res.json({
+    status: 'running',
+    database: getConnectionStatus() ? 'connected' : 'disconnected',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Health check for frontend
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    database: getConnectionStatus() ? 'connected' : 'disconnected'
+  });
 });
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`\n🚀 Server running on port ${PORT}`);
+  console.log(`   API:    http://localhost:${PORT}/api`);
+  console.log(`   Health: http://localhost:${PORT}/api/health\n`);
 });
