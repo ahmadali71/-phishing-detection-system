@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Shield, Bell, Moon, Sun, Search, GraduationCap, X, Trash2, Menu } from 'lucide-react';
+import { Shield, Bell, Moon, Sun, Search, X, Trash2, Menu, User, LogOut } from 'lucide-react';
 
 export default function Header({
   activeTab,
@@ -31,15 +31,17 @@ export default function Header({
       case 'dashboard':
         return { num: '4', text: 'DASHBOARD', color: '#2563eb' };
       case 'url-detection':
-        return { num: '5', text: 'URL DETECTION SCREEN', color: '#2563eb' };
+        return { num: '5', text: 'URL DETECTION', color: '#2563eb' };
       case 'email-detection':
-        return { num: '6', text: 'EMAIL DETECTION SCREEN', color: '#6366f1' };
+        return { num: '6', text: 'EMAIL DETECTION', color: '#6366f1' };
       case 'scan-history':
-        return { num: '8', text: 'SCAN HISTORY & REPORTS', color: '#2563eb' };
+        return { num: '8', text: 'SCAN HISTORY', color: '#2563eb' };
       case 'profile-settings':
-        return { num: '9', text: 'PROFILE & SETTINGS', color: '#7c3aed' };
+        return { num: '9', text: 'SETTINGS', color: '#7c3aed' };
       case 'ai-assistant':
-        return { num: 'AI', text: 'AI DEFENSE ASSISTANT', color: '#06b6d4' };
+        return { num: 'AI', text: 'AI ASSISTANT', color: '#06b6d4' };
+      case 'admin-panel':
+        return { num: 'A', text: 'ADMIN PANEL', color: '#f59e0b' };
       default:
         return { num: '4', text: 'DASHBOARD', color: '#2563eb' };
     }
@@ -49,15 +51,13 @@ export default function Header({
 
   return (
     <header className="app-header">
-      {/* Left: Hamburger + Screen Badge matching PDF */}
+      {/* Left: Hamburger + Screen Badge */}
       <div className="header-brand">
-        {/* Mobile hamburger */}
         <button onClick={onMenuToggle} className="hamburger-btn" title="Menu" aria-label="Toggle menu">
           <Menu size={22} />
         </button>
 
-        {/* Screen Badge matching PDF Chapter 6 */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
+        <div className="header-badge-wrap">
           <div style={{
             background: `linear-gradient(135deg, ${badge.color}, #1d4ed8)`,
             color: '#ffffff',
@@ -68,50 +68,39 @@ export default function Header({
             alignItems: 'center',
             justifyContent: 'center',
             fontWeight: '900',
-            fontSize: '0.88rem',
-            boxShadow: '0 2px 8px rgba(37, 99, 235, 0.35)'
+            fontSize: '0.84rem',
+            boxShadow: '0 2px 8px rgba(37, 99, 235, 0.35)',
+            flexShrink: 0
           }}>
             {badge.num}
           </div>
-          <div style={{ fontWeight: '900', fontSize: '0.88rem', letterSpacing: '0.08em', color: 'var(--text-primary)', textTransform: 'uppercase' }}>
+          <div className="header-badge-title">
             {badge.text}
           </div>
         </div>
       </div>
 
-      {/* Search & Notifications — kept outside .header-controls so panels stay visible on mobile */}
+      {/* Center / Right Actions: Search, Notifications, Theme Toggle */}
       <div className="header-actions">
-        {/* Search */}
+        {/* Search button & popover */}
         <div ref={searchRef} style={{ position: 'relative' }}>
           <button
             onClick={() => setShowSearch(v => !v)}
             className="btn-icon"
             title="Search"
             aria-label="Search"
-            style={{ position: 'relative' }}
           >
             <Search size={17} />
           </button>
           {showSearch && (
-            <div className="glass-panel" style={{
-              position: 'absolute',
-              top: 'calc(100% + 8px)',
-              right: 0,
-              width: 280,
-              background: 'var(--bg-secondary)',
-              borderRadius: 14,
-              padding: 12,
-              zIndex: 200,
-              border: '1px solid var(--border-color)',
-              boxShadow: '0 8px 30px rgba(0,0,0,0.4)'
-            }}>
+            <div className="glass-panel header-search-popover">
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--bg-input)', padding: '8px 12px', borderRadius: 10, border: '1px solid var(--border-color)' }}>
                 <Search size={15} color="var(--text-muted)" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => { setSearchQuery(e.target.value); }}
-                  placeholder={t.searchPlaceholder || 'Search scans...'}
+                  placeholder={t?.searchPlaceholder || 'Search scans or URLs...'}
                   autoFocus
                   style={{
                     background: 'transparent', border: 'none', outline: 'none',
@@ -137,33 +126,16 @@ export default function Header({
           )}
         </div>
 
-        {/* Notifications */}
+        {/* Notifications button & dropdown */}
         <div ref={notifRef} style={{ position: 'relative' }}>
           <button onClick={() => setShowNotifications(v => !v)} className="btn-icon" title="Notifications" aria-label="Notifications" style={{ position: 'relative' }}>
             <Bell size={17} />
             {unreadCount > 0 && (
-              <span style={{
-                position: 'absolute', top: 2, right: 2,
-                width: 8, height: 8, borderRadius: '50%',
-                background: '#ef4444', boxShadow: '0 0 6px #ef4444'
-              }} />
+              <span className="notif-pulse-dot" />
             )}
           </button>
           {showNotifications && (
-            <div className="glass-panel" style={{
-              position: 'absolute',
-              top: 'calc(100% + 8px)',
-              right: 0,
-              width: 320,
-              background: 'var(--bg-secondary)',
-              borderRadius: 14,
-              padding: 14,
-              zIndex: 200,
-              border: '1px solid var(--border-color)',
-              boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
-              maxHeight: '60vh',
-              overflowY: 'auto'
-            }}>
+            <div className="glass-panel header-notif-popover">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                 <div style={{ fontWeight: 800, fontSize: '0.92rem', display: 'flex', alignItems: 'center', gap: 7 }}>
                   Notifications
@@ -191,40 +163,44 @@ export default function Header({
             </div>
           )}
         </div>
-      </div>
 
-      {/* Right Controls */}
-      <div className="header-controls">
-        {/* Theme Toggle */}
-        <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="btn-icon" title="Toggle Theme" aria-label="Toggle theme">
+        {/* Theme Toggle Button — Always accessible on mobile & desktop */}
+        <button
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          className="btn-icon"
+          title="Toggle Theme"
+          aria-label="Toggle theme"
+        >
           {theme === 'dark' ? <Sun size={17} color="#f59e0b" /> : <Moon size={17} color="#3b82f6" />}
         </button>
 
-        {/* User Card matching PDF Page 61 Screen 4 (Ayesha Khan / Amna Najam + Premium User) */}
-        {currentUser ? (
-          <div className="header-user-info" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{
-              width: 36, height: 36, borderRadius: '50%',
-              background: 'linear-gradient(135deg, #1d4ed8, #7c3aed)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'white', fontWeight: 900, fontSize: '0.92rem', flexShrink: 0,
-              boxShadow: '0 2px 8px rgba(37, 99, 235, 0.4)'
-            }}>
-              {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'A'}
+        {/* Desktop User Info & Logout */}
+        <div className="header-controls">
+          {currentUser ? (
+            <div className="header-user-info" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{
+                width: 34, height: 34, borderRadius: '50%',
+                background: 'linear-gradient(135deg, #1d4ed8, #7c3aed)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'white', fontWeight: 900, fontSize: '0.88rem', flexShrink: 0,
+                boxShadow: '0 2px 8px rgba(37, 99, 235, 0.4)'
+              }}>
+                {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'A'}
+              </div>
+              <div style={{ lineHeight: 1.2 }}>
+                <div className="header-user-name" style={{ fontWeight: '800', fontSize: '0.86rem' }}>{currentUser.name}</div>
+                <div className="header-user-role" style={{ fontSize: '0.7rem', color: '#2563eb', fontWeight: '700' }}>{currentUser.role || 'Premium User'}</div>
+              </div>
+              <button onClick={onLogout} className="btn-secondary" style={{ fontSize: '0.74rem', padding: '5px 10px' }}>
+                {t?.logout || 'Logout'}
+              </button>
             </div>
-            <div style={{ lineHeight: 1.25 }}>
-              <div className="header-user-name" style={{ fontWeight: '800', fontSize: '0.88rem' }}>{currentUser.name}</div>
-              <div className="header-user-role" style={{ fontSize: '0.72rem', color: '#2563eb', fontWeight: '700' }}>{currentUser.role || 'Premium User'}</div>
-            </div>
-            <button onClick={onLogout} className="btn-secondary" style={{ fontSize: '0.74rem', padding: '5px 10px' }}>
-              {t.logout || 'Logout'}
+          ) : (
+            <button onClick={onOpenAuth} className="btn-primary" style={{ fontSize: '0.84rem', padding: '8px 16px' }}>
+              {t?.loginRegister || 'Sign In'}
             </button>
-          </div>
-        ) : (
-          <button onClick={onOpenAuth} className="btn-primary" style={{ fontSize: '0.86rem', padding: '8px 18px' }}>
-            {t.loginRegister || 'Login / Register'}
-          </button>
-        )}
+          )}
+        </div>
       </div>
     </header>
   );

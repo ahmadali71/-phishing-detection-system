@@ -1164,6 +1164,216 @@ input:focus, select:focus, textarea:focus {
 
 .responsive-grid-3-col {
   display: grid;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-icon:hover {
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
+/* ================================================================
+   10. BADGES & STATUS INDICATORS
+================================================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-family: var(--font-display);
+  font-size: 0.73rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.badge-danger  { background: var(--color-danger-bg);  color: #fb7185; border: 1px solid var(--color-danger-border); }
+.badge-warning { background: var(--color-warning-bg); color: #fbbf24; border: 1px solid var(--color-warning-border); }
+.badge-emerald { background: var(--color-emerald-bg); color: #34d399; border: 1px solid var(--color-emerald-border); }
+.badge-blue    { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.35); }
+
+/* ================================================================
+   11. DATA TABLES & WRAPPERS
+================================================================ */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 14px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 520px;
+}
+
+th {
+  text-align: start;
+  padding: 13px 16px;
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--border-color);
+  font-family: var(--font-display);
+}
+
+td {
+  padding: 15px 16px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.88rem;
+}
+
+tr:hover td {
+  background: rgba(59, 130, 246, 0.05);
+}
+
+/* ================================================================
+   12. FORM INPUTS & TOGGLE SWITCHES
+================================================================ */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="date"],
+select,
+textarea {
+  background: var(--bg-input) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  border-radius: 12px;
+  padding: 11px 16px;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent-blue) !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+}
+
+/* ================================================================
+   13. MOBILE BOTTOM NAVIGATION (MODERN APP DOCK)
+================================================================ */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 250;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  padding: 4px 6px;
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+
+.mobile-bottom-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+  max-width: 580px;
+  margin: 0 auto;
+  gap: 2px;
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px 4px;
+  border-radius: 12px;
+  flex: 1;
+  min-height: 48px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.mobile-nav-item:active {
+  transform: scale(0.92);
+}
+
+.mobile-nav-icon-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.mobile-nav-active-dot {
+  display: none;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #3b82f6;
+  box-shadow: 0 0 8px #3b82f6;
+  margin-top: 2px;
+}
+
+.mobile-nav-item.active .mobile-nav-active-dot {
+  display: block;
+}
+
+.mobile-nav-item.active {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.mobile-nav-item.active .mobile-nav-icon-wrap {
+  transform: translateY(-1px);
+}
+
+.mobile-nav-badge {
+  position: absolute;
+  top: -3px;
+  right: -6px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
+  border-radius: 8px;
+  background: #ef4444;
+  color: white;
+  font-size: 0.58rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
+  line-height: 1;
+}
+
+.mobile-nav-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.responsive-grid-3-col {
+  display: grid;
   grid-template-columns: 210px 1fr 280px;
   gap: 20px;
   align-items: start;
@@ -1171,230 +1381,6 @@ input:focus, select:focus, textarea:focus {
 
 /* ================================================================
     14. RESPONSIVE BREAKPOINTS (LAPTOP, TABLET & SMARTPHONE)
-================================================================ */
-@media (max-width: 1024px) {
-  .app-main { padding: 22px 24px; }
-  .responsive-grid-4 { grid-template-columns: repeat(2, 1fr); }
-  .responsive-grid-3 { grid-template-columns: repeat(2, 1fr); }
-  .responsive-grid-2-1 { grid-template-columns: 1fr; }
-  .responsive-profile-grid,
-  .profile-layout {
-    grid-template-columns: 1fr 1fr;
-  }
-  .responsive-grid-3-col {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .hamburger-btn { display: flex; }
-  .mobile-bottom-nav { display: flex; }
-  .header-controls { display: none; }
-  .header-search-bar { display: none; }
-  .header-search-toggle { display: none; }
-  .header-brand { flex: 1; }
-
-  .app-sidebar {
-    position: fixed;
-    inset-block-start: 0;
-    inset-inline-start: 0;
-    bottom: 0;
-    height: 100vh;
-    z-index: 300;
-    width: 280px;
-    transform: translateX(-100%);
-    box-shadow: 6px 0 30px rgba(0,0,0,0.6);
-    background: var(--bg-secondary);
-  }
-
-  .app-sidebar.sidebar-open {
-    transform: translateX(0);
-  }
-
-  .rtl-layout .app-sidebar {
-    transform: translateX(100%);
-    box-shadow: -6px 0 30px rgba(0,0,0,0.6);
-  }
-
-  .rtl-layout .app-sidebar.sidebar-open {
-    transform: translateX(0);
-  }
-
-  .app-main {
-    padding: 14px 14px 80px 14px;
-  }
-
-  .header-brand-subtitle {
-    display: none;
-  }
-
-  .responsive-grid-3-col {
-    grid-template-columns: 1fr;
-  }
-
-  .mobile-bottom-nav {
-    height: 62px;
-    padding: 5px 2px 6px;
-    padding-bottom: max(6px, env(safe-area-inset-bottom));
-  }
-
-  .mobile-nav-item {
-    padding: 3px 1px;
-    gap: 2px;
-    border-radius: 8px;
-  }
-
-  .mobile-nav-label {
-    font-size: 0.58rem;
-    letter-spacing: 0;
-    margin-top: 1px;
-  }
-
-  .responsive-grid-4,
-  .responsive-grid-3,
-  .responsive-grid-2-1,
-  .responsive-grid-2,
-  .responsive-profile-grid,
-  .responsive-auth-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .profile-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .responsive-auth-banner {
-    display: none;
-  }
-
-  .auth-modal-card {
-    grid-template-columns: 1fr !important;
-    max-width: 480px !important;
-    margin: 0 12px;
-    border-radius: 20px;
-  }
-
-  .auth-form-section {
-    padding: 28px 20px !important;
-  }
-
-  .auth-form-section .auth-title {
-    font-size: 1.4rem !important;
-  }
-
-  .auth-form-section .auth-subtitle {
-    font-size: 0.82rem !important;
-    margin-bottom: 16px !important;
-  }
-
-  .auth-form {
-    gap: 10px !important;
-  }
-
-  .auth-input-wrap {
-    padding: 10px 12px !important;
-    gap: 8px !important;
-    min-height: 48px;
-  }
-
-  .auth-input-wrap input {
-    font-size: 0.9rem !important;
-    min-height: 44px;
-  }
-
-  .pw-toggle {
-    right: 8px !important;
-  }
-
-  .auth-meta-row {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 8px !important;
-  }
-
-  .auth-submit-btn {
-    padding: 12px !important;
-    font-size: 0.95rem !important;
-    margin-top: 4px !important;
-  }
-
-  .auth-switch {
-    font-size: 0.82rem !important;
-    margin-top: 16px !important;
-  }
-
-  .auth-badge {
-    margin-bottom: 14px !important;
-  }
-
-  .auth-badge-box {
-    width: 24px !important;
-    height: 24px !important;
-    font-size: 0.78rem !important;
-  }
-
-  .auth-badge-text {
-    font-size: 0.72rem !important;
-    letter-spacing: 0.04em !important;
-  }
-
-  .glass-panel {
-    border-radius: 14px;
-  }
-
-  .btn-primary {
-    padding: 10px 16px;
-    font-size: 0.85rem;
-    border-radius: 10px;
-  }
-
-  .btn-secondary {
-    padding: 9px 14px;
-    font-size: 0.82rem;
-    border-radius: 10px;
-  }
-
-  .btn-icon {
-    width: 34px;
-    height: 34px;
-  }
-
-  .badge {
-    font-size: 0.65rem;
-    padding: 3px 10px;
-  }
-
-  input[type="text"],
-  input[type="password"],
-  input[type="email"],
-  input[type="date"],
-  select,
-  textarea {
-    padding: 10px 14px;
-    font-size: 0.85rem;
-    border-radius: 10px;
-  }
-
-  table {
-    min-width: 480px;
-  }
-
-  th, td {
-    padding: 12px 14px;
-    font-size: 0.82rem;
-  }
-
-  .sidebar-nav-item {
-    padding: 10px 12px;
-    font-size: 0.85rem;
-  }
-
-  .sidebar-drawer-header {
-    padding: 14px 10px 12px;
-  }
-
-  .sidebar-academic-card {
-    padding: 12px;
   }
 
   .profile-layout {

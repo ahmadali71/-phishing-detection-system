@@ -188,8 +188,8 @@ export default function Dashboard({ stats, recentActivity, onNavigateScan, onVie
         </div>
       </div>
 
-      {/* ── Bottom Card: Recent Activity (Exact Match to PDF Page 61 Screen 4) ── */}
-      <div className="glass-panel" style={{ padding: '24px' }}>
+      {/* ── Bottom Card: Recent Activity (Responsive Table + Mobile Cards) ── */}
+      <div className="glass-panel" style={{ padding: '20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <h3 style={{ fontSize: '1.1rem', fontWeight: '800' }}>Recent Activity</h3>
           <button
@@ -203,11 +203,12 @@ export default function Dashboard({ stats, recentActivity, onNavigateScan, onVie
               cursor: 'pointer'
             }}
           >
-            View All
+            View All →
           </button>
         </div>
 
-        <div className="table-wrapper">
+        {/* Desktop / Tablet Table View */}
+        <div className="table-wrapper dashboard-desktop-table">
           <table>
             <thead>
               <tr>
@@ -220,9 +221,15 @@ export default function Dashboard({ stats, recentActivity, onNavigateScan, onVie
             </thead>
             <tbody>
               {activityList.slice(0, 5).map((item, idx) => (
-                <tr key={idx}>
+                <tr
+                  key={idx}
+                  onClick={() => onViewDetail && onViewDetail(item)}
+                  style={{ cursor: onViewDetail ? 'pointer' : 'default' }}
+                >
                   <td style={{ fontWeight: '700' }}>{item.type}</td>
-                  <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>{item.input}</td>
+                  <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', maxWidth: '280px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {item.input}
+                  </td>
                   <td>
                     <span style={{
                       fontWeight: '800',
@@ -232,13 +239,66 @@ export default function Dashboard({ stats, recentActivity, onNavigateScan, onVie
                     </span>
                   </td>
                   <td style={{ fontWeight: '800' }}>{item.riskScore}</td>
-                   <td style={{ textAlign: 'end', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
-                     {item.time || item.date || 'Just now'}
-                   </td>
+                  <td style={{ textAlign: 'end', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
+                    {item.time || item.date || 'Just now'}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile-Only Touch Cards List */}
+        <div className="dashboard-mobile-cards" style={{ display: 'none', flexDirection: 'column', gap: '10px' }}>
+          {activityList.slice(0, 5).map((item, idx) => {
+            const isPhish = item.result === 'Phishing';
+            const isSusp = item.result === 'Suspicious';
+            const color = isPhish ? '#ef4444' : (isSusp ? '#f59e0b' : '#10b981');
+            return (
+              <div
+                key={idx}
+                onClick={() => onViewDetail && onViewDetail(item)}
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: '12px',
+                  background: 'var(--bg-input)',
+                  border: '1px solid var(--border-color)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '6px',
+                  cursor: 'pointer'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span className="badge badge-blue" style={{ fontSize: '0.65rem', padding: '2px 8px' }}>
+                    {item.type}
+                  </span>
+                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                    {item.time || item.date || 'Just now'}
+                  </span>
+                </div>
+                <div style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '0.82rem',
+                  color: 'var(--text-primary)',
+                  fontWeight: '600',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap'
+                }}>
+                  {item.input}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
+                  <span style={{ fontWeight: '800', fontSize: '0.86rem', color }}>
+                    {item.result}
+                  </span>
+                  <span style={{ fontWeight: '800', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+                    Risk: {item.riskScore}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
