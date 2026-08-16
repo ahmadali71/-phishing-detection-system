@@ -431,7 +431,8 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 14px;
   padding: 8px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-  width: 260px;
+  width: min(260px, calc(100vw - 80px));
+  max-width: 260px;
 }
 
 /* ================================================================
@@ -1336,6 +1337,16 @@ input:focus, select:focus, textarea:focus {
   .auth-modal-banner {
     display: none !important;
   }
+
+  .dashboard-actions {
+    flex-wrap: wrap;
+  }
+
+  .dashboard-actions .btn-primary,
+  .dashboard-actions .btn-secondary {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1351,10 +1362,15 @@ input:focus, select:focus, textarea:focus {
 
   .header-brand-text h1 {
     font-size: 1rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  .header-brand-tag {
+  .header-brand-subtitle {
     font-size: 0.75rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
   }
 
   .header-user-name, .header-user-role {
@@ -1423,6 +1439,20 @@ input:focus, select:focus, textarea:focus {
 
   .profile-account-status-text {
     font-size: 0.82rem;
+  }
+
+  .header-notif-popover {
+    right: 8px !important;
+    left: 8px !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+
+  .header-search-popover {
+    right: 8px !important;
+    left: 8px !important;
+    width: auto !important;
+    max-width: none !important;
   }
 }
 

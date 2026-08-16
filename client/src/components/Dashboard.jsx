@@ -38,7 +38,7 @@ export default function Dashboard({ stats, recentActivity, onNavigateScan, onVie
             Overview of your security activity
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div className="dashboard-actions" style={{ display: 'flex', gap: '10px' }}>
           <button onClick={() => onNavigateScan('url-detection')} className="btn-primary" style={{ padding: '10px 20px', fontSize: '0.88rem' }}>
             <Search size={16} /> Scan URL Now
           </button>
