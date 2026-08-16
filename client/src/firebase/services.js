@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api';
+// Use relative URL — Vite dev server proxies /api to http://localhost:5000
+const API_URL = '/api';
 
 // Create axios instance
 const api = axios.create({
@@ -59,7 +60,7 @@ export const logsService = {
 export const usersService = {
   // Auth endpoints (replacing old addUser behavior)
   async register(userData) {
-    const response = await axios.post(`${API_URL}/auth/register`, userData);
+    const response = await api.post('/auth/register', userData);
     if (response.data) {
       localStorage.setItem('user', JSON.stringify(response.data));
     }
@@ -67,7 +68,7 @@ export const usersService = {
   },
 
   async login(userData) {
-    const response = await axios.post(`${API_URL}/auth/login`, userData);
+    const response = await api.post('/auth/login', userData);
     if (response.data) {
       localStorage.setItem('user', JSON.stringify(response.data));
     }

@@ -37,7 +37,14 @@ function AppInner() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
 
@@ -127,11 +134,18 @@ function AppInner() {
   );
 
   const handleLoginSuccess = useCallback((user) => {
-    setCurrentUser(user);
+    const userData = {
+      name: user.name,
+      email: user.email,
+      token: user.token,
+      role: 'Premium User'
+    };
+    setCurrentUser(userData);
+    // Save to localStorage for session persistence
+    localStorage.setItem('user', JSON.stringify(userData));
     addSystemLog('INFO', 'Auth', `${user.name} logged in.`);
-    addUser(user);
     addNotification('Welcome Back!', `Logged in as ${user.name}.`, 'INFO');
-  }, [addSystemLog, addUser, addNotification]);
+  }, [addSystemLog, addNotification]);
 
   return (
     <>
@@ -144,7 +158,7 @@ function AppInner() {
             theme={theme} setTheme={setTheme}
             currentUser={currentUser}
             onOpenAuth={() => setIsAuthOpen(true)}
-            onLogout={() => setCurrentUser(null)}
+            onLogout={() => { localStorage.removeItem('user'); setCurrentUser(null); }}
             notifications={notifications}
             onMarkNotificationRead={(id) => setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))}
             onClearNotifications={() => setNotifications([])}
@@ -163,7 +177,7 @@ function AppInner() {
               activeTab={activeTab}
               setActiveTab={setActiveTab}
               currentUser={currentUser}
-              onLogout={() => setCurrentUser(null)}
+              onLogout={() => { localStorage.removeItem('user'); setCurrentUser(null); }}
               onOpenAuth={() => setIsAuthOpen(true)}
               isOpen={sidebarOpen}
               onClose={() => setSidebarOpen(false)}

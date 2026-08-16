@@ -1,23 +1,31 @@
 import React, { useState } from 'react';
-import { X, Mail, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { X, Mail, Lock, User, Eye, EyeOff, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import loginArt from '../assets/login_art.png';
 import registerArt from '../assets/register_art.png';
 import { usersService } from './../firebase/services';
 
 export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
   const [isRegister, setIsRegister] = useState(false);
-  const [emailOrUser, setEmailOrUser] = useState('');
+  
+  // Login fields
+  const [email, setEmail] = useState('');
+  
+  // Register fields
+  const [fullName, setFullName] = useState('');
+  const [regEmail, setRegEmail] = useState('');
+  
+  // Shared fields
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [username, setUsername] = useState('');
-  const [regEmail, setRegEmail] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
+  
+  // UI states
   const [showPw, setShowPw] = useState(false);
   const [showConfirmPw, setShowConfirmPw] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
 
   if (!isOpen) return null;
 
@@ -25,6 +33,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
     e.preventDefault();
     setIsLoading(true);
     setErrorMsg('');
+    setSuccessMsg('');
 
     try {
       if (isRegister) {
@@ -33,53 +42,152 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
           setIsLoading(false);
           return;
         }
+        if (!agreeTerms) {
+          setErrorMsg('You must agree to the Terms & Conditions');
+          setIsLoading(false);
+          return;
+        }
+
         const user = await usersService.register({
           name: fullName,
           email: regEmail,
           password: password,
         });
-        if (onLoginSuccess) onLoginSuccess(user);
-        onClose();
+        
+        setSuccessMsg('Registration successful! Logging you in...');
+        setTimeout(() => {
+          if (onLoginSuccess) onLoginSuccess(user);
+          onClose();
+        }, 1500);
+
       } else {
         const user = await usersService.login({
-          email: emailOrUser,
+          email: email,
           password: password,
         });
-        if (onLoginSuccess) onLoginSuccess(user);
-        onClose();
+        
+        setSuccessMsg('Login successful!');
+        setTimeout(() => {
+          if (onLoginSuccess) onLoginSuccess(user);
+          onClose();
+        }, 1000);
       }
     } catch (error) {
-      setErrorMsg(error.response?.data?.message || 'Authentication failed');
+      setErrorMsg(error.response?.data?.message || 'Authentication failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const switchMode = (toRegister) => {
+    setIsRegister(toRegister);
+    setErrorMsg('');
+    setSuccessMsg('');
+    setPassword('');
+    setConfirmPassword('');
+  };
+
+  // Custom Input Component for consistent beautiful UI
+  const AuthInput = ({ icon: Icon, type, placeholder, value, onChange, isPassword, showPwState, togglePw }) => (
+    <div className="auth-input-container" style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      background: '#f8fafc',
+      border: '1px solid #e2e8f0',
+      borderRadius: '16px',
+      padding: '14px 18px',
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      position: 'relative'
+    }}>
+      <Icon size={20} color="#94a3b8" style={{ flexShrink: 0 }} />
+      <input
+        type={isPassword ? (showPwState ? 'text' : 'password') : type}
+        required
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        className="auth-input-field"
+        style={{
+          background: 'transparent',
+          border: 'none',
+          outline: 'none',
+          width: '100%',
+          color: '#0f172a',
+          fontSize: '0.95rem',
+          padding: 0,
+          paddingRight: isPassword ? '36px' : '0',
+          fontWeight: '500'
+        }}
+      />
+      {isPassword && (
+        <button
+          type="button"
+          onClick={togglePw}
+          style={{
+            position: 'absolute',
+            right: '16px',
+            background: 'transparent',
+            border: 'none',
+            color: '#94a3b8',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            padding: '4px',
+            transition: 'color 0.2s'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.color = '#475569'}
+          onMouseLeave={(e) => e.currentTarget.style.color = '#94a3b8'}
+          title={showPwState ? "Hide password" : "Show password"}
+        >
+          {showPwState ? <EyeOff size={18} /> : <Eye size={18} />}
+        </button>
+      )}
+      <style>{`
+        .auth-input-container:focus-within {
+          border-color: #3b82f6 !important;
+          background: #ffffff !important;
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
+        }
+        .auth-input-container:focus-within svg:first-child {
+          color: #3b82f6 !important;
+        }
+        .auth-input-field::placeholder {
+          color: #94a3b8;
+          font-weight: 400;
+        }
+      `}</style>
+    </div>
+  );
+
   return (
     <div style={{
       position: 'fixed',
       inset: 0,
-      background: 'rgba(15, 23, 42, 0.72)',
-      backdropFilter: 'blur(10px)',
-      WebkitBackdropFilter: 'blur(10px)',
+      background: 'rgba(15, 23, 42, 0.65)',
+      backdropFilter: 'blur(12px)',
+      WebkitBackdropFilter: 'blur(12px)',
       zIndex: 1000,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '20px',
-      animation: 'authFadeIn 0.25s ease-out'
+      padding: '24px',
+      animation: 'authFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
     }}>
-      {/* ── CARD CONTAINER (Exact 1:1 Match to User Documentation Screenshot) ── */}
+      {/* ── CARD CONTAINER ── */}
       <div style={{
         width: '100%',
-        maxWidth: isRegister ? '860px' : '820px',
+        maxWidth: isRegister ? '900px' : '860px',
         background: '#ffffff',
-        borderRadius: '24px',
-        boxShadow: '0 25px 65px -12px rgba(15, 23, 42, 0.4), 0 0 0 1px rgba(226, 232, 240, 0.8)',
+        borderRadius: '28px',
+        boxShadow: '0 30px 60px -15px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(226, 232, 240, 0.6)',
         overflow: 'hidden',
         position: 'relative',
         display: 'grid',
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+        gridTemplateColumns: '1.1fr 0.9fr',
+        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        transform: 'translateY(0)',
+        opacity: 1
       }} className="auth-modal-card">
 
         {/* Floating Close Button */}
@@ -87,205 +195,154 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
           onClick={onClose}
           style={{
             position: 'absolute',
-            top: '18px',
-            right: '18px',
+            top: '20px',
+            right: '20px',
             background: 'rgba(255, 255, 255, 0.9)',
             border: '1px solid #e2e8f0',
             borderRadius: '50%',
-            width: '36px',
-            height: '36px',
+            width: '40px',
+            height: '40px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             color: '#64748b',
             cursor: 'pointer',
             zIndex: 30,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-            transition: 'all 0.2s'
+            boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
+            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.05)';
+            e.currentTarget.style.color = '#0f172a';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.color = '#64748b';
           }}
           title="Close Modal"
         >
-          <X size={18} />
+          <X size={20} />
         </button>
 
         {/* ── LEFT COLUMN: FORM SECTION ── */}
-        <div className="auth-form-section" style={{
-          padding: isRegister ? '36px 40px' : '44px 44px',
+        <div style={{
+          padding: isRegister ? '40px 48px' : '48px 56px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          background: '#ffffff'
+          background: '#ffffff',
+          position: 'relative'
         }}>
 
+          {/* Messages */}
+          <div style={{ position: 'absolute', top: '24px', left: '48px', right: '48px' }}>
+            {errorMsg && (
+              <div style={{ padding: '12px 16px', background: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', borderRadius: '12px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px', animation: 'slideDown 0.3s ease' }}>
+                <AlertCircle size={18} />
+                <span style={{ fontWeight: 500 }}>{errorMsg}</span>
+              </div>
+            )}
+            {successMsg && (
+              <div style={{ padding: '12px 16px', background: '#f0fdf4', border: '1px solid #bbf7d0', color: '#166534', borderRadius: '12px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px', animation: 'slideDown 0.3s ease' }}>
+                <CheckCircle2 size={18} />
+                <span style={{ fontWeight: 500 }}>{successMsg}</span>
+              </div>
+            )}
+          </div>
+
           {!isRegister ? (
-            <div className="auth-login-form">
-              {/* Badge: [2] LOGIN SCREEN */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '9px', marginBottom: '20px' }}>
+            /* ========================================================
+               LOGIN SCREEN
+            ======================================================== */
+            <div style={{ marginTop: (errorMsg || successMsg) ? '40px' : '0', transition: 'margin 0.3s ease' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
                 <div style={{
-                  background: 'linear-gradient(135deg, #1d4ed8, #2563eb)',
+                  background: 'linear-gradient(135deg, #1d4ed8, #3b82f6)',
                   color: '#ffffff',
-                  width: '28px',
-                  height: '28px',
-                  borderRadius: '8px',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '10px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontWeight: '900',
-                  fontSize: '0.92rem',
-                  boxShadow: '0 3px 8px rgba(37, 99, 235, 0.4)'
+                  fontWeight: '800',
+                  fontSize: '1rem',
+                  boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)'
                 }}>
-                  2
+                  <Lock size={16} />
                 </div>
                 <span style={{
-                  fontWeight: '900',
-                  fontSize: '0.86rem',
-                  letterSpacing: '0.08em',
-                  color: '#0f172a',
-                  fontFamily: 'var(--font-display)',
+                  fontWeight: '800',
+                  fontSize: '0.85rem',
+                  letterSpacing: '0.1em',
+                  color: '#2563eb',
                   textTransform: 'uppercase'
                 }}>
-                  LOGIN SCREEN
+                  Secure Login
                 </span>
               </div>
 
-              {/* Title & Subtitle */}
               <h2 style={{
-                fontSize: '2rem',
+                fontSize: '2.2rem',
                 fontWeight: '900',
                 color: '#0f172a',
-                fontFamily: 'var(--font-display)',
                 letterSpacing: '-0.03em',
-                marginBottom: '4px',
+                marginBottom: '8px',
                 lineHeight: '1.2'
               }}>
-                Welcome Back!
+                Welcome Back
               </h2>
               <p style={{
                 color: '#64748b',
-                fontSize: '0.94rem',
-                marginBottom: '28px',
+                fontSize: '0.95rem',
+                marginBottom: '32px',
                 fontWeight: '500'
               }}>
-                Login to your account
+                Enter your credentials to access your dashboard.
               </p>
 
-              <form className="auth-form" onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {errorMsg && (
-                  <div style={{ padding: '10px', background: '#fee2e2', color: '#991b1b', borderRadius: '8px', fontSize: '0.85rem' }}>
-                    {errorMsg}
-                  </div>
-                )}
-                {/* Input 1: Email or Username */}
-                <div className="auth-input-wrap" style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  background: '#ffffff',
-                  border: '1.5px solid #cbd5e1',
-                  borderRadius: '14px',
-                  padding: '13px 16px',
-                  transition: 'all 0.2s ease'
-                }}>
-                  <Mail size={19} color="#64748b" className="auth-icon" style={{ flexShrink: 0 }} />
-                  <input
-                    type="text"
-                    required
-                    placeholder="Email or Username"
-                    value={emailOrUser}
-                    onChange={(e) => setEmailOrUser(e.target.value)}
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      outline: 'none',
-                      width: '100%',
-                      color: '#0f172a',
-                      fontSize: '0.95rem',
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                
+                <AuthInput
+                  icon={Mail}
+                  type="email"
+                  placeholder="Email Address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
 
-                      padding: 0,
-                      fontWeight: '500'
-                    }}
-                  />
-                </div>
+                <AuthInput
+                  icon={Lock}
+                  isPassword
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  showPwState={showPw}
+                  togglePw={() => setShowPw(!showPw)}
+                />
 
-                {/* Input 2: Password with Eye Toggle */}
-                <div className="auth-input-wrap" style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  background: '#ffffff',
-                  border: '1.5px solid #cbd5e1',
-                  borderRadius: '14px',
-                  padding: '13px 16px',
-                  position: 'relative',
-                  transition: 'all 0.2s ease'
-                }}>
-                  <Lock size={19} color="#64748b" className="auth-icon" style={{ flexShrink: 0 }} />
-                  <input
-                    type={showPw ? 'text' : 'password'}
-                    required
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      outline: 'none',
-                      width: '100%',
-                      color: '#0f172a',
-                      fontSize: '0.95rem',
-
-                      padding: 0,
-                      paddingRight: '32px',
-                      fontWeight: '500'
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPw(!showPw)}
-                    className="pw-toggle"
-                    style={{
-                      position: 'absolute',
-                      right: '14px',
-                      background: 'transparent',
-                      border: 'none',
-                      color: '#64748b',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '4px'
-                    }}
-                    title={showPw ? "Hide password" : "Show password"}
-                  >
-                    {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-
-                {/* Remember Me & Forgot Password */}
-                <div className="auth-meta-row" style={{
+                <div style={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  fontSize: '0.86rem',
-                  marginTop: '2px'
+                  marginTop: '4px',
+                  marginBottom: '8px'
                 }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: '#475569', fontWeight: '500' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: '#475569', fontSize: '0.9rem', fontWeight: '500' }}>
                     <input
                       type="checkbox"
                       checked={rememberMe}
                       onChange={() => setRememberMe(!rememberMe)}
-                      style={{ cursor: 'pointer', accentColor: '#2563eb', width: '16px', height: '16px', borderRadius: '4px' }}
+                      style={{ cursor: 'pointer', accentColor: '#2563eb', width: '18px', height: '18px', borderRadius: '6px' }}
                     />
                     Remember me
                   </label>
                   <a
                     href="#forgot"
                     onClick={(e) => e.preventDefault()}
-                    style={{
-                      color: '#2563eb',
-                      fontWeight: '700',
-                      textDecoration: 'none',
-                      fontSize: '0.86rem'
-                    }}
+                    style={{ color: '#2563eb', fontWeight: '600', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s' }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#1d4ed8'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = '#2563eb'}
                   >
                     Forgot Password?
                   </a>
@@ -293,387 +350,218 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
 
                  <button
                    type="submit"
-                   disabled={isLoading}
-                   className="auth-submit-btn"
+                   disabled={isLoading || successMsg}
                    style={{
-                     background: 'linear-gradient(90deg, #1d4ed8 0%, #0284c7 60%, #06b6d4 100%)',
+                     background: 'linear-gradient(90deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)',
                      color: '#ffffff',
                      border: 'none',
-                     borderRadius: '14px',
-                     padding: '14px',
-                     fontWeight: '800',
-                     fontSize: '1.02rem',
-                     cursor: isLoading ? 'not-allowed' : 'pointer',
-                     opacity: isLoading ? 0.7 : 1,
-                     marginTop: '8px',
-                     boxShadow: '0 8px 24px -4px rgba(2, 132, 199, 0.45)',
-                     transition: 'transform 0.15s, box-shadow 0.15s',
+                     borderRadius: '16px',
+                     padding: '16px',
+                     fontWeight: '700',
+                     fontSize: '1.05rem',
+                     cursor: (isLoading || successMsg) ? 'not-allowed' : 'pointer',
+                     opacity: (isLoading || successMsg) ? 0.8 : 1,
+                     boxShadow: '0 10px 25px -5px rgba(37, 99, 235, 0.4)',
+                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                      display: 'flex',
                      justifyContent: 'center',
                      alignItems: 'center',
-                     gap: '8px'
+                     gap: '10px'
+                   }}
+                   onMouseEnter={(e) => {
+                     if(!isLoading && !successMsg) e.currentTarget.style.transform = 'translateY(-2px)';
+                   }}
+                   onMouseLeave={(e) => {
+                     if(!isLoading && !successMsg) e.currentTarget.style.transform = 'translateY(0)';
                    }}
                  >
-                   {isLoading ? <Loader2 size={20} className="animate-spin" /> : 'Login'}
+                   {isLoading ? <Loader2 size={22} className="animate-spin" /> : 'Sign In'}
                  </button>
               </form>
 
-              {/* Bottom Switch to Register */}
-              <div className="auth-switch" style={{
-                textAlign: 'center',
-                marginTop: '24px',
-                fontSize: '0.9rem',
-                color: '#64748b',
-                fontWeight: '500'
-              }}>
+              <div style={{ textAlign: 'center', marginTop: '32px', fontSize: '0.95rem', color: '#64748b', fontWeight: '500' }}>
                 Don't have an account?{' '}
                 <button
                   type="button"
-                  onClick={() => setIsRegister(true)}
+                  onClick={() => switchMode(true)}
                   style={{
                     background: 'transparent',
                     border: 'none',
                     color: '#2563eb',
-                    fontWeight: '800',
+                    fontWeight: '700',
                     cursor: 'pointer',
-                    fontSize: '0.9rem',
-                    padding: 0
+                    fontSize: '0.95rem',
+                    padding: 0,
+                    textDecoration: 'underline',
+                    textUnderlineOffset: '4px'
                   }}
                 >
-                  Register here
+                  Create one now
                 </button>
               </div>
             </div>
           ) : (
             /* ========================================================
-               SCREEN 3: REGISTER SCREEN (Exact Match to User Screenshot)
+               REGISTER SCREEN
             ======================================================== */
-            <div>
-              {/* Badge: [3] REGISTER SCREEN */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '9px', marginBottom: '14px' }}>
+            <div style={{ marginTop: (errorMsg || successMsg) ? '40px' : '0', transition: 'margin 0.3s ease' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
                 <div style={{
-                  background: 'linear-gradient(135deg, #6366f1, #7c3aed)',
+                  background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
                   color: '#ffffff',
-                  width: '28px',
-                  height: '28px',
-                  borderRadius: '8px',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '10px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontWeight: '900',
-                  fontSize: '0.92rem',
-                  boxShadow: '0 3px 8px rgba(99, 102, 241, 0.4)'
+                  fontWeight: '800',
+                  fontSize: '1rem',
+                  boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)'
                 }}>
-                  3
+                  <User size={16} />
                 </div>
                 <span style={{
-                  fontWeight: '900',
-                  fontSize: '0.86rem',
-                  letterSpacing: '0.08em',
-                  color: '#0f172a',
-                  fontFamily: 'var(--font-display)',
+                  fontWeight: '800',
+                  fontSize: '0.85rem',
+                  letterSpacing: '0.1em',
+                  color: '#6366f1',
                   textTransform: 'uppercase'
                 }}>
-                  REGISTER SCREEN
+                  Join APDS
                 </span>
               </div>
 
-              {/* Title & Subtitle */}
               <h2 style={{
-                fontSize: '1.85rem',
+                fontSize: '2rem',
                 fontWeight: '900',
                 color: '#0f172a',
-                fontFamily: 'var(--font-display)',
                 letterSpacing: '-0.03em',
-                marginBottom: '4px',
+                marginBottom: '6px',
                 lineHeight: '1.2'
               }}>
-                Create Your Account
+                Create Account
               </h2>
               <p style={{
                 color: '#64748b',
                 fontSize: '0.9rem',
-                marginBottom: '18px',
+                marginBottom: '24px',
                 fontWeight: '500'
               }}>
-                Join APDS and stay protected
+                Sign up to start scanning and protecting your digital assets.
               </p>
 
-              <form className="auth-form auth-register-form" onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '11px' }}>
-                {errorMsg && (
-                  <div style={{ padding: '10px', background: '#fee2e2', color: '#991b1b', borderRadius: '8px', fontSize: '0.85rem' }}>
-                    {errorMsg}
-                  </div>
-                )}
-                {/* Input 1: Full Name */}
-                <div className="auth-input-wrap" style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  background: '#ffffff',
-                  border: '1.5px solid #cbd5e1',
-                  borderRadius: '12px',
-                  padding: '11px 14px'
-                }}>
-                  <User size={18} color="#64748b" className="auth-icon" style={{ flexShrink: 0 }} />
-                  <input
-                    type="text"
-                    required
-                    placeholder="Full Name"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      outline: 'none',
-                      width: '100%',
-                      color: '#0f172a',
-                      fontSize: '0.9rem',
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                
+                <AuthInput
+                  icon={User}
+                  type="text"
+                  placeholder="Full Name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                />
 
-                      padding: 0,
-                      fontWeight: '500'
-                    }}
-                  />
-                </div>
+                <AuthInput
+                  icon={Mail}
+                  type="email"
+                  placeholder="Email Address"
+                  value={regEmail}
+                  onChange={(e) => setRegEmail(e.target.value)}
+                />
 
-                {/* Input 2: Email Address */}
-                <div className="auth-input-wrap" style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  background: '#ffffff',
-                  border: '1.5px solid #cbd5e1',
-                  borderRadius: '12px',
-                  padding: '11px 14px'
-                }}>
-                  <Mail size={18} color="#64748b" className="auth-icon" style={{ flexShrink: 0 }} />
-                  <input
-                    type="email"
-                    required
-                    placeholder="Email Address"
-                    value={regEmail}
-                    onChange={(e) => setRegEmail(e.target.value)}
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      outline: 'none',
-                      width: '100%',
-                      color: '#0f172a',
-                      fontSize: '0.9rem',
-
-                      padding: 0,
-                      fontWeight: '500'
-                    }}
-                  />
-                </div>
-
-                {/* Input 3: Username */}
-                <div className="auth-input-wrap" style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  background: '#ffffff',
-                  border: '1.5px solid #cbd5e1',
-                  borderRadius: '12px',
-                  padding: '11px 14px'
-                }}>
-                  <User size={18} color="#64748b" className="auth-icon" style={{ flexShrink: 0 }} />
-                  <input
-                    type="text"
-                    required
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      outline: 'none',
-                      width: '100%',
-                      color: '#0f172a',
-                      fontSize: '0.9rem',
-
-                      padding: 0,
-                      fontWeight: '500'
-                    }}
-                  />
-                </div>
-
-                {/* Input 4: Password */}
-                <div className="auth-input-wrap" style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  background: '#ffffff',
-                  border: '1.5px solid #cbd5e1',
-                  borderRadius: '12px',
-                  padding: '11px 14px',
-                  position: 'relative'
-                }}>
-                  <User size={18} color="#64748b" className="auth-icon" style={{ flexShrink: 0 }} />
-                  <input
-                    type={showPw ? 'text' : 'password'}
-                    required
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                  <AuthInput
+                    icon={Lock}
+                    isPassword
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      outline: 'none',
-                      width: '100%',
-                      color: '#0f172a',
-                      fontSize: '0.9rem',
-
-                      padding: 0,
-                      paddingRight: '30px',
-                      fontWeight: '500'
-                    }}
+                    showPwState={showPw}
+                    togglePw={() => setShowPw(!showPw)}
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPw(!showPw)}
-                    className="pw-toggle"
-                    style={{
-                      position: 'absolute',
-                      right: '12px',
-                      background: 'transparent',
-                      border: 'none',
-                      color: '#64748b',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center'
-                    }}
-                    title={showPw ? "Hide password" : "Show password"}
-                  >
-                    {showPw ? <EyeOff size={17} /> : <Eye size={17} />}
-                  </button>
-                </div>
 
-                {/* Input 5: Confirm Password */}
-                <div className="auth-input-wrap" style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  background: '#ffffff',
-                  border: '1.5px solid #cbd5e1',
-                  borderRadius: '12px',
-                  padding: '11px 14px',
-                  position: 'relative'
-                }}>
-                  <User size={18} color="#64748b" className="auth-icon" style={{ flexShrink: 0 }} />
-                  <input
-                    type={showConfirmPw ? 'text' : 'password'}
-                    required
-                    placeholder="Confirm Password"
+                  <AuthInput
+                    icon={Lock}
+                    isPassword
+                    placeholder="Confirm"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      outline: 'none',
-                      width: '100%',
-                      color: '#0f172a',
-                      fontSize: '0.9rem',
-
-                      padding: 0,
-                      paddingRight: '30px',
-                      fontWeight: '500'
-                    }}
+                    showPwState={showConfirmPw}
+                    togglePw={() => setShowConfirmPw(!showConfirmPw)}
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPw(!showConfirmPw)}
-                    className="pw-toggle"
-                    style={{
-                      position: 'absolute',
-                      right: '12px',
-                      background: 'transparent',
-                      border: 'none',
-                      color: '#64748b',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center'
-                    }}
-                    title={showConfirmPw ? "Hide password" : "Show password"}
-                  >
-                    {showConfirmPw ? <EyeOff size={17} /> : <Eye size={17} />}
-                  </button>
                 </div>
 
-                {/* Terms & Conditions Checkbox */}
                 <label style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
+                  gap: '10px',
                   cursor: 'pointer',
-                  fontSize: '0.84rem',
+                  fontSize: '0.88rem',
                   color: '#475569',
-                  marginTop: '2px',
+                  marginTop: '6px',
+                  marginBottom: '6px',
                   fontWeight: '500'
                 }}>
                   <input
                     type="checkbox"
-                    required
                     checked={agreeTerms}
                     onChange={() => setAgreeTerms(!agreeTerms)}
-                    style={{ cursor: 'pointer', accentColor: '#6366f1', width: '16px', height: '16px', borderRadius: '4px' }}
+                    style={{ cursor: 'pointer', accentColor: '#6366f1', width: '18px', height: '18px', borderRadius: '6px' }}
                   />
                   <span>
-                    I agree to the{' '}
-                    <strong style={{ color: '#4f46e5' }}>Terms & Conditions</strong>
+                    I agree to the <a href="#" style={{ color: '#4f46e5', fontWeight: '600', textDecoration: 'underline', textUnderlineOffset: '2px' }}>Terms of Service</a> & <a href="#" style={{ color: '#4f46e5', fontWeight: '600', textDecoration: 'underline', textUnderlineOffset: '2px' }}>Privacy Policy</a>
                   </span>
                 </label>
 
                  <button
                    type="submit"
-                   disabled={isLoading}
-                   className="auth-submit-btn"
+                   disabled={isLoading || successMsg}
                    style={{
-                     background: 'linear-gradient(90deg, #7c3aed 0%, #2563eb 55%, #06b6d4 100%)',
+                     background: 'linear-gradient(90deg, #4f46e5 0%, #6366f1 50%, #8b5cf6 100%)',
                      color: '#ffffff',
                      border: 'none',
-                     borderRadius: '14px',
-                     padding: '13px',
-                     fontWeight: '800',
-                     fontSize: '1rem',
-                     cursor: isLoading ? 'not-allowed' : 'pointer',
-                     opacity: isLoading ? 0.7 : 1,
-                     marginTop: '4px',
-                     boxShadow: '0 8px 24px -4px rgba(124, 58, 237, 0.4)',
-                     transition: 'transform 0.15s, box-shadow 0.15s',
+                     borderRadius: '16px',
+                     padding: '16px',
+                     fontWeight: '700',
+                     fontSize: '1.05rem',
+                     cursor: (isLoading || successMsg) ? 'not-allowed' : 'pointer',
+                     opacity: (isLoading || successMsg) ? 0.8 : 1,
+                     boxShadow: '0 10px 25px -5px rgba(99, 102, 241, 0.4)',
+                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                      display: 'flex',
                      justifyContent: 'center',
                      alignItems: 'center',
-                     gap: '8px'
+                     gap: '10px'
+                   }}
+                   onMouseEnter={(e) => {
+                     if(!isLoading && !successMsg) e.currentTarget.style.transform = 'translateY(-2px)';
+                   }}
+                   onMouseLeave={(e) => {
+                     if(!isLoading && !successMsg) e.currentTarget.style.transform = 'translateY(0)';
                    }}
                  >
-                   {isLoading ? <Loader2 size={20} className="animate-spin" /> : 'Create Account'}
+                   {isLoading ? <Loader2 size={22} className="animate-spin" /> : 'Create Account'}
                  </button>
               </form>
 
-              {/* Bottom Switch to Login */}
-              <div style={{
-                textAlign: 'center',
-                marginTop: '18px',
-                fontSize: '0.88rem',
-                color: '#64748b',
-                fontWeight: '500'
-              }}>
+              <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '0.95rem', color: '#64748b', fontWeight: '500' }}>
                 Already have an account?{' '}
                 <button
                   type="button"
-                  onClick={() => setIsRegister(false)}
+                  onClick={() => switchMode(false)}
                   style={{
                     background: 'transparent',
                     border: 'none',
                     color: '#4f46e5',
-                    fontWeight: '800',
+                    fontWeight: '700',
                     cursor: 'pointer',
-                    fontSize: '0.88rem',
-                    padding: 0
+                    fontSize: '0.95rem',
+                    padding: 0,
+                    textDecoration: 'underline',
+                    textUnderlineOffset: '4px'
                   }}
                 >
-                  Login here
+                  Log in
                 </button>
               </div>
             </div>
@@ -681,29 +569,62 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
 
         </div>
 
-        {/* ── RIGHT COLUMN: EXACT ARTWORK FROM USER DOCUMENTATION SCREENSHOT ── */}
+        {/* ── RIGHT COLUMN: ARTWORK ── */}
         <div style={{
-          background: '#f8fafc',
+          background: isRegister ? 'linear-gradient(135deg, #eef2ff, #f5f3ff)' : 'linear-gradient(135deg, #eff6ff, #f0f9ff)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           overflow: 'hidden',
           position: 'relative',
-          borderInlineStart: '1px solid #f1f5f9'
-        }} className="auth-modal-banner">
+          padding: '20px'
+        }}>
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            opacity: 0.5,
+            backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)',
+            backgroundSize: '24px 24px'
+          }}></div>
           <img
             src={isRegister ? registerArt : loginArt}
-            alt="Cybersecurity Protection Storyboard"
+            alt="Authentication Art"
             style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              display: 'block'
+              width: '90%',
+              height: 'auto',
+              maxHeight: '90%',
+              objectFit: 'contain',
+              display: 'block',
+              position: 'relative',
+              zIndex: 10,
+              filter: 'drop-shadow(0 20px 30px rgba(0,0,0,0.1))',
+              transition: 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+              transform: isRegister ? 'scale(1.05)' : 'scale(1)'
             }}
           />
         </div>
 
       </div>
+
+      <style>{`
+        @keyframes authFadeIn {
+          from { opacity: 0; backdrop-filter: blur(0px); }
+          to { opacity: 1; backdrop-filter: blur(12px); }
+        }
+        @keyframes slideDown {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @media (max-width: 768px) {
+          .auth-modal-card {
+            grid-template-columns: 1fr !important;
+            max-width: 450px !important;
+          }
+          .auth-modal-card > div:last-child {
+            display: none !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
