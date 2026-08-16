@@ -1328,6 +1328,14 @@ input:focus, select:focus, textarea:focus {
     font-size: 0.85rem;
   }
 
+  .dashboard-desktop-table {
+    display: none !important;
+  }
+
+  .dashboard-mobile-cards {
+    display: flex !important;
+  }
+
   .auth-modal-card {
     grid-template-columns: 1fr !important;
     max-width: 480px !important;
@@ -1346,6 +1354,74 @@ input:focus, select:focus, textarea:focus {
   .dashboard-actions .btn-secondary {
     flex: 1 1 100%;
     justify-content: center;
+  }
+
+  .scan-history-desktop-table {
+    display: none !important;
+  }
+
+  .scan-history-mobile-cards {
+    display: flex !important;
+  }
+
+  .scan-history-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .scan-history-filter-bar input[type="date"] {
+    width: 100%;
+  }
+
+  .models-desktop-table,
+  .users-desktop-table {
+    display: none !important;
+  }
+
+  .models-mobile-cards,
+  .users-mobile-cards {
+    display: flex !important;
+  }
+
+  .admin-mobile-cards .btn-secondary {
+    padding: 6px 12px;
+    font-size: 0.82rem;
+  }
+
+  .btn-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .url-scanner-presets .btn-secondary {
+    padding: 8px 14px;
+    font-size: 0.82rem;
+  }
+
+  .chatbot-header-actions .btn-secondary {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+  }
+
+  .email-upload-area {
+    padding: 18px;
+  }
+
+  .theme-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .modal-form-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .email-scanner-tabs button {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .chat-messages {
+    max-height: 65vh;
   }
 }
 
@@ -1439,6 +1515,10 @@ input:focus, select:focus, textarea:focus {
 
   .profile-account-status-text {
     font-size: 0.82rem;
+  }
+
+  .report-meta-grid {
+    grid-template-columns: 1fr 1fr !important;
   }
 
   .header-notif-popover {
@@ -1931,6 +2011,10 @@ input:focus, select:focus, textarea:focus {
     padding: 10px;
     font-size: 0.85rem;
     border-radius: 10px;
+  }
+
+  .report-meta-grid {
+    grid-template-columns: 1fr !important;
   }
 }
 

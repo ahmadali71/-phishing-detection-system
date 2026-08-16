@@ -125,7 +125,7 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
         )}
 
         {/* Preset sample links */}
-        <div style={{ marginTop: '12px', display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div className="url-scanner-presets" style={{ marginTop: '12px', display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '700' }}>{t.testPresets || 'Test Presets:'}</span>
           <button onClick={() => { setInputUrl('https://paypal-secure-login.com'); handleScan('https://paypal-secure-login.com'); }} className="btn-secondary" style={{ fontSize: '0.73rem', padding: '4px 10px' }}>
             paypal-secure-login.com

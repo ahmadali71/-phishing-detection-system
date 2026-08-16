@@ -91,7 +91,7 @@ export default function EmailScanner({ onScanComplete, t }) {
 
       {/* Tabs & Input Box (Exact Match to PDF Page 63 Screen 6) */}
       <div className="glass-panel" style={{ padding: '24px' }}>
-        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+        <div className="email-scanner-tabs" style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
           <button
             onClick={() => setActiveTab('text')}
             style={{
@@ -141,7 +141,7 @@ export default function EmailScanner({ onScanComplete, t }) {
             </div>
           </div>
         ) : (
-          <div style={{
+          <div className="email-upload-area" style={{
             padding: '36px',
             border: '2px dashed var(--border-color)',
             borderRadius: '14px',

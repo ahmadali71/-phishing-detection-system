@@ -306,7 +306,7 @@ export default function ProfileSettings({ currentUser, onUpdateProfile, theme, s
               <label style={{ fontSize: '0.72rem', fontWeight: '800', color: 'var(--text-muted)', display: 'block', marginBottom: '10px', letterSpacing: '0.06em' }}>
                 {t.languageLabel ? t.languageLabel.replace('LANGUAGE', 'THEME') : 'THEME'}
               </label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: '10px' }}>
+              <div className="theme-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: '10px' }}>
                 {[
                   { id: 'light', label: t.lightTheme || 'Light', color: '#f8fafc', border: '#e2e8f0', dot: '#3b82f6' },
                   { id: 'dark', label: t.darkThemeLabel || 'Dark', color: '#0f172a', border: '#334155', dot: '#f8fafc' },

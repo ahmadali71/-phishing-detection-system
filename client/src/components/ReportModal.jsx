@@ -62,7 +62,7 @@ export default function ReportModal({ record, onClose, onExportPdf }) {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+          <div className="report-meta-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
             <div style={{ padding: '12px', background: 'var(--bg-input)', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
               <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '700' }}>VERDICT</div>
               <div style={{ fontWeight: '800', marginTop: '2px', color: isPhishing ? '#ef4444' : (isSuspicious ? '#f59e0b' : '#10b981') }}>

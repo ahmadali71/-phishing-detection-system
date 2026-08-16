@@ -62,7 +62,7 @@ export default function ScanHistory({ scanHistory, onViewDetail, onExportPdf, t,
       </div>
 
       {/* ── Filter Bar with Date Selectors & Export PDF (Exact Match to PDF Page 63 Screen 8) ── */}
-      <div className="glass-panel"
+      <div className="glass-panel scan-history-filter-bar"
         style={{
           padding: '16px 20px',
           display: 'flex',
@@ -126,8 +126,56 @@ export default function ScanHistory({ scanHistory, onViewDetail, onExportPdf, t,
         </div>
       </div>
 
+      {/* ── Mobile Card View (hidden on desktop) ── */}
+      <div className="scan-history-mobile-cards" style={{ display: 'none', flexDirection: 'column', gap: '10px' }}>
+        {records.map((item, idx) => {
+          const isPhish = item.result === 'Phishing';
+          const isSusp = item.result === 'Suspicious';
+          const color = isPhish ? '#ef4444' : (isSusp ? '#f59e0b' : '#10b981');
+          return (
+            <div key={item.id ?? idx} style={{
+              padding: '14px',
+              borderRadius: '12px',
+              background: 'var(--bg-input)',
+              border: '1px solid var(--border-color)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span className="badge badge-blue" style={{ fontSize: '0.65rem', padding: '2px 8px' }}>{item.type}</span>
+                <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{item.date}</span>
+              </div>
+              <div style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.82rem',
+                color: 'var(--text-primary)',
+                fontWeight: '600',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}>
+                {item.input}
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontWeight: '800', fontSize: '0.86rem', color }}>{item.result}</span>
+                <span style={{ fontWeight: '800', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>Risk: {item.riskScore}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button onClick={() => onViewDetail?.(item)} className="btn-secondary" style={{ padding: '6px 14px', fontSize: '0.82rem' }}>
+                  <ExternalLink size={13} /> View
+                </button>
+              </div>
+            </div>
+          );
+        })}
+        {records.length === 0 && (
+          <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '36px' }}>No records found.</div>
+        )}
+      </div>
+
       {/* ── Table (Exact Match to PDF Page 63 Screen 8) ── */}
-      <div className="glass-panel" style={{ padding: '20px' }}>
+      <div className="glass-panel scan-history-desktop-table" style={{ padding: '20px' }}>
         <div className="table-wrapper">
           <table>
             <thead>

@@ -158,7 +158,7 @@ export default function AiChatbot({ t, language = 'English' }) {
             {t.chatbotDesc || 'Interactive conversational AI. Ask cybersecurity questions or paste links and email text directly for instant security analysis.'}
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="chatbot-header-actions" style={{ display: 'flex', gap: '8px' }}>
           <button
             onClick={() => handleSendMessage('Scan paypal-secure-login.com')}
             className="btn-secondary"

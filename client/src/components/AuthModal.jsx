@@ -780,6 +780,9 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
           .modal-art-pane {
             display: none !important;
           }
+          .m-grid-two {
+            grid-template-columns: 1fr !important;
+          }
         }
       `}</style>
     </div>

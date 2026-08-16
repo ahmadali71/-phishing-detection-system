@@ -142,7 +142,43 @@ export default function AdminPanel({
             <span className="badge badge-emerald">Ensemble Active</span>
           </div>
 
-          <div className="table-wrapper">
+          {/* Mobile Card View */}
+          <div className="admin-mobile-cards models-mobile-cards" style={{ display: 'none', flexDirection: 'column', gap: '10px' }}>
+            {models.map((m) => (
+              <div key={m.id} style={{
+                padding: '14px',
+                borderRadius: '12px',
+                background: 'var(--bg-input)',
+                border: '1px solid var(--border-color)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontWeight: '700', fontSize: '0.82rem' }}>{m.id}</span>
+                  <span className={`badge badge-${m.status === 'Active' ? 'emerald' : 'warning'}`}>{m.status}</span>
+                </div>
+                <div>
+                  <div style={{ fontWeight: '800', fontSize: '0.95rem' }}>{m.name}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{m.type}</div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{m.framework}</span>
+                  <span style={{ fontWeight: '800', fontSize: '0.88rem', color: '#10b981' }}>{m.accuracy}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '4px' }}>
+                  <button onClick={() => onToggleModelStatus(m.id)} className="btn-secondary" style={{ fontSize: '0.75rem', padding: '6px 12px' }}>
+                    {m.status === 'Active' ? 'Deactivate' : 'Activate'}
+                  </button>
+                  <button onClick={() => onDeleteModel(m.id)} className="btn-secondary" style={{ fontSize: '0.75rem', padding: '6px 10px', color: '#f87171' }}>
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="table-wrapper models-desktop-table">
             <table>
               <thead>
                 <tr>
@@ -278,7 +314,34 @@ export default function AdminPanel({
       {activeAdminTab === 'users' && (
         <div className="glass-panel" style={{ padding: '20px' }}>
           <h3 style={{ fontSize: '1.1rem', fontWeight: '800', marginBottom: '16px' }}>Registered User Accounts</h3>
-          <div className="table-wrapper">
+          {/* Mobile Card View */}
+          <div className="admin-mobile-cards users-mobile-cards" style={{ display: 'none', flexDirection: 'column', gap: '10px' }}>
+            {usersList.map((u, idx) => (
+              <div key={idx} style={{
+                padding: '14px',
+                borderRadius: '12px',
+                background: 'var(--bg-input)',
+                border: '1px solid var(--border-color)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: '800', fontSize: '0.95rem' }}>{u.name}</span>
+                  <span className="badge badge-emerald">Active</span>
+                </div>
+                <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>{u.email}</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
+                  <span className="badge badge-blue">{u.role}</span>
+                  <button onClick={() => onUpdateUserRole(u.email, u.role === 'Admin' ? 'User' : 'Admin')} className="btn-secondary" style={{ fontSize: '0.75rem', padding: '6px 12px' }}>
+                    Toggle Role
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="table-wrapper users-desktop-table">
             <table>
               <thead>
                 <tr>
@@ -331,7 +394,7 @@ export default function AdminPanel({
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="modal-form-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
                   <label style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-secondary)' }}>Framework</label>
                   <select

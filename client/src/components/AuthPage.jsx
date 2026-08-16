@@ -975,6 +975,9 @@ export default function AuthPage({ onLoginSuccess }) {
           .auth-form-wrapper {
             padding: 24px 16px;
           }
+          .grid-two-inputs {
+            grid-template-columns: 1fr !important;
+          }
         }
       `}</style>
     </div>
