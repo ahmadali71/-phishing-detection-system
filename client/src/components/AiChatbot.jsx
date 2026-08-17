@@ -18,6 +18,7 @@ export default function AiChatbot({ t, language = 'English' }) {
   const [isTyping, setIsTyping] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
   const messagesEndRef = useRef(null);
+  const textareaRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -40,6 +41,9 @@ export default function AiChatbot({ t, language = 'English' }) {
     };
     setMessages(prev => [...prev, userMessage]);
     setInputText('');
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
     setIsTyping(true);
 
     try {
@@ -418,39 +422,54 @@ export default function AiChatbot({ t, language = 'English' }) {
           </div>
         )}
 
-        {/* ── Input Bar (Mobile-Optimized) ── */}
-        <div style={{
-          padding: '10px 12px',
-          borderTop: '1px solid var(--border-color)',
-          background: 'var(--bg-secondary)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          position: 'sticky',
-          bottom: 0,
-          zIndex: 10,
-        }}>
-          <input
-            type="text"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder={t.chatPlaceholder || 'Type a question or paste a URL / email…'}
-            style={{
-              flex: 1,
-              minWidth: 0,
-              background: 'var(--bg-input)',
-              border: '1.5px solid var(--border-color)',
-              borderRadius: '24px',
-              padding: '11px 18px',
-              color: 'var(--text-primary)',
-              fontSize: '0.9rem',
-              outline: 'none',
-              transition: 'border-color 0.2s',
-            }}
-            onFocus={e => e.target.style.borderColor = '#635fec'}
-            onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
-          />
+        {/* ── Input Bar (Generous Mobile-Optimized Layout) ── */}
+        <div className="chat-input-bar">
+          <div className="chat-input-wrapper">
+            <textarea
+              ref={textareaRef}
+              rows={1}
+              value={inputText}
+              onChange={(e) => {
+                setInputText(e.target.value);
+                e.target.style.height = 'auto';
+                e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
+              placeholder={t.chatPlaceholder || 'Type a question or paste URL / email text to analyze...'}
+              className="chat-textarea"
+            />
+            {inputText.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  setInputText('');
+                  if (textareaRef.current) {
+                    textareaRef.current.style.height = 'auto';
+                    textareaRef.current.focus();
+                  }
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  padding: '4px 6px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  borderRadius: '50%'
+                }}
+                title="Clear input"
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+
           <button
             type="button"
             onClick={() => handleSendMessage()}

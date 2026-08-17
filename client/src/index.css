@@ -3115,3 +3115,72 @@ input:focus, select:focus, textarea:focus {
     display: none !important;
   }
 }
+
+
+/* ================================================================
+   31. EXPANDED MOBILE AI CHAT INPUT & CHIPS
+================================================================ */
+.chat-input-bar {
+  padding: 12px 14px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  position: sticky;
+  bottom: 0;
+  z-index: 15;
+}
+
+.chat-input-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: var(--bg-input);
+  border: 1.5px solid var(--border-color);
+  border-radius: 22px;
+  padding: 6px 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  min-height: 48px;
+}
+
+.chat-input-wrapper:focus-within {
+  border-color: #635fec;
+  box-shadow: 0 0 0 3px rgba(99, 95, 236, 0.25);
+}
+
+.chat-textarea {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1rem;
+  line-height: 1.4;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  max-height: 130px;
+  min-height: 24px;
+  padding: 6px 0;
+}
+
+.chat-textarea::placeholder {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+@media (max-width: 640px) {
+  .chat-input-bar {
+    padding: 10px 10px;
+  }
+  .chat-input-wrapper {
+    min-height: 48px;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+  .chat-textarea {
+    font-size: 1rem;
+    padding: 6px 0;
+  }
+}
