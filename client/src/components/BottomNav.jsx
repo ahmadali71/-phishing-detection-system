@@ -1,43 +1,41 @@
 import React from 'react';
-import { LayoutDashboard, Globe, Mail, Bot, Settings, History, Shield } from 'lucide-react';
+import { LayoutDashboard, Globe, Mail, Bot, History, Settings } from 'lucide-react';
+
+const NAV = [
+  { id: 'dashboard',       label: 'Home',    icon: LayoutDashboard },
+  { id: 'url-detection',   label: 'URL',     icon: Globe },
+  { id: 'email-detection', label: 'Email',   icon: Mail },
+  { id: 'ai-assistant',    label: 'AI',      icon: Bot },
+  { id: 'scan-history',    label: 'History', icon: History },
+  { id: 'profile-settings',label: 'Profile', icon: Settings },
+];
 
 export default function BottomNav({ activeTab, setActiveTab, t }) {
-  const navItems = [
-    { id: 'dashboard',        label: t?.dashboard || 'Home',      icon: LayoutDashboard },
-    { id: 'url-detection',    label: t?.urlDetection || 'URL',    icon: Globe },
-    { id: 'email-detection',  label: t?.emailDetection || 'Email',icon: Mail },
-    { id: 'ai-assistant',     label: t?.aiAssistant || 'AI Chat', icon: Bot },
-    { id: 'scan-history',     label: t?.scanHistory || 'History', icon: History },
-    { id: 'profile-settings', label: t?.profile || 'Settings',   icon: Settings },
-  ];
-
   return (
-    <nav className="mobile-bottom-nav" aria-label="Mobile navigation">
-      <div className="mobile-bottom-nav-inner">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeTab === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => {
-                setActiveTab(item.id);
-                if (window.navigator?.vibrate) {
-                  try { window.navigator.vibrate(10); } catch (e) {}
-                }
-              }}
-              className={`mobile-nav-item${isActive ? ' active' : ''}`}
-              aria-current={isActive ? 'page' : undefined}
-            >
-              <span className="mobile-nav-icon-wrap">
-                <Icon size={20} strokeWidth={isActive ? 2.4 : 1.8} />
-                {isActive && <span className="mobile-nav-active-dot" />}
-              </span>
-              <span className="mobile-nav-label">{item.label}</span>
-            </button>
-          );
-        })}
-      </div>
+    <nav className="bottom-nav" aria-label="Mobile navigation">
+      {NAV.map(item => {
+        const Icon = item.icon;
+        const active = activeTab === item.id;
+        return (
+          <button
+            key={item.id}
+            className={`bottom-nav-btn${active ? ' active' : ''}`}
+            onClick={() => {
+              setActiveTab(item.id);
+              try { window.navigator?.vibrate?.(8); } catch (_) {}
+            }}
+            aria-current={active ? 'page' : undefined}
+          >
+            <span className="bnb-icon">
+              <Icon size={22} strokeWidth={active ? 2.5 : 1.8} />
+            </span>
+            <span className="bnb-label">
+              {(t && (t[item.id] || t.dashboard)) || item.label}
+            </span>
+            {active && <span className="bnb-pip" />}
+          </button>
+        );
+      })}
     </nav>
   );
 }
