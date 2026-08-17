@@ -3127,9 +3127,7 @@ input:focus, select:focus, textarea:focus {
   display: flex;
   align-items: flex-end;
   gap: 10px;
-  position: sticky;
-  bottom: 0;
-  z-index: 15;
+  flex-shrink: 0;
 }
 
 .chat-input-wrapper {

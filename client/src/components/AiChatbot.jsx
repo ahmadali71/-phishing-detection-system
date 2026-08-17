@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Bot, Send, User, RefreshCw, Sparkles, Copy, Check, Terminal, Shield, Zap, HelpCircle } from 'lucide-react';
+import { Bot, Send, User, RefreshCw, Copy, Check, Terminal, Zap, X } from 'lucide-react';
 import { generateChatbotResponse } from '../utils/chatbotEngine';
 
 export default function AiChatbot({ t, language = 'English' }) {
@@ -225,16 +225,16 @@ export default function AiChatbot({ t, language = 'English' }) {
         </div>
       </div>
 
-      {/* Main Chat Box */}
-      <div className="glass-panel glass-panel-glow" style={{
+      {/* Main Chat Box — flex column; messages scroll, input stays at bottom */}
+      <div style={{
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'hidden',
         background: 'var(--bg-card)',
         border: '1px solid var(--border-color)',
         borderRadius: '16px',
-        minHeight: 0,          /* lets flex children shrink properly */
-        height: 'clamp(460px, 70vh, 680px)',
+        height: 'clamp(480px, 72vh, 700px)',
+        overflow: 'hidden',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.35)'
       }}>
         {/* Header */}
         <div style={{
@@ -278,9 +278,9 @@ export default function AiChatbot({ t, language = 'English' }) {
           </button>
         </div>
 
-        {/* Message Stream */}
+        {/* Message Stream — takes all free space, scrollable */}
         <div className="chat-messages" style={{
-          flex: 1,
+          flex: '1 1 0',
           overflowY: 'auto',
           padding: '16px',
           display: 'flex',
@@ -422,8 +422,8 @@ export default function AiChatbot({ t, language = 'English' }) {
           </div>
         )}
 
-        {/* ── Input Bar (Generous Mobile-Optimized Layout) ── */}
-        <div className="chat-input-bar">
+        {/* ── Input Bar — pinned to bottom of the flex column, NOT sticky ── */}
+        <div className="chat-input-bar" style={{ flexShrink: 0 }}>
           <div className="chat-input-wrapper">
             <textarea
               ref={textareaRef}
