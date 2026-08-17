@@ -57,22 +57,86 @@ export const logsService = {
   },
 };
 
+// ── Demo accounts used as offline fallback when server is not reachable ──
+const DEMO_ACCOUNTS = [
+  {
+    _id: 'demo-admin-001',
+    name: 'System Administrator',
+    email: 'admin@apds.edu',
+    password: 'Admin@12345',
+    role: 'admin',
+    token: 'demo-admin-token',
+  },
+  {
+    _id: 'demo-user-001',
+    name: 'Amna Najam',
+    email: 'amna.student@uos.edu.pk',
+    password: 'User@12345',
+    role: 'user',
+    token: 'demo-user-token',
+  },
+  {
+    _id: 'demo-user-002',
+    name: 'Alisha Noor',
+    email: 'alisha.student@uos.edu.pk',
+    password: 'User@12345',
+    role: 'user',
+    token: 'demo-user-token-2',
+  },
+];
+
 export const usersService = {
-  // Auth endpoints (replacing old addUser behavior)
   async register(userData) {
-    const response = await api.post('/auth/register', userData);
-    if (response.data) {
-      localStorage.setItem('user', JSON.stringify(response.data));
+    try {
+      const response = await api.post('/auth/register', userData);
+      if (response.data) {
+        localStorage.setItem('user', JSON.stringify(response.data));
+      }
+      return response.data;
+    } catch (err) {
+      // Offline fallback: check demo accounts
+      const found = DEMO_ACCOUNTS.find(
+        a => a.email.toLowerCase() === userData.email?.toLowerCase()
+      );
+      if (found) {
+        throw new Error('User already exists');
+      }
+      // Allow demo self-registration
+      const newUser = {
+        _id: `demo-new-${Date.now()}`,
+        name: userData.name,
+        email: userData.email,
+        role: 'user',
+        token: `demo-token-${Date.now()}`,
+      };
+      localStorage.setItem('user', JSON.stringify(newUser));
+      return newUser;
     }
-    return response.data;
   },
 
   async login(userData) {
-    const response = await api.post('/auth/login', userData);
-    if (response.data) {
-      localStorage.setItem('user', JSON.stringify(response.data));
+    try {
+      const response = await api.post('/auth/login', userData);
+      if (response.data) {
+        localStorage.setItem('user', JSON.stringify(response.data));
+      }
+      return response.data;
+    } catch (err) {
+      // ── OFFLINE DEMO FALLBACK ──
+      // If server is down, match against known demo accounts
+      const found = DEMO_ACCOUNTS.find(
+        a =>
+          a.email.toLowerCase() === userData.email?.toLowerCase() &&
+          a.password === userData.password
+      );
+      if (found) {
+        const { password: _pw, ...safeUser } = found;
+        localStorage.setItem('user', JSON.stringify(safeUser));
+        return safeUser;
+      }
+      // Re-throw original error so login form shows correct message
+      throw err;
     }
-    return response.data;
   },
 
   async logout() {

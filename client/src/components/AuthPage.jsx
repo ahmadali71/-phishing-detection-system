@@ -250,6 +250,58 @@ export default function AuthPage({ onLoginSuccess }) {
                     </>
                   )}
                 </button>
+
+                {/* Demo Credential Quick-Fill Helpers */}
+                <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('admin@apds.edu');
+                      setPassword('Admin@12345');
+                    }}
+                    style={{
+                      flex: 1,
+                      padding: '7px 10px',
+                      background: 'rgba(99, 95, 236, 0.12)',
+                      border: '1px solid rgba(99, 95, 236, 0.3)',
+                      borderRadius: '8px',
+                      fontSize: '0.74rem',
+                      fontWeight: '700',
+                      color: '#635fec',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    🔑 Fill Admin Demo
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('amna.student@uos.edu.pk');
+                      setPassword('User@12345');
+                    }}
+                    style={{
+                      flex: 1,
+                      padding: '7px 10px',
+                      background: 'rgba(59, 130, 246, 0.1)',
+                      border: '1px solid rgba(59, 130, 246, 0.25)',
+                      borderRadius: '8px',
+                      fontSize: '0.74rem',
+                      fontWeight: '700',
+                      color: '#2563eb',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    👤 Fill User Demo
+                  </button>
+                </div>
               </>
             ) : (
               /* ================= REGISTER FIELDS ================= */
