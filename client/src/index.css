@@ -3042,3 +3042,20 @@ input:focus, select:focus, textarea:focus {
     display: none !important;
   }
 }
+
+
+/* ================================================================
+   29. DESKTOP-ONLY HEADER WRAPPER (HIDDEN ON MOBILE TO PREVENT DUPLICATES)
+================================================================ */
+.desktop-header-wrap {
+  display: block;
+}
+
+@media (max-width: 1024px) {
+  .desktop-header-wrap {
+    display: none !important;
+  }
+  .header-brand-page {
+    display: none !important;
+  }
+}

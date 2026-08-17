@@ -74,11 +74,11 @@ export default function EmailScanner({ onScanComplete, t }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '960px', margin: '0 auto' }}>
-      {/* ── Top Badge & Title (Exact Match to PDF Page 63 Screen 6) ── */}
-      <div>
+      {/* ── Desktop Top Badge & Title (Hidden on Mobile to Prevent Duplicate Section) ── */}
+      <div className="desktop-header-wrap">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
           <div style={{
-            background: 'linear-gradient(135deg, #635fec, #4338ca)',
+            background: 'linear-gradient(135deg, #4f46e5, #6366f1)',
             color: '#ffffff',
             width: '28px',
             height: '28px',
@@ -88,7 +88,7 @@ export default function EmailScanner({ onScanComplete, t }) {
             justifyContent: 'center',
             fontWeight: '900',
             fontSize: '0.9rem',
-            boxShadow: '0 2px 10px rgba(99, 95, 236, 0.45)',
+            boxShadow: '0 2px 8px rgba(99, 102, 241, 0.4)',
             flexShrink: 0
           }}>
             6

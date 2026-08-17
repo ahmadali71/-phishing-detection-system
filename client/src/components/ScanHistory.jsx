@@ -26,11 +26,11 @@ export default function ScanHistory({ scanHistory, onViewDetail, onExportPdf, t,
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px', maxWidth: '1080px', margin: '0 auto' }}>
-      {/* ── Desktop Top Badge & Title (Exact Match to PDF Page 63 Screen 8) ── */}
-      <div>
+      {/* ── Desktop Top Badge & Title (Hidden on Mobile to Prevent Duplicate Section) ── */}
+      <div className="desktop-header-wrap">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
           <div style={{
-            background: 'linear-gradient(135deg, #635fec, #4338ca)',
+            background: 'linear-gradient(135deg, #1d4ed8, #2563eb)',
             color: '#ffffff',
             width: '28px',
             height: '28px',
@@ -40,7 +40,7 @@ export default function ScanHistory({ scanHistory, onViewDetail, onExportPdf, t,
             justifyContent: 'center',
             fontWeight: '900',
             fontSize: '0.9rem',
-            boxShadow: '0 2px 10px rgba(99, 95, 236, 0.45)',
+            boxShadow: '0 2px 8px rgba(37, 99, 235, 0.4)',
             flexShrink: 0
           }}>
             8
@@ -49,7 +49,7 @@ export default function ScanHistory({ scanHistory, onViewDetail, onExportPdf, t,
             fontWeight: '900',
             fontSize: '0.88rem',
             letterSpacing: '0.08em',
-            color: '#818cf8',
+            color: 'var(--accent-blue)',
             fontFamily: 'var(--font-display)',
             textTransform: 'uppercase'
           }}>

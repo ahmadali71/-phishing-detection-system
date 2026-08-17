@@ -146,8 +146,8 @@ export default function AiChatbot({ t, language = 'English' }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', maxWidth: '980px', margin: '0 auto' }}>
-      {/* ── Top Badge & Title ── */}
-      <div>
+      {/* ── Desktop Top Badge & Title (Hidden on Mobile to Prevent Duplicate Section) ── */}
+      <div className="desktop-header-wrap">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
           <div style={{
             background: 'linear-gradient(135deg, #06b6d4, #3b82f6)',
