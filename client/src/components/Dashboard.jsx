@@ -79,53 +79,28 @@ export default function Dashboard({ stats, recentActivity, onNavigateScan, onVie
         </div>
       </div>
 
-      {/* ── Mobile Feature Capability Hero (Electric Indigo #635fec Blocks) ── */}
-      <div className="mobile-feature-hero">
-        <div className="mobile-feature-header">
-          <div className="mobile-feature-title-wrap">
-            <div className="mobile-feature-icon-badge" style={{ background: 'linear-gradient(135deg, #635fec 0%, #3b82f6 100%)' }}>
-              <Zap size={18} />
-            </div>
-            <div>
-              <div className="mobile-feature-title">Automated Threat Monitoring</div>
-              <div className="mobile-feature-tag">Multi-Layer AI Defense</div>
-            </div>
+      {/* ── Mobile Vibrant Hero Banner (ONLY ON MOBILE, Exact Match to Reference Image) ── */}
+      <div className="mobile-vibrant-hero">
+        <div className="mobile-vibrant-hero-content">
+          <h2 className="mobile-vibrant-hero-title">Automated Threat Monitoring</h2>
+          <p className="mobile-vibrant-hero-desc">
+            Multi-layered ML & NLP analysis pipeline protecting web users against domain typosquatting, email social engineering, and fraudulent links.
+          </p>
+          <div className="mobile-vibrant-chips">
+            <div className="mobile-vibrant-chip-item">🛡️ Dual ML Scanners</div>
+            <div className="mobile-vibrant-chip-item">⚡ Sub-Second Scans</div>
+            <div className="mobile-vibrant-chip-item">🎯 94.6% Accuracy</div>
+            <div className="mobile-vibrant-chip-item">🔒 Risk Scoring Gauge</div>
           </div>
+          <button
+            onClick={() => onNavigateScan('url-detection')}
+            className="mobile-vibrant-hero-btn"
+          >
+            Scan URL Now →
+          </button>
         </div>
-
-        {/* 4 Capability Blocks */}
-        <div className="mobile-capability-grid">
-          <div className="mobile-capability-pill">
-            <span className="mobile-cap-emoji">🛡️</span>
-            <div className="mobile-cap-text">
-              <span className="mobile-cap-name">Dual Scanners</span>
-              <span className="mobile-cap-sub">URL & Email NLP engines</span>
-            </div>
-          </div>
-
-          <div className="mobile-capability-pill">
-            <span className="mobile-cap-emoji">⚡</span>
-            <div className="mobile-cap-text">
-              <span className="mobile-cap-name">Instant Analysis</span>
-              <span className="mobile-cap-sub">Sub-second ML classification</span>
-            </div>
-          </div>
-
-          <div className="mobile-capability-pill">
-            <span className="mobile-cap-emoji">🎯</span>
-            <div className="mobile-cap-text">
-              <span className="mobile-cap-name">94.6% Accuracy</span>
-              <span className="mobile-cap-sub">Random Forest classifier</span>
-            </div>
-          </div>
-
-          <div className="mobile-capability-pill">
-            <span className="mobile-cap-emoji">🔒</span>
-            <div className="mobile-cap-text">
-              <span className="mobile-cap-name">Risk Scoring</span>
-              <span className="mobile-cap-sub">Radial gauge threat audit</span>
-            </div>
-          </div>
+        <div className="mobile-vibrant-hero-circle">
+          <Zap size={42} strokeWidth={2.2} />
         </div>
       </div>
 

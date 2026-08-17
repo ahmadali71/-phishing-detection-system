@@ -128,53 +128,31 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
         </div>
       </div>
 
-      {/* ── Mobile Feature Capability Hero (Electric Indigo #635fec Blocks) ── */}
-      <div className="mobile-feature-hero">
-        <div className="mobile-feature-header">
-          <div className="mobile-feature-title-wrap">
-            <div className="mobile-feature-icon-badge">
-              <Globe size={18} />
-            </div>
-            <div>
-              <div className="mobile-feature-title">URL Phishing Detection</div>
-              <div className="mobile-feature-tag">Real-Time Threat Analysis</div>
-            </div>
+      {/* ── Mobile Vibrant Hero Banner (ONLY ON MOBILE, Exact Match to Reference Image) ── */}
+      <div className="mobile-vibrant-hero">
+        <div className="mobile-vibrant-hero-content">
+          <h2 className="mobile-vibrant-hero-title">URL Phishing Detection</h2>
+          <p className="mobile-vibrant-hero-desc">
+            Analyze any website link in real time to detect typosquatting, raw IP hosting, SSL anomalies, and blacklisted domains.
+          </p>
+          <div className="mobile-vibrant-chips">
+            <div className="mobile-vibrant-chip-item">🛡️ Typosquatting</div>
+            <div className="mobile-vibrant-chip-item">🌐 Raw IP Hosting</div>
+            <div className="mobile-vibrant-chip-item">🔒 SSL Anomalies</div>
+            <div className="mobile-vibrant-chip-item">🚫 Blacklisted Domains</div>
           </div>
+          <button
+            onClick={() => {
+              const el = document.getElementById('url-scan-input');
+              if (el) { el.focus(); el.scrollIntoView({ behavior: 'smooth' }); }
+            }}
+            className="mobile-vibrant-hero-btn"
+          >
+            Scan Now →
+          </button>
         </div>
-
-        {/* 4 Capability Blocks */}
-        <div className="mobile-capability-grid">
-          <div className="mobile-capability-pill">
-            <span className="mobile-cap-emoji">🛡️</span>
-            <div className="mobile-cap-text">
-              <span className="mobile-cap-name">Typosquatting</span>
-              <span className="mobile-cap-sub">Domain spoofing detection</span>
-            </div>
-          </div>
-
-          <div className="mobile-capability-pill">
-            <span className="mobile-cap-emoji">🌐</span>
-            <div className="mobile-cap-text">
-              <span className="mobile-cap-name">Raw IP Hosting</span>
-              <span className="mobile-cap-sub">Direct IP bypass analysis</span>
-            </div>
-          </div>
-
-          <div className="mobile-capability-pill">
-            <span className="mobile-cap-emoji">🔒</span>
-            <div className="mobile-cap-text">
-              <span className="mobile-cap-name">SSL Anomalies</span>
-              <span className="mobile-cap-sub">Cert chain & validity check</span>
-            </div>
-          </div>
-
-          <div className="mobile-capability-pill">
-            <span className="mobile-cap-emoji">🚫</span>
-            <div className="mobile-cap-text">
-              <span className="mobile-cap-name">Blacklisted Domains</span>
-              <span className="mobile-cap-sub">Global threat intelligence</span>
-            </div>
-          </div>
+        <div className="mobile-vibrant-hero-circle">
+          <Globe size={42} strokeWidth={2.2} />
         </div>
       </div>
 
@@ -182,6 +160,7 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
       <div className="glass-panel" style={{ padding: '20px' }}>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <input
+            id="url-scan-input"
             type="text"
             value={inputUrl}
             onChange={(e) => setInputUrl(e.target.value)}

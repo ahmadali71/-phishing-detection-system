@@ -120,53 +120,31 @@ export default function EmailScanner({ onScanComplete, t }) {
         </div>
       </div>
 
-      {/* ── Mobile Feature Capability Hero (Electric Indigo #635fec Blocks) ── */}
-      <div className="mobile-feature-hero">
-        <div className="mobile-feature-header">
-          <div className="mobile-feature-title-wrap">
-            <div className="mobile-feature-icon-badge" style={{ background: 'linear-gradient(135deg, #635fec 0%, #4338ca 100%)' }}>
-              <Mail size={18} />
-            </div>
-            <div>
-              <div className="mobile-feature-title">Email Phishing Detection</div>
-              <div className="mobile-feature-tag">NLP BERT Content Engine</div>
-            </div>
+      {/* ── Mobile Vibrant Hero Banner (ONLY ON MOBILE, Exact Match to Reference Image) ── */}
+      <div className="mobile-vibrant-hero">
+        <div className="mobile-vibrant-hero-content">
+          <h2 className="mobile-vibrant-hero-title">Email Phishing Detection</h2>
+          <p className="mobile-vibrant-hero-desc">
+            Scans email content for manufactured urgency, deceptive links, financial harvesting phrasing, and malicious attachments.
+          </p>
+          <div className="mobile-vibrant-chips">
+            <div className="mobile-vibrant-chip-item">⏱️ Urgency Triggers</div>
+            <div className="mobile-vibrant-chip-item">🔗 Deceptive Links</div>
+            <div className="mobile-vibrant-chip-item">💳 Credential Phishing</div>
+            <div className="mobile-vibrant-chip-item">📎 Malicious Files</div>
           </div>
+          <button
+            onClick={() => {
+              const el = document.getElementById('email-scan-textarea');
+              if (el) { el.focus(); el.scrollIntoView({ behavior: 'smooth' }); }
+            }}
+            className="mobile-vibrant-hero-btn"
+          >
+            Analyze Now →
+          </button>
         </div>
-
-        {/* 4 Capability Blocks */}
-        <div className="mobile-capability-grid">
-          <div className="mobile-capability-pill">
-            <span className="mobile-cap-emoji">⏱️</span>
-            <div className="mobile-cap-text">
-              <span className="mobile-cap-name">Urgency Triggers</span>
-              <span className="mobile-cap-sub">Manufactured panic detection</span>
-            </div>
-          </div>
-
-          <div className="mobile-capability-pill">
-            <span className="mobile-cap-emoji">🔗</span>
-            <div className="mobile-cap-text">
-              <span className="mobile-cap-name">Deceptive Links</span>
-              <span className="mobile-cap-sub">Hidden redirect scanner</span>
-            </div>
-          </div>
-
-          <div className="mobile-capability-pill">
-            <span className="mobile-cap-emoji">💳</span>
-            <div className="mobile-cap-text">
-              <span className="mobile-cap-name">Credential Phishing</span>
-              <span className="mobile-cap-sub">Harvesting phrases audit</span>
-            </div>
-          </div>
-
-          <div className="mobile-capability-pill">
-            <span className="mobile-cap-emoji">📎</span>
-            <div className="mobile-cap-text">
-              <span className="mobile-cap-name">Malicious Attachments</span>
-              <span className="mobile-cap-sub">Executable & macro check</span>
-            </div>
-          </div>
+        <div className="mobile-vibrant-hero-circle">
+          <Mail size={42} strokeWidth={2.2} />
         </div>
       </div>
 
@@ -212,6 +190,7 @@ export default function EmailScanner({ onScanComplete, t }) {
         {activeTab === 'text' ? (
           <div>
             <textarea
+              id="email-scan-textarea"
               rows={5}
               value={emailContent}
               onChange={(e) => setEmailContent(e.target.value)}

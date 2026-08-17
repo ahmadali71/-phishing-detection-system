@@ -26,50 +26,69 @@ export default function ScanHistory({ scanHistory, onViewDetail, onExportPdf, t,
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px', maxWidth: '1080px', margin: '0 auto' }}>
-      {/* ── Badge & Title with Capability Blocks ── */}
-      <div className="feature-hero-card">
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-            <div className="badge-screen-num">8</div>
-            <span className="badge-screen-title">SCAN HISTORY &amp; REPORTS</span>
-            <span className="badge-live-ai">● AUDIT TRAIL</span>
+      {/* ── Desktop Top Badge & Title (Exact Match to PDF Page 63 Screen 8) ── */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #635fec, #4338ca)',
+            color: '#ffffff',
+            width: '28px',
+            height: '28px',
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontWeight: '900',
+            fontSize: '0.9rem',
+            boxShadow: '0 2px 10px rgba(99, 95, 236, 0.45)',
+            flexShrink: 0
+          }}>
+            8
           </div>
-          <h2 className="feature-hero-title">Inspection Log &amp; Security Reports</h2>
-          <p className="feature-hero-desc">
-            Review detailed analytical records of all past URL and Email scans, filter by classification category, and export formal PDF audit dossiers.
-          </p>
+          <span style={{
+            fontWeight: '900',
+            fontSize: '0.88rem',
+            letterSpacing: '0.08em',
+            color: '#818cf8',
+            fontFamily: 'var(--font-display)',
+            textTransform: 'uppercase'
+          }}>
+            SCAN HISTORY &amp; REPORTS
+          </span>
         </div>
 
-        {/* Feature Blocks */}
-        <div className="feature-blocks-grid">
-          <div className="feature-block-item">
-            <div className="feature-block-icon" style={{ background: 'rgba(59, 130, 246, 0.12)' }}>📋</div>
-            <div className="feature-block-content">
-              <span className="feature-block-title">Audit Trail</span>
-              <span className="feature-block-sub">Historical forensic log</span>
-            </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+          <div>
+            <h2 style={{ fontSize: 'clamp(1.35rem, 4vw, 1.85rem)', fontWeight: '800' }}>Scan History</h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
+              View and manage your past scan records and download security audit reports.
+            </p>
           </div>
-          <div className="feature-block-item">
-            <div className="feature-block-icon" style={{ background: 'rgba(239, 68, 68, 0.12)' }}>🔍</div>
-            <div className="feature-block-content">
-              <span className="feature-block-title">Category Filters</span>
-              <span className="feature-block-sub">Phishing, safe, suspicious</span>
-            </div>
+        </div>
+      </div>
+
+      {/* ── Mobile Vibrant Hero Banner (ONLY ON MOBILE, Exact Match to Reference Image) ── */}
+      <div className="mobile-vibrant-hero">
+        <div className="mobile-vibrant-hero-content">
+          <h2 className="mobile-vibrant-hero-title">Scan History &amp; Reports</h2>
+          <p className="mobile-vibrant-hero-desc">
+            Review detailed forensic logs of all past URL and Email scans, filter by threat category, and export formal PDF audit dossiers.
+          </p>
+          <div className="mobile-vibrant-chips">
+            <div className="mobile-vibrant-chip-item">📋 Forensic Audit Log</div>
+            <div className="mobile-vibrant-chip-item">🔍 Category Filters</div>
+            <div className="mobile-vibrant-chip-item">📄 PDF Export</div>
+            <div className="mobile-vibrant-chip-item">⏱️ Timestamps</div>
           </div>
-          <div className="feature-block-item">
-            <div className="feature-block-icon" style={{ background: 'rgba(16, 185, 129, 0.12)' }}>📄</div>
-            <div className="feature-block-content">
-              <span className="feature-block-title">PDF Export</span>
-              <span className="feature-block-sub">Printable security report</span>
-            </div>
-          </div>
-          <div className="feature-block-item">
-            <div className="feature-block-icon" style={{ background: 'rgba(168, 85, 247, 0.12)' }}>⏱️</div>
-            <div className="feature-block-content">
-              <span className="feature-block-title">Time Stamps</span>
-              <span className="feature-block-sub">Precise scan timeline</span>
-            </div>
-          </div>
+          <button
+            onClick={() => onExportPdf?.()}
+            className="mobile-vibrant-hero-btn"
+          >
+            Export PDF →
+          </button>
+        </div>
+        <div className="mobile-vibrant-hero-circle">
+          <Download size={38} strokeWidth={2.2} />
         </div>
       </div>
 

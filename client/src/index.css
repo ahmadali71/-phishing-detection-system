@@ -2897,3 +2897,148 @@ input:focus, select:focus, textarea:focus {
     font-size: 0.62rem;
   }
 }
+
+
+/* ================================================================
+   28. MOBILE VIBRANT HERO BANNER (EXACT COLOR & LAYOUT AS USER IMAGE)
+   SHOWN ONLY ON MOBILE / TABLET (<= 1024px), HIDDEN ON DESKTOP!
+================================================================ */
+.mobile-vibrant-hero {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .mobile-vibrant-hero {
+    display: flex !important;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #6265f1 0%, #5956eb 50%, #4f46e5 100%) !important;
+    border-radius: 20px;
+    padding: 22px 18px;
+    box-shadow: 0 10px 30px rgba(89, 86, 235, 0.35);
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 8px;
+    border: none !important;
+  }
+
+  .mobile-vibrant-hero-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+    z-index: 2;
+  }
+
+  .mobile-vibrant-hero-title {
+    font-size: clamp(1.2rem, 4.5vw, 1.45rem) !important;
+    font-weight: 900 !important;
+    color: #ffffff !important;
+    font-family: var(--font-display) !important;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin: 0 !important;
+  }
+
+  .mobile-vibrant-hero-desc {
+    font-size: 0.82rem !important;
+    color: rgba(255, 255, 255, 0.92) !important;
+    line-height: 1.45 !important;
+    margin: 0 !important;
+    font-weight: 500 !important;
+  }
+
+  .mobile-vibrant-hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    margin-top: 4px;
+    padding: 9px 18px;
+    background: #ffffff !important;
+    color: #5956eb !important;
+    font-weight: 800 !important;
+    font-size: 0.84rem !important;
+    font-family: var(--font-display) !important;
+    border-radius: 12px;
+    border: none !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15) !important;
+    cursor: pointer;
+    transition: transform 0.18s;
+  }
+
+  .mobile-vibrant-hero-btn:active {
+    transform: scale(0.96);
+  }
+
+  .mobile-vibrant-hero-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.22) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff !important;
+    flex-shrink: 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+  }
+
+  .mobile-vibrant-chips {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    margin-top: 3px;
+  }
+
+  .mobile-vibrant-chip-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 9px;
+    background: rgba(255, 255, 255, 0.18) !important;
+    border: 1px solid rgba(255, 255, 255, 0.28) !important;
+    border-radius: 8px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #ffffff !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media (max-width: 480px) {
+  .mobile-vibrant-hero {
+    padding: 16px 14px !important;
+    gap: 10px !important;
+  }
+  .mobile-vibrant-hero-circle {
+    width: 68px !important;
+    height: 68px !important;
+  }
+  .mobile-vibrant-hero-circle svg {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  .mobile-vibrant-chips {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 5px !important;
+  }
+  .mobile-vibrant-chip-item {
+    font-size: 0.68rem !important;
+    padding: 4px 7px !important;
+  }
+}
+
+/* STRICTLY HIDE MOBILE HERO ON DESKTOP */
+@media (min-width: 1025px) {
+  .mobile-vibrant-hero {
+    display: none !important;
+  }
+}
