@@ -6,14 +6,34 @@ const { connectDB, getConnectionStatus } = require('./config/db');
 // Load env vars
 dotenv.config();
 
-// Connect to database (non-blocking)
-connectDB();
-
 const app = express();
 
 // Middleware
 app.use(express.json());
 app.use(cors());
+
+// Lazy DB connection for Vercel serverless — connect on first request if not already connected
+let dbConnectionPromise = null;
+
+async function ensureDBConnected() {
+  if (getConnectionStatus()) {
+    return true;
+  }
+  if (!dbConnectionPromise) {
+    dbConnectionPromise = connectDB();
+  }
+  try {
+    await dbConnectionPromise;
+    return getConnectionStatus();
+  } catch {
+    return false;
+  }
+}
+
+app.use(async (req, res, next) => {
+  await ensureDBConnected();
+  next();
+});
 
 // Route imports
 const authRoutes = require('./routes/authRoutes');
