@@ -380,7 +380,50 @@ export async function generateChatbotResponse(userMessage, chatHistory = [], lan
     };
   }
 
-  // K. General / Catch-all — answer any question thoughtfully
+  // K. WAF, Web Application Security & Common Attack Vectors
+  if (lower.includes('waf') || lower.includes('web application firewall') || lower.includes('sql injection') ||
+    lower.includes('xss') || lower.includes('cross site scripting') || lower.includes('csrf') ||
+    lower.includes('cross site request forgery') || lower.includes('zero trust') || lower.includes('ransomware') ||
+    lower.includes('ddos') || lower.includes('denial of service') || lower.includes('injection') ||
+    lower.includes('owasp') || lower.includes('vulnerability') || lower.includes('exploit')) {
+    return {
+      text: `🛡️ **Web Application Security & WAF Defense**\n\n` +
+        `### What is a WAF?\n` +
+        `A **Web Application Firewall (WAF)** sits between users and your web app, inspecting HTTP traffic for malicious payloads. It blocks common attacks like SQL injection, XSS, CSRF, and known exploit patterns using signatures, behavioral rules, and anomaly detection.\n\n` +
+        `### Common Web Attack Vectors\n` +
+        `1. **SQL Injection (SQLi):** Attacker injects SQL code into input fields to read/modify/drop database tables. Defense: parameterized queries, ORMs, input validation.\n` +
+        `2. **Cross-Site Scripting (XSS):** Malicious scripts injected into pages viewed by other users. Defense: output encoding, CSP headers, input sanitization.\n` +
+        `3. **CSRF:** Tricks a logged-in user into submitting unwanted actions. Defense: anti-CSRF tokens, SameSite cookies, custom request headers.\n` +
+        `4. **Denial of Service (DoS/DDoS):** Overwhelms the application or network with traffic. Defense: rate limiting, WAF rate rules, CDN edge protection, auto-scaling.\n\n` +
+        `### How APDS Complements WAF\n` +
+        `APDS focuses on **phishing and social engineering** — the human layer — while WAF protects the application layer. Together they cover both the user and the infrastructure.`,
+      suggestions: ['How does APDS detect phishing?', 'What is SQL injection?', 'Scan a suspicious URL']
+    };
+  }
+
+  // L. AI, Social Engineering & General Cybersecurity Topics
+  if (lower.includes('ai') || lower.includes('artificial intelligence') || lower.includes('machine learning') ||
+    lower.includes('deep learning') || lower.includes('neural network') || lower.includes('social engineering') ||
+    lower.includes('malware') || lower.includes('ransomware') || lower.includes('trojan') || lower.includes('virus') ||
+    lower.includes('vpn') || lower.includes('firewall') || lower.includes('intrusion detection') ||
+    lower.includes('ids') || lower.includes('ips') || lower.includes('siem') || lower.includes('threat intelligence') ||
+    lower.includes('apt') || lower.includes('zero day') || lower.includes('patch')) {
+    return {
+      text: `🤖 **AI & Advanced Cybersecurity Concepts**\n\n` +
+        `### Artificial Intelligence in Cybersecurity\n` +
+        `AI and Machine Learning are transforming security by automating threat detection, anomaly classification, and predictive analytics. APDS itself uses a hybrid ensemble of Random Forest, SVM, and DistilBERT NLP models to classify phishing with 94.6% accuracy.\n\n` +
+        `### Key Concepts\n` +
+        `- **Social Engineering:** Psychological manipulation to trick users into revealing secrets. APDS detects this via NLP urgency-keyword analysis and sender-reputation heuristics.\n` +
+        `- **Malware / Ransomware:** Malicious code that encrypts data or steals credentials. APDS focuses on the *phishing delivery vector* that drops malware.\n` +
+        `- **VPN:** Encrypts network traffic and masks IP addresses. Useful for privacy but does NOT prevent phishing — fake sites can still steal credentials over HTTPS.\n` +
+        `- **Firewall / IDS / IPS:** Network-layer access control and intrusion detection. Complement WAF and endpoint protection.\n\n` +
+        `### Ask Me More\n` +
+        `You can ask about specific attacks, defensive strategies, or how APDS models work under the hood.`,
+      suggestions: ['What is WAF?', 'How does APDS detect phishing?', 'Explain ML model architecture']
+    };
+  }
+
+  // M. General / Catch-all — answer any question thoughtfully
   return {
     text: `🛡️ **APDS Cyber Intelligence Assistant**\n\n` +
       `I understand your question relates to: **${query.length > 80 ? query.slice(0, 77) + '...' : query}**\n\n` +
