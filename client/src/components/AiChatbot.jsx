@@ -467,31 +467,22 @@ export default function AiChatbot({ t, language = 'English' }) {
               placeholder={t.chatPlaceholder || 'Type a question or paste URL / email text to analyze...'}
               className="chat-textarea"
             />
-            {inputText.length > 0 && (
-              <button
-                type="button"
-                onClick={() => {
-                  setInputText('');
-                  if (textareaRef.current) {
-                    textareaRef.current.style.height = 'auto';
-                    textareaRef.current.focus();
-                  }
-                }}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'var(--text-muted)',
-                  cursor: 'pointer',
-                  padding: '4px 6px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  borderRadius: '50%'
-                }}
-                title="Clear input"
-              >
-                <X size={16} />
-              </button>
-            )}
+             {inputText.length > 0 && (
+               <button
+                 type="button"
+                 onClick={() => {
+                   setInputText('');
+                   if (textareaRef.current) {
+                     textareaRef.current.style.height = 'auto';
+                     textareaRef.current.focus();
+                   }
+                 }}
+                 className="chat-clear-btn"
+                 title="Clear input"
+               >
+                 <X size={16} />
+               </button>
+             )}
           </div>
 
           <button
