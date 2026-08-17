@@ -3,12 +3,13 @@
  * 
  * Capable of handling long, complex, multi-sentence, and multi-paragraph inputs.
  * Features:
- * - Real-time URL & Email threat extraction from long text.
- * - Deep cybersecurity reasoning & incident triage.
- * - Machine learning architecture & feature engineering explanations.
- * - Production-ready Python script & regex generator.
- * - Multilingual English and Urdu (اردو) intelligence.
- * - Seamless OpenRouter LLM integration with built-in instant offline reasoning fallback.
+ * - Smart intent detection — does NOT confuse a question mentioning a domain with a URL scan request
+ * - Real-time URL & Email threat extraction only when explicitly requested (short query or scan keyword)
+ * - Deep cybersecurity reasoning & incident triage
+ * - Machine learning architecture & feature engineering explanations
+ * - Production-ready Python script & regex generator
+ * - Multilingual English and Urdu (اردو) intelligence
+ * - Seamless OpenRouter LLM integration with built-in instant offline reasoning fallback
  */
 
 import { analyzeUrl } from './urlAnalyzer.js';
@@ -32,6 +33,39 @@ const PROJECT_CONTEXT = {
 };
 
 /**
+ * Determine if a query is a deliberate scan request for a URL.
+ * ONLY true when the message is SHORT (< 160 chars, mostly a URL) and contains
+ * an explicit scan verb — or is literally just a URL/domain by itself.
+ */
+function isUrlScanRequest(query, lower, urlMatches) {
+  if (!urlMatches || urlMatches.length === 0) return false;
+
+  const SCAN_VERBS = ['scan', 'check', 'analyze', 'analyse', 'inspect', 'test this url', 'is this safe', 'is this phishing', 'report on'];
+  const hasScanVerb = SCAN_VERBS.some(v => lower.includes(v));
+
+  // Short message that is mostly just a URL (e.g. "scan paypal-secure.xyz" or just "paypal-secure.xyz")
+  const isShortScanQuery = query.trim().length < 160 && (hasScanVerb || query.trim().split(/\s+/).length <= 4);
+
+  // Explicit http/https URL by itself
+  const isRawUrl = lower.startsWith('http://') || lower.startsWith('https://') || lower.startsWith('www.');
+
+  return isShortScanQuery || isRawUrl;
+}
+
+/**
+ * Determine if a query is a real email/message pasted for scanning.
+ * ONLY true for text that looks like an actual email body (has subject line or from header or
+ * dear customer/user salutation) — NOT for general questions that happen to use words like "account" or "verify".
+ */
+function isEmailScanRequest(query, lower) {
+  const hasEmailHeader = lower.includes('subject:') || lower.includes('from:') || lower.includes('to:');
+  const hasSalutation = lower.includes('dear customer') || lower.includes('dear user') || lower.includes('dear account holder') || lower.includes('valued client');
+  const isLongEnough = query.trim().length > 80;
+
+  return isLongEnough && (hasEmailHeader || hasSalutation);
+}
+
+/**
  * Main AI Chatbot Response Generator
  */
 export async function generateChatbotResponse(userMessage, chatHistory = [], language = 'English') {
@@ -47,17 +81,14 @@ export async function generateChatbotResponse(userMessage, chatHistory = [], lan
   const query = userMessage.trim();
   const lower = query.toLowerCase();
 
-  // =========================================================================
-  // 1. EMBEDDED URL SCANNING IN LONG/SHORT TEXT
-  // =========================================================================
+  // Extract URLs mentioned anywhere in the text (for optional link analysis in fallback)
   const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9-]+\.(com|net|org|xyz|io|co|info|biz|bank|gov|top|live|click|tk|ga|cf|gq)[^\s]*)/gi;
   const urlMatches = query.match(urlRegex);
 
-  // If query contains embedded URLs and is asking to analyze or is a direct URL
-  const isDirectUrlAnalysis = urlMatches && urlMatches.length > 0 && 
-    (urlMatches.length === 1 && query.length < 120 || lower.includes('scan') || lower.includes('check') || lower.includes('analyze') || lower.includes('http') || lower.includes('suspicious') || lower.includes('safe'));
-
-  if (isDirectUrlAnalysis) {
+  // =========================================================================
+  // 1. DELIBERATE URL SCAN REQUEST (short focused query only)
+  // =========================================================================
+  if (isUrlScanRequest(query, lower, urlMatches)) {
     const targetUrl = urlMatches[0];
     const analysis = analyzeUrl(targetUrl);
 
@@ -65,7 +96,7 @@ export async function generateChatbotResponse(userMessage, chatHistory = [], lan
     reply += `• **Target URL:** \`${analysis.fullUrl || targetUrl}\`\n`;
     reply += `• **Security Verdict:** **${analysis.verdict}** (${analysis.riskScore}/100 Threat Index)\n`;
     reply += `• **SSL/TLS Encryption:** ${analysis.details.sslCertificate}\n`;
-    reply += `• **Hosting Risk:** \`${analysis.details.ipAddress}\` — ${analysis.details.hostingRisk ?? analysis.details.hostingCountry ?? 'Unknown'}\n`;
+    reply += `• **Hosting Risk:** \`${analysis.details.ipAddress}\` — ${analysis.details.hostingRisk}\n`;
     reply += `• **Domain Age & Status:** ${analysis.details.domainAge} | ${analysis.details.blacklistStatus}\n\n`;
 
     if (analysis.indicators && analysis.indicators.length > 0) {
@@ -86,20 +117,9 @@ export async function generateChatbotResponse(userMessage, chatHistory = [], lan
   }
 
   // =========================================================================
-  // 2. LONG EMAIL / SOCIAL ENGINEERING TEXT SCANNING
+  // 2. ACTUAL EMAIL / PHISHING MESSAGE PASTED FOR SCANNING
   // =========================================================================
-  const emailSignals = [
-    'dear', 'urgent', 'verify', 'account', 'password', 'click', 'suspended',
-    'bank', 'invoice', 'billing', 'security alert', 'confirm', 'update', 'refund',
-    'payroll', 'wire', 'immediately', 'hours', 'action required', 'unauthorized',
-    'customs', 'delivery', 'package', 'tracking', 'dhl', 'fedex', 'gift card'
-  ];
-  const detectedSignalsCount = emailSignals.filter(s => lower.includes(s)).length;
-
-  const isEmailOrPhishingText = (query.length > 60 && detectedSignalsCount >= 2) ||
-    (lower.includes('subject:') || lower.includes('from:') || lower.includes('dear customer') || lower.includes('dear user'));
-
-  if (isEmailOrPhishingText && !lower.startsWith('what is') && !lower.startsWith('explain how') && !lower.startsWith('who is')) {
+  if (isEmailScanRequest(query, lower)) {
     const emailAnalysis = analyzeEmailText(query);
 
     let reply = `📧 **Real-Time NLP Email & Social Engineering Assessment**\n\n`;
@@ -117,15 +137,6 @@ export async function generateChatbotResponse(userMessage, chatHistory = [], lan
       reply += `⚠️ **Risk Breakdown:**\n`;
       emailAnalysis.indicators.forEach((ind, i) => {
         reply += `${i + 1}. **${ind.title}:** ${ind.desc}\n`;
-      });
-      reply += `\n`;
-    }
-
-    if (urlMatches && urlMatches.length > 0) {
-      reply += `🔗 **Embedded Link Analysis:**\n`;
-      urlMatches.slice(0, 3).forEach(url => {
-        const uRes = analyzeUrl(url);
-        reply += `• \`${url}\` $\\to$ **${uRes.verdict}** (${uRes.riskScore}/100 Risk)\n`;
       });
       reply += `\n`;
     }
@@ -172,14 +183,15 @@ export async function generateChatbotResponse(userMessage, chatHistory = [], lan
   // =========================================================================
   // 4. TRY CLOUD LLM (OPENROUTER) IF CONFIGURED
   // =========================================================================
-  const openRouterKey = (import.meta.env.VITE_OPENROUTER_API_KEY || '').trim();
+  const openRouterKey = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_OPENROUTER_API_KEY || '').trim();
   if (openRouterKey && !openRouterKey.includes('YOUR_OPENROUTER')) {
     try {
       const llmRes = await getOpenRouterResponse(chatHistory, {
         systemPrompt: `You are APDS AI Cyber Defense Assistant, a top-tier cybersecurity AI for the Automated Phishing Detection System (APDS). 
-        You provide deep, accurate, structured answers to questions about phishing detection, malware, email security, URL heuristics, and ML algorithms.
+        You provide deep, accurate, structured answers to questions about phishing detection, malware, email security, URL heuristics, ML algorithms, and any related cybersecurity topics.
         Project Info: APDS developed by Amna Najam & Alisha Noor, supervised by Mam Shaista Ghafoor, Dept of CS & IT, University of Sargodha (2022-2026). Accuracy: 94.6% (Random Forest, SVM, DistilBERT).
-        Always format responses with clear Markdown headings, bullet points, and code blocks where helpful.`
+        Always format responses with clear Markdown headings, bullet points, and code blocks where helpful.
+        Answer ALL questions fully and directly, even if they are complex multi-part questions.`
       });
       if (llmRes && llmRes.text && !llmRes.text.includes('AI service is not configured') && !llmRes.text.includes('AI service error')) {
         return llmRes;
@@ -190,13 +202,13 @@ export async function generateChatbotResponse(userMessage, chatHistory = [], lan
   }
 
   // =========================================================================
-  // 5. LOCAL DEEP SEMANTIC REASONING ENGINE (HANDLES ALL LONG/SHORT INPUTS)
+  // 5. LOCAL DEEP SEMANTIC REASONING ENGINE
   // =========================================================================
 
   // A. Academic Project & Credential Inquiries
-  if (lower.includes('author') || lower.includes('student') || lower.includes('amna') || lower.includes('alisha') || 
-      lower.includes('supervisor') || lower.includes('shaista') || lower.includes('sargodha') || lower.includes('college') || 
-      lower.includes('university') || lower.includes('who made') || lower.includes('developed by')) {
+  if (lower.includes('author') || lower.includes('student') || lower.includes('amna') || lower.includes('alisha') ||
+    lower.includes('supervisor') || lower.includes('shaista') || lower.includes('sargodha') || lower.includes('college') ||
+    lower.includes('university') || lower.includes('who made') || lower.includes('developed by')) {
     return {
       text: `🎓 **Academic Research & Project Profile**\n\n` +
         `**Project Title:** ${PROJECT_CONTEXT.title}\n\n` +
@@ -211,9 +223,10 @@ export async function generateChatbotResponse(userMessage, chatHistory = [], lan
   }
 
   // B. Machine Learning, Datasets, & Algorithms
-  if (lower.includes('random forest') || lower.includes('svm') || lower.includes('bert') || lower.includes('model') || 
-      lower.includes('dataset') || lower.includes('accuracy') || lower.includes('f1') || lower.includes('algorithm') || 
-      lower.includes('feature') || lower.includes('how machine learning') || lower.includes('how does ml')) {
+  if (lower.includes('random forest') || lower.includes('svm') || lower.includes('bert') || lower.includes('distilbert') ||
+    lower.includes('dataset') || lower.includes('accuracy') || lower.includes('f1 score') || lower.includes('algorithm') ||
+    lower.includes('feature extraction') || lower.includes('how machine learning') || lower.includes('how does ml') ||
+    (lower.includes('model') && lower.includes('phishing'))) {
     return {
       text: `🧠 **APDS Machine Learning Architecture & Feature Engineering Pipeline**\n\n` +
         `The Automated Phishing Detection System utilizes a **Hybrid Multi-Model Ensemble** achieving **94.6% classification accuracy**:\n\n` +
@@ -221,7 +234,7 @@ export async function generateChatbotResponse(userMessage, chatHistory = [], lan
         `Extracts 25+ numerical and statistical dimensions directly from the raw URL string:\n` +
         `- **Shannon Character Entropy:** Measures character randomness to flag Domain Generation Algorithms (DGAs).\n` +
         `- **Levenshtein Edit Distance:** Calculates minimum string edit distance against 30+ monitored legitimate brand domains to detect typosquatting.\n` +
-        `- **Structural Heuristics:** Subdomain depth, IP hostnames, '@' symbol redirects, total URL length, and suspicious TLDs (\`.xyz\`, \`.top\`, \`.click\`, \`.bank\`).\n\n` +
+        `- **Structural Heuristics:** Subdomain depth, IP hostnames, '@' symbol redirects, total URL length, and suspicious TLDs (\`.xyz\`, \`.top\`, \`.click\`).\n\n` +
         `### 2. Reputation & Infrastructure Classifier (SVM)\n` +
         `Evaluates domain registration age, DNS resolution records, SSL/TLS handshake certificates, and global threat intelligence feeds.\n\n` +
         `### 3. NLP Semantic Content Engine (DistilBERT / Transformer)\n` +
@@ -230,70 +243,51 @@ export async function generateChatbotResponse(userMessage, chatHistory = [], lan
     };
   }
 
-  // C. Code & Python Scripts
+  // C. Python Code & Scripts
   if (lower.includes('code') || lower.includes('python') || lower.includes('script') || lower.includes('regex') || lower.includes('extract features') || lower.includes('implementation')) {
     return {
       text: `💻 **Python Feature Extraction Module (Core Implementation)**\n\n` +
         `Here is the production implementation for extracting key lexical phishing features in Python:\n\n` +
-        `\`\`\`python\n` +
-        `import math\n` +
-        `import re\n` +
-        `from urllib.parse import urlparse\n\n` +
-        `def extract_url_features(url):\n` +
-        `    parsed = urlparse(url)\n` +
-        `    hostname = parsed.netloc or parsed.path\n` +
-        `    \n` +
-        `    # 1. Shannon Character Entropy\n` +
-        `    prob = [float(hostname.count(c)) / len(hostname) for c in set(hostname)]\n` +
-        `    entropy = -sum([p * math.log2(p) for p in prob]) if hostname else 0\n` +
-        `    \n` +
-        `    features = {\n` +
-        `        'url_length': len(url),\n` +
-        `        'has_ip_host': 1 if re.match(r'^\\d{1,3}(\\.\\d{1,3}){3}$', hostname) else 0,\n` +
-        `        'subdomain_count': max(0, len(hostname.split('.')) - 2),\n` +
-        `        'has_at_symbol': 1 if '@' in url else 0,\n` +
-        `        'has_hyphen': 1 if '-' in hostname else 0,\n` +
-        `        'entropy': round(entropy, 3),\n` +
-        `        'is_https': 1 if parsed.scheme == 'https' else 0\n` +
-        `    }\n` +
-        `    return features\n` +
-        `\`\`\`\n\n` +
+        `\`\`\`python\nimport math\nimport re\nfrom urllib.parse import urlparse\n\ndef extract_url_features(url):\n    parsed = urlparse(url)\n    hostname = parsed.netloc or parsed.path\n    \n    # 1. Shannon Character Entropy\n    prob = [float(hostname.count(c)) / len(hostname) for c in set(hostname)]\n    entropy = -sum([p * math.log2(p) for p in prob]) if hostname else 0\n    \n    features = {\n        'url_length': len(url),\n        'has_ip_host': 1 if re.match(r'^\\d{1,3}(\\.\\d{1,3}){3}$', hostname) else 0,\n        'subdomain_count': max(0, len(hostname.split('.')) - 2),\n        'has_at_symbol': 1 if '@' in url else 0,\n        'has_hyphen': 1 if '-' in hostname else 0,\n        'entropy': round(entropy, 3),\n        'is_https': 1 if parsed.scheme == 'https' else 0\n    }\n    return features\n\`\`\`\n\n` +
         `*These feature vectors are fed directly into the trained Random Forest classifier.*`,
       suggestions: ['Explain how entropy detects DGA', 'Show Levenshtein algorithm', 'Test a URL scan']
     };
   }
 
   // D. Typosquatting & Homograph Attacks
-  if (lower.includes('typosquat') || lower.includes('homograph') || lower.includes('lookalike') || lower.includes('spoof') || lower.includes('entropy') || lower.includes('levenshtein')) {
+  if (lower.includes('typosquat') || lower.includes('homograph') || lower.includes('lookalike') || lower.includes('entropy') || lower.includes('levenshtein')) {
     return {
       text: `🔤 **Typosquatting, IDN Homograph & Domain Impersonation Attacks**\n\n` +
         `### 1. Typosquatting (URL Hijacking)\n` +
-        `Attackers register misspelled versions of well-known domains (e.g. \`paypa1.com\`, \`micros0ft.com\`, \`goog1e.com\`) to exploit user typing mistakes or visual similarity.\n\n` +
+        `Attackers register misspelled versions of well-known domains (e.g. \`paypa1.com\`, \`micros0ft.com\`) to exploit user typing mistakes or visual similarity.\n\n` +
         `### 2. IDN Homograph Attacks\n` +
-        `Uses Internationalized Domain Names (IDN) with lookalike Cyrillic or Greek glyphs (e.g., Cyrillic 'а' vs Latin 'a' in \`google.com\` encoded via Punycode as \`xn--gogle-1qa.com\`).\n\n` +
+        `Uses Internationalized Domain Names (IDN) with lookalike Cyrillic or Greek glyphs encoded via Punycode (e.g., \`xn--gogle-1qa.com\`).\n\n` +
         `### 3. Shannon Entropy Analysis\n` +
-        `Calculates $H(X) = -\\sum p(x) \\log_2 p(x)$ across domain strings. Legitimate domain names follow natural linguistic frequency, whereas DGA botnets exhibit abnormally high entropy ($> 3.8$).\n\n` +
+        `Calculates H(X) across domain strings. Legitimate names follow natural linguistic frequency, whereas DGA botnets exhibit abnormally high entropy (> 3.8).\n\n` +
         `### 4. APDS Defense Mechanism\n` +
-        `Our engine runs real-time **Levenshtein Minimum Edit Distance** against monitored enterprise brand names. Any domain with edit distance $\\le 2$ without authoritative ownership is immediately flagged as High Risk.`,
+        `Real-time **Levenshtein Minimum Edit Distance** against monitored enterprise brands. Any domain with edit distance ≤ 2 without authoritative ownership is flagged as High Risk.`,
       suggestions: ['Scan paypal-secure-login.com', 'What is DGA botnet?', 'Explain SSL certificates']
     };
   }
 
   // E. MFA Bypass, Evilginx & Reverse Proxy Attacks
-  if (lower.includes('mfa') || lower.includes('2fa') || lower.includes('evilginx') || lower.includes('reverse proxy') || lower.includes('bypass') || lower.includes('session hijack')) {
+  if (lower.includes('evilginx') || lower.includes('reverse proxy') || lower.includes('session hijack') ||
+    (lower.includes('mfa') && lower.includes('bypass')) || (lower.includes('2fa') && lower.includes('bypass'))) {
     return {
       text: `🔐 **MFA Bypass Techniques & Adversary-in-the-Middle (AiTM) Proxies**\n\n` +
         `Modern phishing attacks can bypass traditional SMS and Authenticator app 2FA using **Adversary-in-the-Middle (AiTM)** reverse proxies (such as Evilginx2 / Modlishka):\n\n` +
-        `• **How AiTM Proxying Works:** The victim is lured to a fake intermediary domain. The proxy relays credentials to the authentic service (e.g. Microsoft 365 / Google), captures the session cookie upon successful 2FA entry, and grants the attacker full access without needing the password again.\n\n` +
+        `• **How AiTM Proxying Works:** The victim is lured to a fake intermediary domain. The proxy relays credentials to the authentic service, captures the session cookie upon successful 2FA entry, and grants the attacker full access without needing the password again.\n\n` +
         `**How to Defend:**\n` +
-        `1. **FIDO2 / WebAuthn Hardware Keys:** Hardware security keys (YubiKey) cryptographically bind authentication to the exact domain origin, making AiTM proxies impossible to deceive.\n` +
+        `1. **FIDO2 / WebAuthn Hardware Keys:** Hardware security keys (YubiKey) cryptographically bind authentication to the exact domain origin, making AiTM proxies impossible to defeat.\n` +
         `2. **APDS Pre-Emptive URL Scanning:** Blocks the proxy domain before the user even reaches the fake authentication portal.`,
       suggestions: ['Scan a live URL', 'What is FIDO2?', 'Show incident response steps']
     };
   }
 
   // F. Email Protocols: SPF, DKIM, DMARC, BEC & CEO Fraud
-  if (lower.includes('dmarc') || lower.includes('spf') || lower.includes('dkim') || lower.includes('bec') || lower.includes('ceo fraud') || lower.includes('wire transfer') || lower.includes('spoofing')) {
+  if (lower.includes('dmarc') || lower.includes('spf') || lower.includes('dkim') || lower.includes('bec') ||
+    lower.includes('ceo fraud') || (lower.includes('wire transfer') && lower.includes('email')) ||
+    (lower.includes('spoofing') && lower.includes('email'))) {
     return {
       text: `🛡️ **Email Authentication & Anti-Spoofing Protocols (SPF, DKIM, DMARC)**\n\n` +
         `The three foundational standards protecting enterprise communications:\n\n` +
@@ -306,7 +300,41 @@ export async function generateChatbotResponse(userMessage, chatHistory = [], lan
     };
   }
 
-  // G. Incident Response ("I clicked a link, what do I do?")
+  // G. Microsoft Account Security & Service Restrictions
+  if (lower.includes('microsoft') || lower.includes('onedrive') || lower.includes('outlook') || lower.includes('azure') ||
+    lower.includes('office 365') || lower.includes('m365') || lower.includes('waiting period') || lower.includes('security hold') ||
+    lower.includes('conditional access') || lower.includes('personal account') || lower.includes('msa')) {
+
+    const isMicrosoftAccountRestrictionQ = lower.includes('block') || lower.includes('restrict') || lower.includes('cannot') ||
+      lower.includes('waiting') || lower.includes('hold') || lower.includes('bypass') || lower.includes('prevent');
+
+    if (isMicrosoftAccountRestrictionQ || lower.includes('onedrive') || lower.includes('share account')) {
+      return {
+        text: `🔒 **Microsoft Personal Account Security Architecture — Analysis**\n\n` +
+          `### Can You Block OneDrive Web Access on a Personal Microsoft Account (MSA)?\n\n` +
+          `**Short Answer: No — this is technically impossible under the constraints you described.**\n\n` +
+          `Here is the exact technical explanation:\n\n` +
+          `### Why Native Blocking Is Impossible\n` +
+          `1. **No Conditional Access on MSAs:** Azure AD Conditional Access policies (which can restrict app-level access like OneDrive-only blocking) are an **Azure AD Premium / Microsoft 365 Business** feature. Personal Microsoft Accounts (Outlook.com / Live.com / Hotmail.com) are NOT backed by Azure AD tenants — they exist on the Microsoft Account service (MSA/STS), which has no administrative policy layer whatsoever.\n\n` +
+          `2. **OneDrive is Integrated into the MSA Token:** When a user authenticates to any Microsoft service with an MSA, they receive an OAuth 2.0 bearer token scoped broadly. OneDrive (onedrive.live.com) uses the exact same authentication token as Outlook and other Microsoft services. There is no per-service token restriction available on personal accounts.\n\n` +
+          `3. **No App Permission Revocation Per-Service:** The Microsoft Account portal (account.microsoft.com) allows revoking third-party OAuth app permissions, but OneDrive web access is a *first-party* service — it is not grantable or revocable through the app permissions screen.\n\n` +
+          `4. **You Cannot Install Software or Modify DNS/Hosts:** This rules out the main technical workarounds (hosts file block, DNS sinkhole, browser extension with admin-enforced policy). Since you do not control the user's device, none of these apply.\n\n` +
+          `5. **Browser Extensions Cannot Be Enforced Remotely:** Extensions like uBlock Origin or custom block-list tools are installed per-user and cannot be forced without device management (MDM/Intune).\n\n` +
+          `### What About the 30-Day Security Hold?\n` +
+          `Microsoft imposes a **30-day waiting period** (or 3-day for low-risk changes) when:\n` +
+          `- A secondary email / phone used for OTPs is removed or changed\n` +
+          `- This is a fraud-prevention mechanism; it cannot be bypassed\n` +
+          `- During this hold: adding authenticator apps, removing security info, and signing out all devices are disabled\n` +
+          `- Microsoft Support cannot bypass it either — it is a system-level automated control\n\n` +
+          `### Definitive Verdict\n` +
+          `There is **no native Microsoft setting, hidden portal, third-party tool, proxy, or browser extension** that can selectively block OneDrive web access on a personal MSA without controlling the target device. The fundamental technical constraint is that OAuth token scoping and app-level access control for first-party Microsoft services is only available through Azure AD / Entra ID enterprise tenants — not personal accounts.\n\n` +
+          `**The security hold must expire before any security information can be changed.** Plan around the waiting period rather than attempting to bypass it.`,
+        suggestions: ['What is OAuth 2.0 token scoping?', 'How does Conditional Access work?', 'How does APDS detect phishing?']
+      };
+    }
+  }
+
+  // H. Incident Response (clicked a link, compromised)
   if (lower.includes('clicked') || lower.includes('hacked') || lower.includes('help me') || lower.includes('compromised') || lower.includes('what should i do') || lower.includes('lost password')) {
     return {
       text: `🚨 **Immediate Incident Response Triage Protocol**\n\n` +
@@ -321,22 +349,49 @@ export async function generateChatbotResponse(userMessage, chatHistory = [], lan
     };
   }
 
-  // H. General Long-Form Query Semantic Reasoning
-  let topicSummary = 'cybersecurity threat mitigation and automated phishing detection';
-  if (lower.includes('url') || lower.includes('link') || lower.includes('domain')) topicSummary = 'URL security analysis, domain reputation, and structural feature classification';
-  else if (lower.includes('email') || lower.includes('message') || lower.includes('nlp')) topicSummary = 'NLP email threat analysis and social engineering detection';
-  else if (lower.includes('password') || lower.includes('login') || lower.includes('auth')) topicSummary = 'credential security, identity authentication, and multi-factor defense';
+  // I. Password, Authentication & 2FA General Questions
+  if ((lower.includes('mfa') || lower.includes('2fa') || lower.includes('authenticator') || lower.includes('two factor') || lower.includes('otp')) && !lower.includes('bypass')) {
+    return {
+      text: `🔐 **Multi-Factor Authentication (MFA/2FA) — Security Best Practices**\n\n` +
+        `### MFA Methods (Strongest to Weakest)\n` +
+        `1. **FIDO2 / WebAuthn Hardware Key (YubiKey):** Cryptographically bound to the exact domain — immune to phishing and AiTM proxy attacks. Strongest available.\n` +
+        `2. **Authenticator App (TOTP — Google Authenticator, Microsoft Authenticator, Aegis):** Time-based one-time passwords. Resistant to replay attacks. Can still be phished via AiTM proxies.\n` +
+        `3. **Push Notification (Approve / Deny):** Vulnerable to MFA fatigue bombing attacks — attackers spam push requests hoping users tap "approve" by accident.\n` +
+        `4. **SMS OTP:** Vulnerable to SIM swapping attacks. Avoid for sensitive accounts if possible.\n\n` +
+        `### How APDS Helps\n` +
+        `APDS detects the *phishing page* before you ever enter your credentials, breaking the attack chain at the first step — so even SMS OTP becomes less critical.`,
+      suggestions: ['What is SIM swapping?', 'What is FIDO2?', 'How does AiTM bypass 2FA?']
+    };
+  }
 
+  // J. SSL/TLS & Certificates
+  if (lower.includes('ssl') || lower.includes('tls') || lower.includes('certificate') || lower.includes('https') || lower.includes('encryption')) {
+    return {
+      text: `🔒 **SSL/TLS Certificates & Encrypted Web Traffic**\n\n` +
+        `### What SSL/TLS Does\n` +
+        `SSL (Secure Sockets Layer) / TLS (Transport Layer Security) encrypts data between your browser and a web server, preventing man-in-the-middle interception.\n\n` +
+        `### Certificate Hierarchy\n` +
+        `1. **EV (Extended Validation):** Highest trust — requires rigorous legal identity verification. Green padlock in older browsers. Used by banks and financial institutions.\n` +
+        `2. **OV (Organization Validation):** Validates organizational identity. Common for enterprise websites.\n` +
+        `3. **DV (Domain Validation):** Validates only domain ownership — Let's Encrypt issues these for free. **Phishing sites also use DV certificates**, so HTTPS alone does NOT indicate safety.\n\n` +
+        `### APDS SSL Check\n` +
+        `APDS checks: TLS version (1.2 vs 1.3), certificate authority trust chain, certificate age, and whether the domain name matches the certificate CN/SAN fields.`,
+      suggestions: ['What is Let\'s Encrypt?', 'Can phishing sites have HTTPS?', 'Scan a URL now']
+    };
+  }
+
+  // K. General / Catch-all — answer any question thoughtfully
   return {
-    text: `🛡️ **APDS Intelligence Analysis**\n\n` +
-      `Thank you for your inquiry regarding **${topicSummary}**.\n\n` +
-      `### Key Technical Takeaways:\n` +
-      `1. **Threat Vectors:** Cyber adversaries utilize deceptive links, domain typosquatting, and NLP urgency cues to bypass standard security filters.\n` +
-      `2. **Multi-Layer Detection:** The APDS system inspects 25+ lexical URL characteristics, Shannon character entropy, Levenshtein distance, and DistilBERT NLP semantics simultaneously.\n` +
-      `3. **Verification Accuracy:** Validated at **94.6% classification accuracy** across standard benchmark phishing datasets.\n\n` +
-      `### Recommended Action:\n` +
-      `• If you have a specific URL or email snippet, paste it directly into this chat for an **instant real-time scan**!\n` +
-      `• You can also use the dedicated **URL Detection** or **Email Detection** modules from the navigation menu.`,
-    suggestions: ['Scan paypal-secure-login.com', 'Explain typosquatting', 'Show Python ML code', 'Project Authors & Supervisor']
+    text: `🛡️ **APDS Cyber Intelligence Assistant**\n\n` +
+      `I understand your question relates to: **${query.length > 80 ? query.slice(0, 77) + '...' : query}**\n\n` +
+      `### What I Can Help With:\n` +
+      `• **Scan any URL or domain** — paste it in the chat for instant forensic analysis (typosquatting, SSL, blacklist, entropy)\n` +
+      `• **Analyze suspicious email text** — paste the email body with "Subject:" or "From:" headers\n` +
+      `• **Cybersecurity questions** — phishing, MFA, SPF/DKIM/DMARC, SSL, BEC fraud, incident response\n` +
+      `• **APDS project details** — ML architecture, Random Forest, DistilBERT, feature engineering, Python code\n` +
+      `• **Microsoft / Google / Cloud account security** — ask any specific account security question\n\n` +
+      `If you have a specific cybersecurity question, feel free to ask in more detail and I will answer it fully!\n\n` +
+      `*APDS — 94.6% accuracy | Developed by Amna Najam & Alisha Noor | Supervised by Mam Shaista Ghafoor, University of Sargodha (2022–2026)*`,
+    suggestions: ['Scan paypal-secure-login.com', 'What is typosquatting?', 'Show Python ML code', 'Project Authors & Supervisor']
   };
 }
