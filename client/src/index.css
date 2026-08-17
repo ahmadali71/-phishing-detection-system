@@ -3199,8 +3199,10 @@ input:focus, select:focus, textarea:focus {
     display: none !important;
   }
 }
+
+/* ================================================================
    32. ULTRA-POLISHED MOBILE RESPONSIVE SYSTEM
-================================================================ */
+=============================================================== */
 @media (max-width: 768px) {
   .app-main {
     padding: 14px 12px calc(env(safe-area-inset-bottom, 0px) + 84px) 12px !important;
