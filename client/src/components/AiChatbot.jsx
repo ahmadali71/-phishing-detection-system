@@ -146,26 +146,61 @@ export default function AiChatbot({ t, language = 'English' }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', maxWidth: '980px', margin: '0 auto' }}>
-      {/* Title */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-            <span className="badge badge-blue">Module 03</span>
-            <span style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>Real-Time NLU Security Engine</span>
+      {/* Header with Title & Feature Capability Blocks */}
+      <div className="feature-hero-card">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+              <div className="badge-screen-num" style={{ background: 'linear-gradient(135deg, #06b6d4, #3b82f6)' }}>AI</div>
+              <span className="badge-screen-title" style={{ color: '#22d3ee' }}>AI DEFENSE ASSISTANT</span>
+              <span className="badge-live-ai">● REAL-TIME CHAT</span>
+            </div>
+            <h2 className="feature-hero-title">{t.chatbotTitle || 'AI Security Assistant & Live Scanner'}</h2>
+            <p className="feature-hero-desc">
+              {t.chatbotDesc || 'Interactive conversational AI. Ask cybersecurity questions or paste links and email text directly for instant security analysis.'}
+            </p>
           </div>
-          <h2 style={{ fontSize: 'clamp(1.3rem, 4vw, 1.8rem)', fontWeight: '800' }}>{t.chatbotTitle || 'AI Security Assistant & Live Scanner'}</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
-            {t.chatbotDesc || 'Interactive conversational AI. Ask cybersecurity questions or paste links and email text directly for instant security analysis.'}
-          </p>
+          <div className="chatbot-header-actions" style={{ display: 'flex', gap: '8px' }}>
+            <button
+              onClick={() => handleSendMessage('Scan paypal-secure-login.com')}
+              className="btn-secondary"
+              style={{ fontSize: '0.75rem', padding: '6px 12px' }}
+            >
+              <Zap size={14} color="#f59e0b" /> Test Phishing Scan
+            </button>
+          </div>
         </div>
-        <div className="chatbot-header-actions" style={{ display: 'flex', gap: '8px' }}>
-          <button
-            onClick={() => handleSendMessage('Scan paypal-secure-login.com')}
-            className="btn-secondary"
-            style={{ fontSize: '0.75rem', padding: '6px 12px' }}
-          >
-            <Zap size={14} color="#f59e0b" /> Test Phishing Scan
-          </button>
+
+        {/* Feature Capability Blocks */}
+        <div className="feature-blocks-grid">
+          <div className="feature-block-item">
+            <div className="feature-block-icon" style={{ background: 'rgba(6, 182, 212, 0.12)' }}>🤖</div>
+            <div className="feature-block-content">
+              <span className="feature-block-title">Live URL Inspector</span>
+              <span className="feature-block-sub">Paste links right in chat</span>
+            </div>
+          </div>
+          <div className="feature-block-item">
+            <div className="feature-block-icon" style={{ background: 'rgba(59, 130, 246, 0.12)' }}>🛡️</div>
+            <div className="feature-block-content">
+              <span className="feature-block-title">Attack Defense</span>
+              <span className="feature-block-sub">MFA bypass & spoofing guide</span>
+            </div>
+          </div>
+          <div className="feature-block-item">
+            <div className="feature-block-icon" style={{ background: 'rgba(168, 85, 247, 0.12)' }}>💻</div>
+            <div className="feature-block-content">
+              <span className="feature-block-title">Python ML Code</span>
+              <span className="feature-block-sub">Feature extractor scripts</span>
+            </div>
+          </div>
+          <div className="feature-block-item">
+            <div className="feature-block-icon" style={{ background: 'rgba(245, 158, 11, 0.12)' }}>🎓</div>
+            <div className="feature-block-content">
+              <span className="feature-block-title">Academic Knowledge</span>
+              <span className="feature-block-sub">Thesis methodology insights</span>
+            </div>
+          </div>
         </div>
       </div>
 

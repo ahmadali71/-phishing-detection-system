@@ -82,18 +82,61 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px', maxWidth: '950px', margin: '0 auto' }}>
-      {/* Header (Exact Match to PDF Page 62 Screen 5) */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-        <div>
-          <h2 style={{ fontSize: 'clamp(1.4rem, 4vw, 1.85rem)', fontWeight: '800' }}>{t.urlScannerTitle || 'URL Detection'}</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-            {t.urlScannerDesc || 'Analyze any URL for potential threats'}
-          </p>
+      {/* Header with Screen Badge & Capability Blocks */}
+      <div className="feature-hero-card">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+              <div className="badge-screen-num">5</div>
+              <span className="badge-screen-title">URL DETECTION SCREEN</span>
+              <span className="badge-live-ai">● LIVE ML SCANNER</span>
+            </div>
+            <h2 className="feature-hero-title">{t.urlScannerTitle || 'URL Phishing Detection'}</h2>
+            <p className="feature-hero-desc">
+              {t.urlScannerDesc || 'Analyze any website link in real time to detect typosquatting, raw IP hosting, SSL anomalies, and blacklisted domains.'}
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px', color: 'var(--text-muted)' }}>
+            <button className="btn-icon" title={t.scanHistory || 'Scan History'}><Clock size={16} /></button>
+            <button className="btn-icon" title={t.exportPdf || 'Export Results'}><Download size={16} /></button>
+            <button className="btn-icon" title="Documentation"><Info size={16} /></button>
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: '8px', color: 'var(--text-muted)' }}>
-          <button className="btn-icon" title={t.scanHistory || 'Scan History'}><Clock size={16} /></button>
-          <button className="btn-icon" title={t.exportPdf || 'Export Results'}><Download size={16} /></button>
-          <button className="btn-icon" title="Documentation"><Info size={16} /></button>
+
+        {/* Feature Capability Blocks (Highlighted on Mobile & Desktop) */}
+        <div className="feature-blocks-grid">
+          <div className="feature-block-item">
+            <div className="feature-block-icon" style={{ background: 'rgba(59, 130, 246, 0.12)' }}>🛡️</div>
+            <div className="feature-block-content">
+              <span className="feature-block-title">Typosquatting</span>
+              <span className="feature-block-sub">Domain spoofing detection</span>
+            </div>
+          </div>
+
+          <div className="feature-block-item">
+            <div className="feature-block-icon" style={{ background: 'rgba(6, 182, 212, 0.12)' }}>🌐</div>
+            <div className="feature-block-content">
+              <span className="feature-block-title">Raw IP Hosting</span>
+              <span className="feature-block-sub">Direct IP bypass analysis</span>
+            </div>
+          </div>
+
+          <div className="feature-block-item">
+            <div className="feature-block-icon" style={{ background: 'rgba(16, 185, 129, 0.12)' }}>🔒</div>
+            <div className="feature-block-content">
+              <span className="feature-block-title">SSL Anomalies</span>
+              <span className="feature-block-sub">Cert chain & validity check</span>
+            </div>
+          </div>
+
+          <div className="feature-block-item">
+            <div className="feature-block-icon" style={{ background: 'rgba(239, 68, 68, 0.12)' }}>🚫</div>
+            <div className="feature-block-content">
+              <span className="feature-block-title">Blacklisted Domains</span>
+              <span className="feature-block-sub">Global threat match</span>
+            </div>
+          </div>
         </div>
       </div>
 

@@ -30,21 +30,60 @@ export default function Dashboard({ stats, recentActivity, onNavigateScan, onVie
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
-      {/* Title & Quick Actions */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-        <div>
-          <h2 style={{ fontSize: 'clamp(1.4rem, 4vw, 1.85rem)', fontWeight: '800' }}>Dashboard</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-            Overview of your security activity
-          </p>
+      {/* Header with Title & Feature Blocks */}
+      <div className="feature-hero-card">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+              <div className="badge-screen-num">4</div>
+              <span className="badge-screen-title">DASHBOARD</span>
+              <span className="badge-live-ai">● THREAT MONITOR</span>
+            </div>
+            <h2 className="feature-hero-title">Automated Phishing Threat Monitoring</h2>
+            <p className="feature-hero-desc">
+              Multi-layered ML & NLP analysis pipeline protecting web users against domain typosquatting, email social engineering, and fraudulent links.
+            </p>
+          </div>
+          <div className="dashboard-actions" style={{ display: 'flex', gap: '10px' }}>
+            <button onClick={() => onNavigateScan('url-detection')} className="btn-primary" style={{ padding: '10px 20px', fontSize: '0.88rem' }}>
+              <Search size={16} /> Scan URL Now
+            </button>
+            <button onClick={() => onNavigateScan('email-detection')} className="btn-secondary" style={{ padding: '10px 20px', fontSize: '0.88rem' }}>
+              <Zap size={16} /> Analyze Email
+            </button>
+          </div>
         </div>
-        <div className="dashboard-actions" style={{ display: 'flex', gap: '10px' }}>
-          <button onClick={() => onNavigateScan('url-detection')} className="btn-primary" style={{ padding: '10px 20px', fontSize: '0.88rem' }}>
-            <Search size={16} /> Scan URL Now
-          </button>
-          <button onClick={() => onNavigateScan('email-detection')} className="btn-secondary" style={{ padding: '10px 20px', fontSize: '0.88rem' }}>
-            <Zap size={16} /> Analyze Email
-          </button>
+
+        {/* Feature Capability Blocks */}
+        <div className="feature-blocks-grid">
+          <div className="feature-block-item">
+            <div className="feature-block-icon" style={{ background: 'rgba(59, 130, 246, 0.12)' }}>🛡️</div>
+            <div className="feature-block-content">
+              <span className="feature-block-title">Dual Scanners</span>
+              <span className="feature-block-sub">URL + Email ML engines</span>
+            </div>
+          </div>
+          <div className="feature-block-item">
+            <div className="feature-block-icon" style={{ background: 'rgba(6, 182, 212, 0.12)' }}>⚡</div>
+            <div className="feature-block-content">
+              <span className="feature-block-title">Instant Analysis</span>
+              <span className="feature-block-sub">Sub-second ML classification</span>
+            </div>
+          </div>
+          <div className="feature-block-item">
+            <div className="feature-block-icon" style={{ background: 'rgba(16, 185, 129, 0.12)' }}>🎯</div>
+            <div className="feature-block-content">
+              <span className="feature-block-title">94.6% Accuracy</span>
+              <span className="feature-block-sub">Supervised Random Forest</span>
+            </div>
+          </div>
+          <div className="feature-block-item">
+            <div className="feature-block-icon" style={{ background: 'rgba(168, 85, 247, 0.12)' }}>🔒</div>
+            <div className="feature-block-content">
+              <span className="feature-block-title">Risk Scoring</span>
+              <span className="feature-block-sub">Semicircle radial gauge</span>
+            </div>
+          </div>
         </div>
       </div>
 

@@ -74,18 +74,61 @@ export default function EmailScanner({ onScanComplete, t }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px', maxWidth: '950px', margin: '0 auto' }}>
-      {/* Header (Exact Match to PDF Page 63 Screen 6) */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-        <div>
-          <h2 style={{ fontSize: 'clamp(1.4rem, 4vw, 1.85rem)', fontWeight: '800' }}>{t.emailScannerTitle || 'Email Detection'}</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-            {t.emailScannerDesc || 'Analyze email content for phishing threats'}
-          </p>
+      {/* Header with Screen Badge & Capability Blocks */}
+      <div className="feature-hero-card">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+              <div className="badge-screen-num" style={{ background: 'linear-gradient(135deg, #6366f1, #7c3aed)' }}>6</div>
+              <span className="badge-screen-title" style={{ color: '#818cf8' }}>EMAIL DETECTION SCREEN</span>
+              <span className="badge-live-ai">● NLP BERT ENGINE</span>
+            </div>
+            <h2 className="feature-hero-title">{t.emailScannerTitle || 'Email Phishing Detection'}</h2>
+            <p className="feature-hero-desc">
+              {t.emailScannerDesc || 'Scans email content for manufactured urgency, deceptive links, financial harvesting phrasing, and malicious attachments.'}
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px', color: 'var(--text-muted)' }}>
+            <button className="btn-icon" title={t.scanHistory || 'Scan History'}><Clock size={16} /></button>
+            <button className="btn-icon" title={t.exportPdf || 'Export Results'}><Download size={16} /></button>
+            <button className="btn-icon" title="Documentation"><Info size={16} /></button>
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: '8px', color: 'var(--text-muted)' }}>
-          <button className="btn-icon" title={t.scanHistory || 'Scan History'}><Clock size={16} /></button>
-          <button className="btn-icon" title={t.exportPdf || 'Export Results'}><Download size={16} /></button>
-          <button className="btn-icon" title="Documentation"><Info size={16} /></button>
+
+        {/* Feature Capability Blocks */}
+        <div className="feature-blocks-grid">
+          <div className="feature-block-item">
+            <div className="feature-block-icon" style={{ background: 'rgba(245, 158, 11, 0.12)' }}>⏱️</div>
+            <div className="feature-block-content">
+              <span className="feature-block-title">Urgency Triggers</span>
+              <span className="feature-block-sub">Manufactured panic detection</span>
+            </div>
+          </div>
+
+          <div className="feature-block-item">
+            <div className="feature-block-icon" style={{ background: 'rgba(59, 130, 246, 0.12)' }}>🔗</div>
+            <div className="feature-block-content">
+              <span className="feature-block-title">Deceptive Links</span>
+              <span className="feature-block-sub">Hidden redirect scanner</span>
+            </div>
+          </div>
+
+          <div className="feature-block-item">
+            <div className="feature-block-icon" style={{ background: 'rgba(168, 85, 247, 0.12)' }}>💳</div>
+            <div className="feature-block-content">
+              <span className="feature-block-title">Credential Phishing</span>
+              <span className="feature-block-sub">Harvesting phrases audit</span>
+            </div>
+          </div>
+
+          <div className="feature-block-item">
+            <div className="feature-block-icon" style={{ background: 'rgba(239, 68, 68, 0.12)' }}>📎</div>
+            <div className="feature-block-content">
+              <span className="feature-block-title">Malicious Attachments</span>
+              <span className="feature-block-sub">Executable & macro check</span>
+            </div>
+          </div>
         </div>
       </div>
 

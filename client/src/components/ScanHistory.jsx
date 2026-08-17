@@ -26,39 +26,51 @@ export default function ScanHistory({ scanHistory, onViewDetail, onExportPdf, t,
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px', maxWidth: '1080px', margin: '0 auto' }}>
-      {/* ── Badge & Title (Exact Match to PDF Page 63 Screen 8) ── */}
-      <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-          <div style={{
-            background: 'linear-gradient(135deg, #1d4ed8, #2563eb)',
-            color: '#ffffff',
-            width: '28px',
-            height: '28px',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: '900',
-            fontSize: '0.92rem',
-            boxShadow: '0 3px 8px rgba(37, 99, 235, 0.4)'
-          }}>
-            8
+      {/* ── Badge & Title with Capability Blocks ── */}
+      <div className="feature-hero-card">
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+            <div className="badge-screen-num">8</div>
+            <span className="badge-screen-title">SCAN HISTORY &amp; REPORTS</span>
+            <span className="badge-live-ai">● AUDIT TRAIL</span>
           </div>
-          <span style={{
-            fontWeight: '900',
-            fontSize: '0.9rem',
-            letterSpacing: '0.08em',
-            color: 'var(--accent-blue)',
-            fontFamily: 'var(--font-display)'
-          }}>
-            SCAN HISTORY &amp; REPORTS
-          </span>
+          <h2 className="feature-hero-title">Inspection Log &amp; Security Reports</h2>
+          <p className="feature-hero-desc">
+            Review detailed analytical records of all past URL and Email scans, filter by classification category, and export formal PDF audit dossiers.
+          </p>
         </div>
 
-        <h2 style={{ fontSize: '1.85rem', fontWeight: '800' }}>Scan History</h2>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-          View and manage your scan history
-        </p>
+        {/* Feature Blocks */}
+        <div className="feature-blocks-grid">
+          <div className="feature-block-item">
+            <div className="feature-block-icon" style={{ background: 'rgba(59, 130, 246, 0.12)' }}>📋</div>
+            <div className="feature-block-content">
+              <span className="feature-block-title">Audit Trail</span>
+              <span className="feature-block-sub">Historical forensic log</span>
+            </div>
+          </div>
+          <div className="feature-block-item">
+            <div className="feature-block-icon" style={{ background: 'rgba(239, 68, 68, 0.12)' }}>🔍</div>
+            <div className="feature-block-content">
+              <span className="feature-block-title">Category Filters</span>
+              <span className="feature-block-sub">Phishing, safe, suspicious</span>
+            </div>
+          </div>
+          <div className="feature-block-item">
+            <div className="feature-block-icon" style={{ background: 'rgba(16, 185, 129, 0.12)' }}>📄</div>
+            <div className="feature-block-content">
+              <span className="feature-block-title">PDF Export</span>
+              <span className="feature-block-sub">Printable security report</span>
+            </div>
+          </div>
+          <div className="feature-block-item">
+            <div className="feature-block-icon" style={{ background: 'rgba(168, 85, 247, 0.12)' }}>⏱️</div>
+            <div className="feature-block-content">
+              <span className="feature-block-title">Time Stamps</span>
+              <span className="feature-block-sub">Precise scan timeline</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* ── Filter Bar with Date Selectors & Export PDF (Exact Match to PDF Page 63 Screen 8) ── */}
