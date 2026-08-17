@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Bot, Send, User, RefreshCw, Copy, Check, Terminal, Zap, X } from 'lucide-react';
+import { Bot, Send, User, RefreshCw, Copy, Check, Terminal, Zap, X, Wifi, WifiOff } from 'lucide-react';
 import { generateChatbotResponse } from '../utils/chatbotEngine';
 
 export default function AiChatbot({ t, language = 'English' }) {
@@ -17,6 +17,7 @@ export default function AiChatbot({ t, language = 'English' }) {
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
+  const [aiStatus, setAiStatus] = useState('checking'); // checking | online | offline
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
 
@@ -27,6 +28,19 @@ export default function AiChatbot({ t, language = 'English' }) {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping]);
+
+  useEffect(() => {
+    const checkAiStatus = async () => {
+      try {
+        const { getOpenRouterResponse } = await import('../utils/openRouter.js');
+        const res = await getOpenRouterResponse([{ sender: 'user', text: 'hi' }], { maxTokens: 5 });
+        setAiStatus(res.text && !res.text.includes('AI service is not configured') && !res.text.includes('AI service error') ? 'online' : 'offline');
+      } catch {
+        setAiStatus('offline');
+      }
+    };
+    checkAiStatus();
+  }, []);
 
   const handleSendMessage = async (textToSend = inputText) => {
     const query = typeof textToSend === 'string' ? textToSend.trim() : '';
@@ -50,6 +64,9 @@ export default function AiChatbot({ t, language = 'English' }) {
       const response = await generateChatbotResponse(query, [...messages, userMessage], language);
       setIsTyping(false);
 
+      const isAiResponse = response.text && !response.text.includes('AI service is not configured') && !response.text.includes('AI service error') && !response.text.includes('All AI models are temporarily unavailable');
+      setAiStatus(isAiResponse ? 'online' : 'offline');
+
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
         sender: 'bot',
@@ -62,6 +79,7 @@ export default function AiChatbot({ t, language = 'English' }) {
       }
     } catch (error) {
       setIsTyping(false);
+      setAiStatus('offline');
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
         sender: 'bot',
@@ -262,9 +280,15 @@ export default function AiChatbot({ t, language = 'English' }) {
             </div>
             <div>
               <div style={{ fontSize: '0.92rem', fontWeight: '800', color: 'var(--text-primary)' }}>APDS Cyber Intelligence Assistant</div>
-              <div style={{ fontSize: '0.72rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 6px #10b981' }} />
-                Real-Time Dynamic Neural Model Active
+              <div style={{ fontSize: '0.72rem', color: aiStatus === 'online' ? '#10b981' : '#f59e0b', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <span style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  background: aiStatus === 'online' ? '#10b981' : '#f59e0b',
+                  boxShadow: `0 0 6px ${aiStatus === 'online' ? '#10b981' : '#f59e0b'}`
+                }} />
+                {aiStatus === 'online' ? 'Real-Time AI Connected' : aiStatus === 'offline' ? 'Local Fallback Mode' : 'Checking AI connection...'}
               </div>
             </div>
           </div>

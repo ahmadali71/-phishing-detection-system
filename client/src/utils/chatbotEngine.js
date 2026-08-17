@@ -181,7 +181,7 @@ export async function generateChatbotResponse(userMessage, chatHistory = [], lan
   }
 
   // =========================================================================
-  // 4. TRY CLOUD LLM (OPENROUTER) IF CONFIGURED
+  // 4. TRY CLOUD LLM (OPENROUTER) IF CONFIGURED — PRIMARY RESPONSE PATH
   // =========================================================================
   const openRouterKey = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_OPENROUTER_API_KEY || '').trim();
   if (openRouterKey && !openRouterKey.includes('YOUR_OPENROUTER')) {
@@ -196,13 +196,14 @@ export async function generateChatbotResponse(userMessage, chatHistory = [], lan
       if (llmRes && llmRes.text && !llmRes.text.includes('AI service is not configured') && !llmRes.text.includes('AI service error')) {
         return llmRes;
       }
-    } catch {
-      // Gracefully continue to local deep reasoning fallback
+    } catch (error) {
+      console.error('[AI] OpenRouter request failed:', error);
+      // Continue to local fallback only if API is completely unreachable
     }
   }
 
   // =========================================================================
-  // 5. LOCAL DEEP SEMANTIC REASONING ENGINE
+  // 5. LOCAL FALLBACK — ONLY USED WHEN OPENROUTER IS UNAVAILABLE
   // =========================================================================
 
   // A. Academic Project & Credential Inquiries
@@ -401,29 +402,9 @@ export async function generateChatbotResponse(userMessage, chatHistory = [], lan
     };
   }
 
-  // L. AI, Social Engineering & General Cybersecurity Topics
-  if (lower.includes('ai') || lower.includes('artificial intelligence') || lower.includes('machine learning') ||
-    lower.includes('deep learning') || lower.includes('neural network') || lower.includes('social engineering') ||
-    lower.includes('malware') || lower.includes('ransomware') || lower.includes('trojan') || lower.includes('virus') ||
-    lower.includes('vpn') || lower.includes('firewall') || lower.includes('intrusion detection') ||
-    lower.includes('ids') || lower.includes('ips') || lower.includes('siem') || lower.includes('threat intelligence') ||
-    lower.includes('apt') || lower.includes('zero day') || lower.includes('patch')) {
-    return {
-      text: `🤖 **AI & Advanced Cybersecurity Concepts**\n\n` +
-        `### Artificial Intelligence in Cybersecurity\n` +
-        `AI and Machine Learning are transforming security by automating threat detection, anomaly classification, and predictive analytics. APDS itself uses a hybrid ensemble of Random Forest, SVM, and DistilBERT NLP models to classify phishing with 94.6% accuracy.\n\n` +
-        `### Key Concepts\n` +
-        `- **Social Engineering:** Psychological manipulation to trick users into revealing secrets. APDS detects this via NLP urgency-keyword analysis and sender-reputation heuristics.\n` +
-        `- **Malware / Ransomware:** Malicious code that encrypts data or steals credentials. APDS focuses on the *phishing delivery vector* that drops malware.\n` +
-        `- **VPN:** Encrypts network traffic and masks IP addresses. Useful for privacy but does NOT prevent phishing — fake sites can still steal credentials over HTTPS.\n` +
-        `- **Firewall / IDS / IPS:** Network-layer access control and intrusion detection. Complement WAF and endpoint protection.\n\n` +
-        `### Ask Me More\n` +
-        `You can ask about specific attacks, defensive strategies, or how APDS models work under the hood.`,
-      suggestions: ['What is WAF?', 'How does APDS detect phishing?', 'Explain ML model architecture']
-    };
-  }
-
-  // M. General / Catch-all — answer any question thoughtfully
+  // =========================================================================
+  // 5. LOCAL FALLBACK — ONLY USED WHEN OPENROUTER IS UNAVAILABLE
+  // =========================================================================
   return {
     text: `🛡️ **APDS Cyber Intelligence Assistant**\n\n` +
       `I understand your question relates to: **${query.length > 80 ? query.slice(0, 77) + '...' : query}**\n\n` +
