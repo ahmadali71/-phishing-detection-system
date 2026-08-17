@@ -81,81 +81,75 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '22px', maxWidth: '950px', margin: '0 auto' }}>
-      {/* Header with Screen Badge & Capability Blocks */}
-      <div className="feature-hero-card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '960px', margin: '0 auto' }}>
+      {/* ── Top Badge & Title (Exact Match to PDF Page 62 Screen 5) ── */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #1d4ed8, #2563eb)',
+            color: '#ffffff',
+            width: '28px',
+            height: '28px',
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontWeight: '900',
+            fontSize: '0.9rem',
+            boxShadow: '0 2px 8px rgba(37, 99, 235, 0.4)',
+            flexShrink: 0
+          }}>
+            5
+          </div>
+          <span style={{
+            fontWeight: '900',
+            fontSize: '0.88rem',
+            letterSpacing: '0.08em',
+            color: 'var(--accent-blue)',
+            fontFamily: 'var(--font-display)',
+            textTransform: 'uppercase'
+          }}>
+            URL DETECTION SCREEN
+          </span>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-              <div className="badge-screen-num">5</div>
-              <span className="badge-screen-title">URL DETECTION SCREEN</span>
-              <span className="badge-live-ai">● LIVE ML SCANNER</span>
-            </div>
-            <h2 className="feature-hero-title">{t.urlScannerTitle || 'URL Phishing Detection'}</h2>
-            <p className="feature-hero-desc">
-              {t.urlScannerDesc || 'Analyze any website link in real time to detect typosquatting, raw IP hosting, SSL anomalies, and blacklisted domains.'}
+            <h2 style={{ fontSize: 'clamp(1.35rem, 4vw, 1.85rem)', fontWeight: '800' }}>{t.urlDetection || 'URL Detection'}</h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
+              {t.urlScannerDesc || 'Analyze any URL for potential threats'}
             </p>
           </div>
-
           <div style={{ display: 'flex', gap: '8px', color: 'var(--text-muted)' }}>
             <button className="btn-icon" title={t.scanHistory || 'Scan History'}><Clock size={16} /></button>
             <button className="btn-icon" title={t.exportPdf || 'Export Results'}><Download size={16} /></button>
             <button className="btn-icon" title="Documentation"><Info size={16} /></button>
           </div>
         </div>
-
-        {/* Feature Capability Blocks (Highlighted on Mobile & Desktop) */}
-        <div className="feature-blocks-grid">
-          <div className="feature-block-item">
-            <div className="feature-block-icon" style={{ background: 'rgba(59, 130, 246, 0.12)' }}>🛡️</div>
-            <div className="feature-block-content">
-              <span className="feature-block-title">Typosquatting</span>
-              <span className="feature-block-sub">Domain spoofing detection</span>
-            </div>
-          </div>
-
-          <div className="feature-block-item">
-            <div className="feature-block-icon" style={{ background: 'rgba(6, 182, 212, 0.12)' }}>🌐</div>
-            <div className="feature-block-content">
-              <span className="feature-block-title">Raw IP Hosting</span>
-              <span className="feature-block-sub">Direct IP bypass analysis</span>
-            </div>
-          </div>
-
-          <div className="feature-block-item">
-            <div className="feature-block-icon" style={{ background: 'rgba(16, 185, 129, 0.12)' }}>🔒</div>
-            <div className="feature-block-content">
-              <span className="feature-block-title">SSL Anomalies</span>
-              <span className="feature-block-sub">Cert chain & validity check</span>
-            </div>
-          </div>
-
-          <div className="feature-block-item">
-            <div className="feature-block-icon" style={{ background: 'rgba(239, 68, 68, 0.12)' }}>🚫</div>
-            <div className="feature-block-content">
-              <span className="feature-block-title">Blacklisted Domains</span>
-              <span className="feature-block-sub">Global threat match</span>
-            </div>
-          </div>
-        </div>
       </div>
 
-      {/* Input Panel (Exact Match to PDF Page 62 Screen 5) */}
+      {/* ── Input Box & Preset Chips (Exact Match to PDF Page 62 Screen 5) ── */}
       <div className="glass-panel" style={{ padding: '20px' }}>
-        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <input
             type="text"
             value={inputUrl}
             onChange={(e) => setInputUrl(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleScan()}
-            placeholder="Enter or Paste URL here..."
-            style={{ flex: 1, minWidth: '220px', padding: '12px 18px', fontSize: '0.95rem' }}
+            placeholder="http://165.199.108.153/verify-account"
+            style={{
+              flex: 1,
+              minWidth: '200px',
+              padding: '12px 18px',
+              fontSize: '0.95rem',
+              borderRadius: '12px'
+            }}
           />
           <button
             onClick={() => handleScan()}
             disabled={isScanning}
             className="btn-primary"
-            style={{ padding: '12px 28px', fontSize: '0.95rem' }}
+            style={{ padding: '12px 28px', fontSize: '0.95rem', borderRadius: '12px', flexShrink: 0 }}
           >
             {isScanning ? (t.scanningBtn || 'Analyzing...') : (t.analyzeBtn || 'Analyze')}
           </button>
@@ -168,24 +162,24 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
         )}
 
         {/* Preset sample links */}
-        <div className="url-scanner-presets" style={{ marginTop: '12px', display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '700' }}>{t.testPresets || 'Test Presets:'}</span>
-          <button onClick={() => { setInputUrl('https://paypal-secure-login.com'); handleScan('https://paypal-secure-login.com'); }} className="btn-secondary" style={{ fontSize: '0.73rem', padding: '4px 10px' }}>
+        <div style={{ marginTop: '12px', display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: '700' }}>Presets:</span>
+          <button onClick={() => { setInputUrl('https://paypal-secure-login.com'); handleScan('https://paypal-secure-login.com'); }} className="btn-secondary" style={{ fontSize: '0.74rem', padding: '4px 10px' }}>
             paypal-secure-login.com
           </button>
-          <button onClick={() => { setInputUrl('https://google.com'); handleScan('https://google.com'); }} className="btn-secondary" style={{ fontSize: '0.73rem', padding: '4px 10px' }}>
+          <button onClick={() => { setInputUrl('https://google.com'); handleScan('https://google.com'); }} className="btn-secondary" style={{ fontSize: '0.74rem', padding: '4px 10px' }}>
             google.com
           </button>
-          <button onClick={() => { setInputUrl('http://165.199.108.153/verify-account'); handleScan('http://165.199.108.153/verify-account'); }} className="btn-secondary" style={{ fontSize: '0.73rem', padding: '4px 10px' }}>
+          <button onClick={() => { setInputUrl('http://165.199.108.153/verify-account'); handleScan('http://165.199.108.153/verify-account'); }} className="btn-secondary" style={{ fontSize: '0.74rem', padding: '4px 10px' }}>
             165.199.108.153 (IP Host)
           </button>
         </div>
       </div>
 
-      {/* Result Section (Exact Match to PDF Page 62 Screen 5) */}
+      {/* ── Result Section (Exact Match to PDF Page 62 Screen 5) ── */}
       {scanResult && (
-        <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {/* Top Row: Result Banner & Exact Semicircle Arc Radial Gauge */}
+        <div className="glass-panel" style={{ padding: '22px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          {/* Top Row: Result Card & Radial Gauge */}
           <div className="responsive-grid-2-1" style={{ alignItems: 'stretch' }}>
             {/* Result Box */}
             <div style={{
@@ -197,7 +191,7 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
               flexDirection: 'column',
               justifyContent: 'center'
             }}>
-              <div style={{ fontSize: '0.8rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '6px', letterSpacing: '0.05em' }}>
+              <div style={{ fontSize: '0.78rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '6px', letterSpacing: '0.05em' }}>
                 {t.result || 'Result'}
               </div>
               <div style={{
@@ -218,7 +212,7 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
               </p>
             </div>
 
-            {/* Risk Score Semicircle Arc Radial Gauge (Exact Match to User Screenshot) */}
+            {/* Risk Score Semicircle Arc Radial Gauge */}
             <RadialGauge
               score={scanResult.riskScore}
               label={scanResult.riskScore >= 65 ? 'High Risk' : (scanResult.riskScore >= 35 ? 'Medium Risk' : 'Low Risk')}
@@ -227,7 +221,7 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
 
           {/* Middle Section: URL Analysis Details Grid (Exact 6 items from PDF Page 62) */}
           <div>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: '800', marginBottom: '14px' }}>{t.urlAnalysisTitle || 'URL Analysis Details'}</h3>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: '800', marginBottom: '12px' }}>{t.urlAnalysisTitle || 'URL Analysis Details'}</h3>
             <div className="responsive-grid-3">
               {detailItems.map((item, idx) => (
                 <div key={idx} style={{ padding: '14px', background: 'var(--bg-input)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
@@ -252,7 +246,7 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
 
           {/* Bottom Section: Recommendation Banner (Exact Match to PDF Page 62) */}
           <div style={{
-            padding: '16px 20px',
+            padding: '16px 18px',
             borderRadius: '12px',
             background: 'var(--bg-input)',
             border: '1px solid var(--border-color)',
@@ -262,8 +256,8 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
           }}>
             <AlertTriangle size={22} color="#f59e0b" style={{ flexShrink: 0 }} />
             <div>
-              <div style={{ fontSize: '0.76rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)' }}>{t.recommendation || 'Recommendation'}</div>
-              <div style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-primary)', marginTop: '2px' }}>
+              <div style={{ fontSize: '0.74rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)' }}>{t.recommendation || 'Recommendation'}</div>
+              <div style={{ fontSize: '0.88rem', fontWeight: '600', color: 'var(--text-primary)', marginTop: '2px' }}>
                 {scanResult.recommendation || (t.urlRecommendation || 'Do not visit this URL. Report to your administrator.')}
               </div>
             </div>
