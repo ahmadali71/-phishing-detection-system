@@ -228,7 +228,9 @@ export default function AiChatbot({ t, language = 'English' }) {
         overflow: 'hidden',
         background: 'var(--bg-card)',
         border: '1px solid var(--border-color)',
-        borderRadius: '16px'
+        borderRadius: '16px',
+        minHeight: 0,          /* lets flex children shrink properly */
+        height: 'clamp(460px, 70vh, 680px)',
       }}>
         {/* Header */}
         <div style={{
@@ -274,10 +276,9 @@ export default function AiChatbot({ t, language = 'English' }) {
 
         {/* Message Stream */}
         <div className="chat-messages" style={{
-          minHeight: '320px',
-          maxHeight: 'clamp(320px, 55vh, 520px)',
+          flex: 1,
           overflowY: 'auto',
-          padding: '20px',
+          padding: '16px',
           display: 'flex',
           flexDirection: 'column',
           gap: '16px',
@@ -417,38 +418,73 @@ export default function AiChatbot({ t, language = 'English' }) {
           </div>
         )}
 
-        {/* Input Bar */}
+        {/* ── Input Bar (Mobile-Optimized) ── */}
         <div style={{
-          padding: '14px 18px',
+          padding: '10px 12px',
           borderTop: '1px solid var(--border-color)',
           background: 'var(--bg-secondary)',
           display: 'flex',
-          gap: '10px'
+          alignItems: 'center',
+          gap: '8px',
+          position: 'sticky',
+          bottom: 0,
+          zIndex: 10,
         }}>
           <input
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder={t.chatPlaceholder || "Type a question or paste a URL / email text to analyze live..."}
+            placeholder={t.chatPlaceholder || 'Type a question or paste a URL / email…'}
             style={{
               flex: 1,
+              minWidth: 0,
               background: 'var(--bg-input)',
-              border: '1px solid var(--border-color)',
-              borderRadius: '20px',
-              padding: '12px 20px',
+              border: '1.5px solid var(--border-color)',
+              borderRadius: '24px',
+              padding: '11px 18px',
               color: 'var(--text-primary)',
               fontSize: '0.9rem',
-              outline: 'none'
+              outline: 'none',
+              transition: 'border-color 0.2s',
             }}
+            onFocus={e => e.target.style.borderColor = '#635fec'}
+            onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
           />
           <button
             onClick={() => handleSendMessage()}
             disabled={isTyping || !inputText.trim()}
-            className="btn-primary"
-            style={{ borderRadius: '20px', padding: '12px 24px', flexShrink: 0 }}
+            title="Send message"
+            style={{
+              flexShrink: 0,
+              width: '44px',
+              height: '44px',
+              borderRadius: '50%',
+              border: 'none',
+              background: isTyping || !inputText.trim()
+                ? 'var(--bg-input)'
+                : 'linear-gradient(135deg, #635fec, #4338ca)',
+              color: isTyping || !inputText.trim()
+                ? 'var(--text-muted)'
+                : '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: isTyping || !inputText.trim() ? 'not-allowed' : 'pointer',
+              boxShadow: isTyping || !inputText.trim()
+                ? 'none'
+                : '0 4px 14px rgba(99, 95, 236, 0.45)',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              transform: 'scale(1)',
+            }}
+            onMouseEnter={e => {
+              if (!e.currentTarget.disabled) e.currentTarget.style.transform = 'scale(1.08)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = 'scale(1)';
+            }}
           >
-            <Send size={16} /> Send
+            <Send size={18} />
           </button>
         </div>
       </div>
