@@ -196,6 +196,56 @@ export default function AiChatbot({ t, language = 'English' }) {
         </div>
       </div>
 
+      {/* ── Mobile Feature Capability Hero (Electric Indigo #635fec Blocks) ── */}
+      <div className="mobile-feature-hero">
+        <div className="mobile-feature-header">
+          <div className="mobile-feature-title-wrap">
+            <div className="mobile-feature-icon-badge" style={{ background: 'linear-gradient(135deg, #635fec 0%, #06b6d4 100%)' }}>
+              <Bot size={18} />
+            </div>
+            <div>
+              <div className="mobile-feature-title">AI Cyber Defense Assistant</div>
+              <div className="mobile-feature-tag">Real-Time Threat Intelligence</div>
+            </div>
+          </div>
+        </div>
+
+        {/* 4 Capability Blocks */}
+        <div className="mobile-capability-grid">
+          <div className="mobile-capability-pill">
+            <span className="mobile-cap-emoji">🤖</span>
+            <div className="mobile-cap-text">
+              <span className="mobile-cap-name">Live URL Inspector</span>
+              <span className="mobile-cap-sub">Paste links right in chat</span>
+            </div>
+          </div>
+
+          <div className="mobile-capability-pill">
+            <span className="mobile-cap-emoji">🛡️</span>
+            <div className="mobile-cap-text">
+              <span className="mobile-cap-name">Attack Defense</span>
+              <span className="mobile-cap-sub">MFA bypass & spoofing guide</span>
+            </div>
+          </div>
+
+          <div className="mobile-capability-pill">
+            <span className="mobile-cap-emoji">💻</span>
+            <div className="mobile-cap-text">
+              <span className="mobile-cap-name">Python ML Code</span>
+              <span className="mobile-cap-sub">Feature extractor scripts</span>
+            </div>
+          </div>
+
+          <div className="mobile-capability-pill">
+            <span className="mobile-cap-emoji">🎓</span>
+            <div className="mobile-cap-text">
+              <span className="mobile-cap-name">Academic Insights</span>
+              <span className="mobile-cap-sub">Thesis methodology guide</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Main Chat Box */}
       <div className="glass-panel glass-panel-glow" style={{
         display: 'flex',

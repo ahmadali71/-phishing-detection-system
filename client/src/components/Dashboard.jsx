@@ -30,11 +30,11 @@ export default function Dashboard({ stats, recentActivity, onNavigateScan, onVie
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
-      {/* ── Top Badge, Title & Quick Actions (Exact Match to PDF Page 61 Screen 4) ── */}
+      {/* ── Top Badge, Title & Quick Actions ── */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
           <div style={{
-            background: 'linear-gradient(135deg, #1d4ed8, #2563eb)',
+            background: 'linear-gradient(135deg, #635fec, #4338ca)',
             color: '#ffffff',
             width: '28px',
             height: '28px',
@@ -44,7 +44,7 @@ export default function Dashboard({ stats, recentActivity, onNavigateScan, onVie
             justifyContent: 'center',
             fontWeight: '900',
             fontSize: '0.9rem',
-            boxShadow: '0 2px 8px rgba(37, 99, 235, 0.4)',
+            boxShadow: '0 2px 10px rgba(99, 95, 236, 0.45)',
             flexShrink: 0
           }}>
             4
@@ -53,7 +53,7 @@ export default function Dashboard({ stats, recentActivity, onNavigateScan, onVie
             fontWeight: '900',
             fontSize: '0.88rem',
             letterSpacing: '0.08em',
-            color: 'var(--accent-blue)',
+            color: '#818cf8',
             fontFamily: 'var(--font-display)',
             textTransform: 'uppercase'
           }}>
@@ -75,6 +75,56 @@ export default function Dashboard({ stats, recentActivity, onNavigateScan, onVie
             <button onClick={() => onNavigateScan('email-detection')} className="btn-secondary" style={{ padding: '10px 20px', fontSize: '0.88rem' }}>
               <Zap size={16} /> Analyze Email
             </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Mobile Feature Capability Hero (Electric Indigo #635fec Blocks) ── */}
+      <div className="mobile-feature-hero">
+        <div className="mobile-feature-header">
+          <div className="mobile-feature-title-wrap">
+            <div className="mobile-feature-icon-badge" style={{ background: 'linear-gradient(135deg, #635fec 0%, #3b82f6 100%)' }}>
+              <Zap size={18} />
+            </div>
+            <div>
+              <div className="mobile-feature-title">Automated Threat Monitoring</div>
+              <div className="mobile-feature-tag">Multi-Layer AI Defense</div>
+            </div>
+          </div>
+        </div>
+
+        {/* 4 Capability Blocks */}
+        <div className="mobile-capability-grid">
+          <div className="mobile-capability-pill">
+            <span className="mobile-cap-emoji">🛡️</span>
+            <div className="mobile-cap-text">
+              <span className="mobile-cap-name">Dual Scanners</span>
+              <span className="mobile-cap-sub">URL & Email NLP engines</span>
+            </div>
+          </div>
+
+          <div className="mobile-capability-pill">
+            <span className="mobile-cap-emoji">⚡</span>
+            <div className="mobile-cap-text">
+              <span className="mobile-cap-name">Instant Analysis</span>
+              <span className="mobile-cap-sub">Sub-second ML classification</span>
+            </div>
+          </div>
+
+          <div className="mobile-capability-pill">
+            <span className="mobile-cap-emoji">🎯</span>
+            <div className="mobile-cap-text">
+              <span className="mobile-cap-name">94.6% Accuracy</span>
+              <span className="mobile-cap-sub">Random Forest classifier</span>
+            </div>
+          </div>
+
+          <div className="mobile-capability-pill">
+            <span className="mobile-cap-emoji">🔒</span>
+            <div className="mobile-cap-text">
+              <span className="mobile-cap-name">Risk Scoring</span>
+              <span className="mobile-cap-sub">Radial gauge threat audit</span>
+            </div>
           </div>
         </div>
       </div>

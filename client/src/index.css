@@ -2733,3 +2733,167 @@ input:focus, select:focus, textarea:focus {
     border-radius: 10px !important;
   }
 }
+
+
+/* ================================================================
+   27. ELECTRIC INDIGO (#635fec) MOBILE FEATURE HERO & BLOCKS
+================================================================ */
+:root {
+  --color-user-indigo: #635fec;
+  --color-user-indigo-light: rgba(99, 95, 236, 0.14);
+  --color-user-indigo-border: rgba(99, 95, 236, 0.38);
+  --color-user-indigo-glow: 0 4px 24px rgba(99, 95, 236, 0.28);
+}
+
+.mobile-feature-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 18px;
+  background: linear-gradient(135deg, rgba(99, 95, 236, 0.14) 0%, rgba(67, 56, 202, 0.08) 100%);
+  border: 1.5px solid rgba(99, 95, 236, 0.38);
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(99, 95, 236, 0.18);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.mobile-feature-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3.5px;
+  background: linear-gradient(90deg, #635fec 0%, #818cf8 50%, #4338ca 100%);
+}
+
+.mobile-feature-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mobile-feature-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mobile-feature-icon-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #635fec 0%, #4338ca 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(99, 95, 236, 0.5);
+  flex-shrink: 0;
+}
+
+.mobile-feature-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.mobile-feature-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #a5b4fc;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Capability Chips/Blocks Grid */
+.mobile-capability-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+@media (min-width: 769px) {
+  .mobile-capability-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+}
+
+.mobile-capability-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(99, 95, 236, 0.12);
+  border: 1px solid rgba(99, 95, 236, 0.32);
+  border-radius: 11px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-capability-pill:hover {
+  background: rgba(99, 95, 236, 0.24);
+  border-color: #635fec;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 95, 236, 0.25);
+}
+
+.mobile-cap-emoji {
+  font-size: 1.1rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.mobile-cap-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mobile-cap-name {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobile-cap-sub {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 480px) {
+  .mobile-feature-hero {
+    padding: 14px 14px;
+    gap: 10px;
+  }
+  .mobile-capability-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .mobile-capability-pill {
+    padding: 7px 9px;
+  }
+  .mobile-cap-emoji {
+    font-size: 1rem;
+  }
+  .mobile-cap-name {
+    font-size: 0.74rem;
+  }
+  .mobile-cap-sub {
+    font-size: 0.62rem;
+  }
+}

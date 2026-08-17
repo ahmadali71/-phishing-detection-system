@@ -82,11 +82,11 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '960px', margin: '0 auto' }}>
-      {/* ── Top Badge & Title (Exact Match to PDF Page 62 Screen 5) ── */}
+      {/* ── Top Badge & Title ── */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
           <div style={{
-            background: 'linear-gradient(135deg, #1d4ed8, #2563eb)',
+            background: 'linear-gradient(135deg, #635fec, #4338ca)',
             color: '#ffffff',
             width: '28px',
             height: '28px',
@@ -96,7 +96,7 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
             justifyContent: 'center',
             fontWeight: '900',
             fontSize: '0.9rem',
-            boxShadow: '0 2px 8px rgba(37, 99, 235, 0.4)',
+            boxShadow: '0 2px 10px rgba(99, 95, 236, 0.45)',
             flexShrink: 0
           }}>
             5
@@ -105,7 +105,7 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
             fontWeight: '900',
             fontSize: '0.88rem',
             letterSpacing: '0.08em',
-            color: 'var(--accent-blue)',
+            color: '#818cf8',
             fontFamily: 'var(--font-display)',
             textTransform: 'uppercase'
           }}>
@@ -124,6 +124,56 @@ export default function UrlScanner({ onScanComplete, onViewDetail, t }) {
             <button className="btn-icon" title={t.scanHistory || 'Scan History'}><Clock size={16} /></button>
             <button className="btn-icon" title={t.exportPdf || 'Export Results'}><Download size={16} /></button>
             <button className="btn-icon" title="Documentation"><Info size={16} /></button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Mobile Feature Capability Hero (Electric Indigo #635fec Blocks) ── */}
+      <div className="mobile-feature-hero">
+        <div className="mobile-feature-header">
+          <div className="mobile-feature-title-wrap">
+            <div className="mobile-feature-icon-badge">
+              <Globe size={18} />
+            </div>
+            <div>
+              <div className="mobile-feature-title">URL Phishing Detection</div>
+              <div className="mobile-feature-tag">Real-Time Threat Analysis</div>
+            </div>
+          </div>
+        </div>
+
+        {/* 4 Capability Blocks */}
+        <div className="mobile-capability-grid">
+          <div className="mobile-capability-pill">
+            <span className="mobile-cap-emoji">🛡️</span>
+            <div className="mobile-cap-text">
+              <span className="mobile-cap-name">Typosquatting</span>
+              <span className="mobile-cap-sub">Domain spoofing detection</span>
+            </div>
+          </div>
+
+          <div className="mobile-capability-pill">
+            <span className="mobile-cap-emoji">🌐</span>
+            <div className="mobile-cap-text">
+              <span className="mobile-cap-name">Raw IP Hosting</span>
+              <span className="mobile-cap-sub">Direct IP bypass analysis</span>
+            </div>
+          </div>
+
+          <div className="mobile-capability-pill">
+            <span className="mobile-cap-emoji">🔒</span>
+            <div className="mobile-cap-text">
+              <span className="mobile-cap-name">SSL Anomalies</span>
+              <span className="mobile-cap-sub">Cert chain & validity check</span>
+            </div>
+          </div>
+
+          <div className="mobile-capability-pill">
+            <span className="mobile-cap-emoji">🚫</span>
+            <div className="mobile-cap-text">
+              <span className="mobile-cap-name">Blacklisted Domains</span>
+              <span className="mobile-cap-sub">Global threat intelligence</span>
+            </div>
           </div>
         </div>
       </div>

@@ -78,7 +78,7 @@ export default function EmailScanner({ onScanComplete, t }) {
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
           <div style={{
-            background: 'linear-gradient(135deg, #4f46e5, #6366f1)',
+            background: 'linear-gradient(135deg, #635fec, #4338ca)',
             color: '#ffffff',
             width: '28px',
             height: '28px',
@@ -88,7 +88,7 @@ export default function EmailScanner({ onScanComplete, t }) {
             justifyContent: 'center',
             fontWeight: '900',
             fontSize: '0.9rem',
-            boxShadow: '0 2px 8px rgba(99, 102, 241, 0.4)',
+            boxShadow: '0 2px 10px rgba(99, 95, 236, 0.45)',
             flexShrink: 0
           }}>
             6
@@ -116,6 +116,56 @@ export default function EmailScanner({ onScanComplete, t }) {
             <button className="btn-icon" title={t.scanHistory || 'Scan History'}><Clock size={16} /></button>
             <button className="btn-icon" title={t.exportPdf || 'Export Results'}><Download size={16} /></button>
             <button className="btn-icon" title="Documentation"><Info size={16} /></button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Mobile Feature Capability Hero (Electric Indigo #635fec Blocks) ── */}
+      <div className="mobile-feature-hero">
+        <div className="mobile-feature-header">
+          <div className="mobile-feature-title-wrap">
+            <div className="mobile-feature-icon-badge" style={{ background: 'linear-gradient(135deg, #635fec 0%, #4338ca 100%)' }}>
+              <Mail size={18} />
+            </div>
+            <div>
+              <div className="mobile-feature-title">Email Phishing Detection</div>
+              <div className="mobile-feature-tag">NLP BERT Content Engine</div>
+            </div>
+          </div>
+        </div>
+
+        {/* 4 Capability Blocks */}
+        <div className="mobile-capability-grid">
+          <div className="mobile-capability-pill">
+            <span className="mobile-cap-emoji">⏱️</span>
+            <div className="mobile-cap-text">
+              <span className="mobile-cap-name">Urgency Triggers</span>
+              <span className="mobile-cap-sub">Manufactured panic detection</span>
+            </div>
+          </div>
+
+          <div className="mobile-capability-pill">
+            <span className="mobile-cap-emoji">🔗</span>
+            <div className="mobile-cap-text">
+              <span className="mobile-cap-name">Deceptive Links</span>
+              <span className="mobile-cap-sub">Hidden redirect scanner</span>
+            </div>
+          </div>
+
+          <div className="mobile-capability-pill">
+            <span className="mobile-cap-emoji">💳</span>
+            <div className="mobile-cap-text">
+              <span className="mobile-cap-name">Credential Phishing</span>
+              <span className="mobile-cap-sub">Harvesting phrases audit</span>
+            </div>
+          </div>
+
+          <div className="mobile-capability-pill">
+            <span className="mobile-cap-emoji">📎</span>
+            <div className="mobile-cap-text">
+              <span className="mobile-cap-name">Malicious Attachments</span>
+              <span className="mobile-cap-sub">Executable & macro check</span>
+            </div>
           </div>
         </div>
       </div>
