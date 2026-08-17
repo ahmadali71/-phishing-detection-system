@@ -34,7 +34,7 @@ export default function AiChatbot({ t, language = 'English' }) {
       try {
         const { getOpenRouterResponse } = await import('../utils/openRouter.js');
         const res = await getOpenRouterResponse([{ sender: 'user', text: 'hi' }], { maxTokens: 5 });
-        setAiStatus(res.text && !res.text.includes('AI service is not configured') && !res.text.includes('AI service error') ? 'online' : 'offline');
+        setAiStatus(res.text && !res.text.includes('AI service error') ? 'online' : 'offline');
       } catch {
         setAiStatus('offline');
       }
@@ -64,7 +64,7 @@ export default function AiChatbot({ t, language = 'English' }) {
       const response = await generateChatbotResponse(query, [...messages, userMessage], language);
       setIsTyping(false);
 
-      const isAiResponse = response.text && !response.text.includes('AI service is not configured') && !response.text.includes('AI service error') && !response.text.includes('All AI models are temporarily unavailable');
+      const isAiResponse = response.text && !response.text.includes('AI service error');
       setAiStatus(isAiResponse ? 'online' : 'offline');
 
       setMessages(prev => [...prev, {

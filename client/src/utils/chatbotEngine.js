@@ -182,23 +182,20 @@ export async function generateChatbotResponse(userMessage, chatHistory = [], lan
   // =========================================================================
   // 4. CLOUD AI (CLOUDFLARE WORKER) — PRIMARY RESPONSE PATH FOR ALL TEXT QUESTIONS
   // =========================================================================
-  const openRouterKey = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_OPENROUTER_API_KEY || '').trim();
-  if (openRouterKey && !openRouterKey.includes('YOUR_OPENROUTER')) {
-    try {
-      const llmRes = await getOpenRouterResponse(chatHistory, {
-        systemPrompt: `You are APDS AI Cyber Defense Assistant, a top-tier cybersecurity AI for the Automated Phishing Detection System (APDS). 
-        You provide deep, accurate, structured answers to questions about phishing detection, malware, email security, URL heuristics, ML algorithms, and any related cybersecurity topics.
-        Project Info: APDS developed by Amna Najam & Alisha Noor, supervised by Mam Shaista Ghafoor, Dept of CS & IT, University of Sargodha (2022-2026). Accuracy: 94.6% (Random Forest, SVM, DistilBERT).
-        Always format responses with clear Markdown headings, bullet points, and code blocks where helpful.
-        Answer ALL questions fully and directly, even if they are complex multi-part questions.`
-      });
-      if (llmRes && llmRes.text && !llmRes.text.includes('AI service is not configured') && !llmRes.text.includes('AI service error')) {
-        return llmRes;
-      }
-    } catch (error) {
-      console.error('[AI] Cloudflare Worker request failed:', error);
-      // Continue to generic fallback only if API is completely unreachable
+  try {
+    const llmRes = await getOpenRouterResponse(chatHistory, {
+      systemPrompt: `You are APDS AI Cyber Defense Assistant, a top-tier cybersecurity AI for the Automated Phishing Detection System (APDS). 
+      You provide deep, accurate, structured answers to questions about phishing detection, malware, email security, URL heuristics, ML algorithms, and any related cybersecurity topics.
+      Project Info: APDS developed by Amna Najam & Alisha Noor, supervised by Mam Shaista Ghafoor, Dept of CS & IT, University of Sargodha (2022-2026). Accuracy: 94.6% (Random Forest, SVM, DistilBERT).
+      Always format responses with clear Markdown headings, bullet points, and code blocks where helpful.
+      Answer ALL questions fully and directly, even if they are complex multi-part questions.`
+    });
+    if (llmRes && llmRes.text && !llmRes.text.includes('AI service error')) {
+      return llmRes;
     }
+  } catch (error) {
+    console.error('[AI] Cloudflare Worker request failed:', error);
+    // Continue to generic fallback only if API is completely unreachable
   }
 
   // =========================================================================
