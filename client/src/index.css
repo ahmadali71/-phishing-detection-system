@@ -3184,3 +3184,101 @@ input:focus, select:focus, textarea:focus {
     padding: 6px 0;
   }
 }
+
+
+/* ================================================================
+   32. ULTRA-POLISHED MOBILE RESPONSIVE SYSTEM
+================================================================ */
+@media (max-width: 768px) {
+  .app-main {
+    padding: 14px 12px calc(env(safe-area-inset-bottom, 0px) + 84px) 12px !important;
+  }
+
+  .scan-history-mobile-cards {
+    display: flex !important;
+  }
+
+  .scan-history-desktop-table {
+    display: none !important;
+  }
+
+  .responsive-grid-2-1,
+  .responsive-grid-3,
+  .responsive-grid-3-col {
+    grid-template-columns: 1fr !important;
+  }
+
+  .responsive-grid-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .mobile-vibrant-hero {
+    margin-bottom: 4px !important;
+    padding: 20px 16px !important;
+    border-radius: 16px !important;
+  }
+
+  .mobile-vibrant-hero-title {
+    font-size: 1.35rem !important;
+  }
+
+  .mobile-vibrant-hero-desc {
+    font-size: 0.82rem !important;
+    line-height: 1.45 !important;
+  }
+
+  .mobile-vibrant-hero-circle {
+    display: none !important;
+  }
+
+  .mobile-vibrant-chips {
+    gap: 6px !important;
+    margin: 12px 0 14px 0 !important;
+  }
+
+  .mobile-vibrant-chip-item {
+    font-size: 0.72rem !important;
+    padding: 4px 10px !important;
+    border-radius: 12px !important;
+  }
+
+  .glass-panel {
+    border-radius: 14px !important;
+    padding: 16px !important;
+  }
+
+  .btn-primary, .btn-secondary {
+    min-height: 42px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Bottom nav ultra crisp */
+  .bottom-nav {
+    display: flex !important;
+    height: auto !important;
+    min-height: 60px !important;
+    padding-bottom: max(6px, env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .bottom-nav-btn {
+    min-height: 52px !important;
+    padding: 4px 2px !important;
+  }
+
+  .bnb-label {
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .responsive-grid-4 {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  
+  .glass-panel {
+    padding: 14px !important;
+  }
+}

@@ -263,7 +263,53 @@ export default function Dashboard({ stats, recentActivity, onNavigateScan, onVie
           </button>
         </div>
 
-        <div className="table-wrapper">
+        {/* Mobile Cards View */}
+        <div className="scan-history-mobile-cards" style={{ display: 'none', flexDirection: 'column', gap: '10px' }}>
+          {activityList.slice(0, 5).map((item, idx) => {
+            const isPhishing = item.result === 'Phishing';
+            const isSuspicious = item.result === 'Suspicious';
+            const color = isPhishing ? '#ef4444' : (isSuspicious ? '#f59e0b' : '#10b981');
+            return (
+              <div
+                key={idx}
+                style={{
+                  padding: '14px',
+                  borderRadius: '12px',
+                  background: 'var(--bg-input)',
+                  border: '1px solid var(--border-color)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span className="badge badge-blue" style={{ fontSize: '0.7rem', padding: '2px 8px' }}>{item.type}</span>
+                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>{item.time || item.date || 'Just now'}</span>
+                </div>
+                <div style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '0.84rem',
+                  fontWeight: '600',
+                  color: 'var(--text-primary)',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap'
+                }}>
+                  {item.input}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: '800', fontSize: '0.86rem', color }}>{item.result}</span>
+                  <span style={{ fontWeight: '800', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+                    Risk: {item.riskScore}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="table-wrapper scan-history-desktop-table">
           <table>
             <thead>
               <tr>

@@ -11,9 +11,9 @@
  * - Seamless OpenRouter LLM integration with built-in instant offline reasoning fallback.
  */
 
-import { analyzeUrl } from './urlAnalyzer';
-import { analyzeEmailText } from './emailAnalyzer';
-import { getOpenRouterResponse } from './openRouter';
+import { analyzeUrl } from './urlAnalyzer.js';
+import { analyzeEmailText } from './emailAnalyzer.js';
+import { getOpenRouterResponse } from './openRouter.js';
 
 // Academic Project Metadata
 const PROJECT_CONTEXT = {

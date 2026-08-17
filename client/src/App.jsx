@@ -253,6 +253,7 @@ function AppInner() {
           <BottomNav
             activeTab={activeTab}
             setActiveTab={setActiveTab}
+            currentUser={currentUser}
             onSearchToggle={() => setShowSearch(v => !v)}
             onNotificationToggle={() => setShowNotifications(v => !v)}
             unreadCount={notifications.filter(n => !n.read).length}

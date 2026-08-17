@@ -1,19 +1,24 @@
 import React from 'react';
-import { LayoutDashboard, Globe, Mail, Bot, History, Settings } from 'lucide-react';
+import { LayoutDashboard, Globe, Mail, Bot, History, Settings, Shield } from 'lucide-react';
 
-const NAV = [
-  { id: 'dashboard',       label: 'Home',    icon: LayoutDashboard },
-  { id: 'url-detection',   label: 'URL',     icon: Globe },
-  { id: 'email-detection', label: 'Email',   icon: Mail },
-  { id: 'ai-assistant',    label: 'AI',      icon: Bot },
-  { id: 'scan-history',    label: 'History', icon: History },
-  { id: 'profile-settings',label: 'Profile', icon: Settings },
-];
+export default function BottomNav({ activeTab, setActiveTab, currentUser, t }) {
+  const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'Admin' || currentUser?.email?.toLowerCase().includes('admin');
 
-export default function BottomNav({ activeTab, setActiveTab, t }) {
+  const navItems = [
+    { id: 'dashboard',        label: 'Home',    icon: LayoutDashboard },
+    { id: 'url-detection',    label: 'URL',     icon: Globe },
+    { id: 'email-detection',  label: 'Email',   icon: Mail },
+    { id: 'ai-assistant',     label: 'AI',      icon: Bot },
+    { id: 'scan-history',     label: 'History', icon: History },
+    ...(isAdmin
+      ? [{ id: 'admin-panel', label: 'Admin', icon: Shield }]
+      : [{ id: 'profile-settings', label: 'Profile', icon: Settings }]
+    ),
+  ];
+
   return (
     <nav className="bottom-nav" aria-label="Mobile navigation">
-      {NAV.map(item => {
+      {navItems.map(item => {
         const Icon = item.icon;
         const active = activeTab === item.id;
         return (
@@ -22,12 +27,12 @@ export default function BottomNav({ activeTab, setActiveTab, t }) {
             className={`bottom-nav-btn${active ? ' active' : ''}`}
             onClick={() => {
               setActiveTab(item.id);
-              try { window.navigator?.vibrate?.(8); } catch (_) {}
+              try { window.navigator?.vibrate?.(10); } catch (_) {}
             }}
             aria-current={active ? 'page' : undefined}
           >
             <span className="bnb-icon">
-              <Icon size={22} strokeWidth={active ? 2.5 : 1.8} />
+              <Icon size={20} strokeWidth={active ? 2.5 : 1.8} />
             </span>
             <span className="bnb-label">
               {(t && (t[item.id] || t.dashboard)) || item.label}
