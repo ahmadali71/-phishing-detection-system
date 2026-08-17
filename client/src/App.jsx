@@ -134,18 +134,20 @@ function AppInner() {
   );
 
   const handleLoginSuccess = useCallback((user) => {
+    const isUserAdmin = user.role === 'admin' || user.role === 'Admin' || user.email?.toLowerCase().includes('admin');
     const userData = {
       name: user.name,
       email: user.email,
       token: user.token,
-      role: 'Premium User'
+      role: isUserAdmin ? 'Admin' : (user.role || 'User')
     };
     setCurrentUser(userData);
-    // Save to localStorage for session persistence
     localStorage.setItem('user', JSON.stringify(userData));
-    addSystemLog('INFO', 'Auth', `${user.name} logged in.`);
-    addNotification('Welcome Back!', `Logged in as ${user.name}.`, 'INFO');
+    addSystemLog('INFO', 'Auth', `${user.name} logged in (${userData.role}).`);
+    addNotification('Welcome Back!', `Logged in as ${user.name} (${userData.role}).`, 'INFO');
   }, [addSystemLog, addNotification]);
+
+  const isAdmin = currentUser?.role?.toLowerCase() === 'admin' || currentUser?.email?.toLowerCase().includes('admin');
 
   return (
     <>
@@ -209,18 +211,31 @@ function AppInner() {
                 />
               )}
               {activeTab === 'admin-panel' && (
-                <AdminPanel
-                  models={mlModels}
-                  onAddModel={addModel}
-                  onToggleModelStatus={toggleModelStatus}
-                  onDeleteModel={deleteModel}
-                  logs={logs}
-                  onAddLog={addSystemLog}
-                  stats={stats}
-                  usersList={users}
-                  onUpdateUserRole={updateUserRole}
-                  t={t}
-                />
+                isAdmin ? (
+                  <AdminPanel
+                    models={mlModels}
+                    onAddModel={addModel}
+                    onToggleModelStatus={toggleModelStatus}
+                    onDeleteModel={deleteModel}
+                    logs={logs}
+                    onAddLog={addSystemLog}
+                    stats={stats}
+                    usersList={users}
+                    onUpdateUserRole={updateUserRole}
+                    t={t}
+                  />
+                ) : (
+                  <div className="glass-panel" style={{ padding: '40px 24px', textAlign: 'center', maxWidth: '540px', margin: '40px auto' }}>
+                    <div style={{ fontSize: '3rem', marginBottom: '12px' }}>🔒</div>
+                    <h3 style={{ fontSize: '1.3rem', fontWeight: '800', marginBottom: '8px' }}>Access Denied</h3>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '20px' }}>
+                      The Admin Management Suite is restricted to system administrators. Regular user accounts cannot view or modify administrative configurations.
+                    </p>
+                    <button onClick={() => setActiveTab('dashboard')} className="btn-primary" style={{ padding: '10px 24px' }}>
+                      Return to Dashboard
+                    </button>
+                  </div>
+                )
               )}
               {activeTab === 'profile-settings' && (
                 <ProfileSettings
