@@ -3059,3 +3059,59 @@ input:focus, select:focus, textarea:focus {
     display: none !important;
   }
 }
+
+
+/* ================================================================
+   30. CHAT SEND BUTTON & MOBILE INPUT BAR (HIGH VISIBILITY)
+================================================================ */
+.chat-send-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 46px;
+  height: 46px;
+  padding: 0 16px;
+  border-radius: 23px;
+  border: none;
+  background: linear-gradient(135deg, #635fec 0%, #4338ca 100%) !important;
+  color: #ffffff !important;
+  font-weight: 800;
+  font-size: 0.88rem;
+  font-family: var(--font-display);
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(99, 95, 236, 0.45);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.chat-send-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 95, 236, 0.6);
+  background: linear-gradient(135deg, #716df0 0%, #4f46e5 100%) !important;
+}
+
+.chat-send-btn:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.chat-send-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+  background: linear-gradient(135deg, #635fec 0%, #4338ca 100%) !important;
+}
+
+@media (max-width: 640px) {
+  .chat-send-btn {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+  }
+  .chat-send-text {
+    display: none !important;
+  }
+}

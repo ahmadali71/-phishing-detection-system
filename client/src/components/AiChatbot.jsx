@@ -452,39 +452,15 @@ export default function AiChatbot({ t, language = 'English' }) {
             onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
           />
           <button
+            type="button"
             onClick={() => handleSendMessage()}
             disabled={isTyping || !inputText.trim()}
-            title="Send message"
-            style={{
-              flexShrink: 0,
-              width: '44px',
-              height: '44px',
-              borderRadius: '50%',
-              border: 'none',
-              background: isTyping || !inputText.trim()
-                ? 'var(--bg-input)'
-                : 'linear-gradient(135deg, #635fec, #4338ca)',
-              color: isTyping || !inputText.trim()
-                ? 'var(--text-muted)'
-                : '#ffffff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: isTyping || !inputText.trim() ? 'not-allowed' : 'pointer',
-              boxShadow: isTyping || !inputText.trim()
-                ? 'none'
-                : '0 4px 14px rgba(99, 95, 236, 0.45)',
-              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-              transform: 'scale(1)',
-            }}
-            onMouseEnter={e => {
-              if (!e.currentTarget.disabled) e.currentTarget.style.transform = 'scale(1.08)';
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.transform = 'scale(1)';
-            }}
+            className="chat-send-btn"
+            aria-label="Send Message"
+            title="Send Message"
           >
-            <Send size={18} />
+            <Send size={18} strokeWidth={2.4} />
+            <span className="chat-send-text">Send</span>
           </button>
         </div>
       </div>
