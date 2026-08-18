@@ -1,57 +1,64 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
-  PlusCircle, Zap, Cpu, Globe, Search,
-  Paperclip, ArrowUp, Copy, Check, X, FileText,
-  Shield, Sparkles, Volume2, VolumeX, ThumbsUp, ThumbsDown,
-  Download, Wand2, Mic, ChevronDown, ChevronUp, Terminal,
-  RefreshCw, Layers
+  Menu, Plus, ArrowUp, Copy, Check, Terminal,
+  RefreshCw, X, Paperclip, FileText, Sparkles,
+  Volume2, VolumeX, ThumbsUp, ThumbsDown, Download,
+  Wand2, Mic, Cpu, Shield, Globe, Lock, Code2,
+  ChevronDown, ChevronUp, AlertCircle
 } from 'lucide-react';
 import { generateChatbotResponse } from '../utils/chatbotEngine';
 
 /* ─────────────────────────────────────────────────────────────────
-   APDS NEURAL SENTINEL AI 3.0 — ULTRA-PREMIUM CYBERNETIC STYLES
+   ULTRA-PREMIUM AI CHATBOT DESIGN SYSTEM
+   Modern, sleek, cyber-luxury aesthetic with glassmorphism
 ───────────────────────────────────────────────────────────────── */
-const CHAT_CSS = `
-  @keyframes apds-core-pulse {
+const CHATBOT_STYLES = `
+  @keyframes ai-glow-breathe {
     0%, 100% {
+      box-shadow: 0 0 25px rgba(59, 130, 246, 0.35), 0 0 50px rgba(99, 102, 241, 0.2);
       transform: scale(1);
-      box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4), 0 0 30px rgba(59, 130, 246, 0.3);
     }
     50% {
+      box-shadow: 0 0 40px rgba(59, 130, 246, 0.6), 0 0 70px rgba(99, 102, 241, 0.35);
       transform: scale(1.04);
-      box-shadow: 0 0 0 16px rgba(99, 102, 241, 0), 0 0 45px rgba(59, 130, 246, 0.55);
     }
   }
-  @keyframes apds-orbit-spin {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
-  }
-  @keyframes apds-fade-up {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes apds-dot-bounce {
-    0%, 80%, 100% { transform: translateY(0); opacity: 0.35; }
-    40%           { transform: translateY(-6px); opacity: 1; }
+
+  @keyframes ai-fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
-  /* ── Root Container ── */
-  .apds-ai-root {
+  @keyframes ai-dot-wave {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.35; }
+    30% { transform: translateY(-6px); opacity: 1; }
+  }
+
+  /* ── Main Container ── */
+  .ai-container {
     display: flex;
     flex-direction: column;
     height: 100%;
-    min-height: 100%;
+    min-height: calc(100vh - 145px);
     background: var(--bg-primary, #080c16);
     color: var(--text-primary, #f8fafc);
-    position: relative;
-    border-radius: 24px;
+    border-radius: 20px;
     border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
+    box-shadow: var(--shadow-card, 0 12px 40px rgba(0, 0, 0, 0.25));
+    position: relative;
+    overflow: hidden;
     font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+    box-sizing: border-box;
   }
 
-  /* ── Executive Top Navigation ── */
-  .apds-ai-topbar {
+  /* ── Header Bar ── */
+  .ai-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -60,18 +67,17 @@ const CHAT_CSS = `
     border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
     flex-shrink: 0;
     z-index: 20;
-    gap: 12px;
   }
-  .apds-ai-brand {
+  .ai-header-brand {
     display: flex;
     align-items: center;
     gap: 10px;
   }
-  .apds-ai-brand-badge {
+  .ai-header-icon {
     width: 34px;
     height: 34px;
     border-radius: 10px;
-    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #4f46e5 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -79,103 +85,129 @@ const CHAT_CSS = `
     box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
     flex-shrink: 0;
   }
-  .apds-ai-status-pill {
+  .ai-header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .ai-header-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    font-family: var(--font-display, 'Outfit', sans-serif);
+    color: var(--text-primary, #f8fafc);
+    line-height: 1.1;
+  }
+  .ai-header-status {
     font-size: 0.7rem;
+    font-weight: 600;
     color: #10b981;
-    font-weight: 700;
     display: flex;
     align-items: center;
     gap: 5px;
-    padding: 2px 8px;
-    border-radius: 999px;
-    background: rgba(16, 185, 129, 0.12);
-    border: 1px solid rgba(16, 185, 129, 0.25);
   }
-  .apds-ai-status-dot {
+  .ai-status-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
     background: #10b981;
     box-shadow: 0 0 8px #10b981;
+    display: inline-block;
   }
 
-  .apds-ai-btn {
-    background: var(--bg-input, rgba(255, 255, 255, 0.05));
-    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-    cursor: pointer;
-    color: var(--text-secondary, #cbd5e1);
+  .ai-header-actions {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 8px;
+  }
+  .ai-btn-ghost {
+    background: var(--bg-input, rgba(255, 255, 255, 0.05));
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    color: var(--text-secondary, #cbd5e1);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
     gap: 5px;
     padding: 6px 12px;
-    border-radius: 12px;
+    border-radius: 10px;
     font-size: 0.78rem;
     font-weight: 600;
-    transition: all 0.18s ease;
+    transition: all 0.16s ease;
     font-family: inherit;
     -webkit-tap-highlight-color: transparent;
   }
-  .apds-ai-btn:hover {
+  .ai-btn-ghost:hover {
     color: #ffffff;
-    border-color: #6366f1;
-    background: rgba(99, 102, 241, 0.15);
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.12);
   }
-  .apds-ai-btn:active {
-    transform: scale(0.94);
+  .ai-btn-ghost:active {
+    transform: scale(0.95);
   }
 
-  /* ── Scrollable Chat & Welcome Area ── */
-  .apds-ai-scroll {
+  /* ── Scrollable Viewport ── */
+  .ai-viewport {
     flex: 1 1 0;
     min-height: 0;
     overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
     display: flex;
     flex-direction: column;
+    -webkit-overflow-scrolling: touch;
   }
 
   /* ── Welcome Stage ── */
-  .apds-welcome-stage {
+  .ai-welcome-box {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 24px 20px 36px;
-    width: 100%;
+    padding: 24px 20px 32px;
+    text-align: center;
     max-width: 640px;
     margin: 0 auto;
+    width: 100%;
     box-sizing: border-box;
-    text-align: center;
   }
 
-  /* ── Holographic Core Emblem ── */
-  .apds-holo-core {
-    position: relative;
-    width: 72px;
-    height: 72px;
+  .ai-welcome-avatar {
+    width: 68px;
+    height: 68px;
     border-radius: 50%;
     background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     color: #ffffff;
-    animation: apds-core-pulse 3.6s infinite ease-in-out;
+    animation: ai-glow-breathe 4s infinite ease-in-out;
     margin-bottom: 20px;
     flex-shrink: 0;
   }
-  .apds-holo-orbit {
-    position: absolute;
-    inset: -6px;
-    border-radius: 50%;
-    border: 1.5px dashed rgba(99, 102, 241, 0.4);
-    animation: apds-orbit-spin 12s linear infinite;
+
+  .ai-welcome-title {
+    font-size: clamp(1.45rem, 6vw, 1.95rem);
+    font-weight: 800;
+    font-family: var(--font-display, 'Outfit', sans-serif);
+    color: var(--text-primary, #f8fafc);
+    margin: 0 0 6px 0;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+  }
+  .ai-welcome-title span {
+    background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
-  /* ── Model Selector Pills ── */
-  .apds-mode-bar {
+  .ai-welcome-sub {
+    font-size: 0.88rem;
+    color: var(--text-muted, #8493a8);
+    margin: 0 0 22px 0;
+    line-height: 1.5;
+  }
+
+  /* ── Mode Switcher Pills ── */
+  .ai-mode-strip {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -183,51 +215,52 @@ const CHAT_CSS = `
     flex-wrap: wrap;
     margin-bottom: 22px;
   }
-  .apds-mode-pill {
+  .ai-mode-item {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 16px;
+    padding: 6px 14px;
     border-radius: 999px;
-    font-size: 0.84rem;
+    font-size: 0.82rem;
     font-weight: 700;
     cursor: pointer;
     font-family: inherit;
-    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.18s ease;
+    border: 1.5px solid transparent;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
   }
-  .apds-mode-pill.active {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(59, 130, 246, 0.25) 100%);
+  .ai-mode-item.active {
+    background: rgba(59, 130, 246, 0.2);
     color: #93c5fd;
-    border: 1.5px solid rgba(99, 102, 241, 0.5);
-    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
+    border-color: rgba(59, 130, 246, 0.45);
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.2);
     transform: translateY(-1px);
   }
-  .light-theme .apds-mode-pill.active {
+  .light-theme .ai-mode-item.active {
     background: #eef2ff;
     color: #3730a3;
     border-color: #a5b4fc;
   }
-  .apds-mode-pill.inactive {
+  .ai-mode-item.inactive {
     background: var(--bg-card, #141f36);
     color: var(--text-secondary, #cbd5e1);
-    border: 1.5px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    border-color: var(--border-color, rgba(255, 255, 255, 0.08));
   }
-  .apds-mode-pill.inactive:hover {
-    border-color: #6366f1;
+  .ai-mode-item.inactive:hover {
+    border-color: #3b82f6;
     color: #ffffff;
   }
 
-  /* ── Action Prompt Tiles ── */
-  .apds-prompt-grid {
+  /* ── Quick Prompt Cards Grid ── */
+  .ai-prompt-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
     width: 100%;
     margin-top: 18px;
   }
-  .apds-prompt-tile {
+  .ai-prompt-card {
     display: flex;
     align-items: flex-start;
     gap: 10px;
@@ -239,41 +272,42 @@ const CHAT_CSS = `
     cursor: pointer;
     text-align: left;
     font-family: inherit;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     -webkit-tap-highlight-color: transparent;
   }
-  .apds-prompt-tile:hover {
-    border-color: #6366f1;
-    background: rgba(99, 102, 241, 0.08);
+  .ai-prompt-card:hover {
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.08);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.15);
   }
-  .apds-prompt-tile:active {
+  .ai-prompt-card:active {
     transform: scale(0.97);
   }
 
-  /* ── Command Input Deck (Non-remounting, stable) ── */
-  .apds-input-deck {
+  /* ── Floating Input Deck ── */
+  .ai-input-wrapper {
     width: 100%;
     max-width: 680px;
     margin: 0 auto;
     box-sizing: border-box;
   }
-  .apds-input-card {
+  .ai-input-card {
     background: var(--bg-card, #141f36);
     border: 1.5px solid var(--border-color, rgba(255, 255, 255, 0.12));
-    border-radius: 24px;
+    border-radius: 22px;
     padding: 12px 16px 10px 16px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
     transition: all 0.2s ease;
     box-sizing: border-box;
     width: 100%;
   }
-  .apds-input-card:focus-within {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2), 0 10px 36px rgba(0, 0, 0, 0.25);
+  .ai-input-card:focus-within {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2), 0 10px 36px rgba(0, 0, 0, 0.25);
   }
-  .apds-textarea {
+
+  .ai-textarea {
     width: 100%;
     border: none;
     outline: none;
@@ -284,27 +318,32 @@ const CHAT_CSS = `
     line-height: 1.55;
     font-family: inherit;
     min-height: 38px;
-    max-height: 240px;
+    max-height: 220px;
     padding: 0 0 6px 0;
     box-sizing: border-box;
     display: block;
     overflow-y: auto;
     -webkit-tap-highlight-color: transparent;
   }
-  .apds-textarea::placeholder {
+  .ai-textarea::placeholder {
     color: var(--text-muted, #8493a8);
-    font-size: 0.98rem;
+    font-size: 0.96rem;
   }
 
-  /* ── Inner Chips & Actions Row ── */
-  .apds-card-row {
+  .ai-controls-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding-top: 4px;
     gap: 8px;
   }
-  .apds-inner-chip {
+  .ai-chips-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .ai-chip-btn {
     display: inline-flex;
     align-items: center;
     gap: 5px;
@@ -321,18 +360,17 @@ const CHAT_CSS = `
     -webkit-tap-highlight-color: transparent;
     user-select: none;
   }
-  .apds-inner-chip.active {
-    background: rgba(99, 102, 241, 0.25);
+  .ai-chip-btn.active {
+    background: rgba(59, 130, 246, 0.22);
     color: #93c5fd;
-    border-color: rgba(99, 102, 241, 0.5);
+    border-color: rgba(59, 130, 246, 0.45);
   }
-  .apds-inner-chip:hover {
-    border-color: #6366f1;
+  .ai-chip-btn:hover {
+    border-color: #3b82f6;
     color: #ffffff;
   }
 
-  /* ── Elevated Circular Send Button ── */
-  .apds-send-btn {
+  .ai-send-btn {
     width: 38px;
     height: 38px;
     border-radius: 50%;
@@ -345,51 +383,51 @@ const CHAT_CSS = `
     flex-shrink: 0;
     -webkit-tap-highlight-color: transparent;
   }
-  .apds-send-btn.ready {
-    background: linear-gradient(135deg, #3b82f6 0%, #4f46e5 100%);
+  .ai-send-btn.ready {
+    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
     color: #ffffff;
-    box-shadow: 0 4px 16px rgba(79, 70, 229, 0.45);
-    transform: scale(1.03);
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.45);
+    transform: scale(1.02);
   }
-  .apds-send-btn.ready:hover {
-    background: linear-gradient(135deg, #2563eb 0%, #4338ca 100%);
+  .ai-send-btn.ready:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
     transform: scale(1.1);
   }
-  .apds-send-btn.ready:active {
+  .ai-send-btn.ready:active {
     transform: scale(0.92);
   }
-  .apds-send-btn.disabled {
-    background: rgba(99, 102, 241, 0.15);
+  .ai-send-btn.disabled {
+    background: rgba(59, 130, 246, 0.15);
     color: rgba(255, 255, 255, 0.3);
     cursor: not-allowed;
   }
 
-  /* ── Message Bubble Stream ── */
-  .apds-msg-row {
+  /* ── Message Bubbles ── */
+  .ai-msg-item {
     display: flex;
     flex-direction: column;
     width: 100%;
     margin-bottom: 16px;
     padding: 0 20px;
     box-sizing: border-box;
-    animation: apds-fade-up 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: ai-fade-in-up 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
-  .apds-bubble {
+  .ai-bubble {
     max-width: 86%;
     padding: 14px 18px;
     font-size: 0.96rem;
     line-height: 1.65;
-    border-radius: 22px;
+    border-radius: 20px;
     word-break: break-word;
   }
-  .apds-bubble-user {
+  .ai-bubble-user {
     align-self: flex-end;
     background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
     color: #ffffff;
     border-bottom-right-radius: 4px;
     box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
   }
-  .apds-bubble-bot {
+  .ai-bubble-bot {
     align-self: flex-start;
     background: var(--bg-card, #141f36);
     color: var(--text-primary, #f8fafc);
@@ -398,107 +436,75 @@ const CHAT_CSS = `
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   }
 
-  /* ── Thought / Reasoning Accordion ── */
-  .apds-thought-box {
-    margin-bottom: 10px;
-    border-radius: 12px;
-    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-    background: var(--bg-input, rgba(255, 255, 255, 0.03));
-    overflow: hidden;
-  }
-  .apds-thought-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 12px;
-    cursor: pointer;
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: var(--text-muted, #8493a8);
-    user-select: none;
-  }
-  .apds-thought-head:hover {
-    color: #93c5fd;
-    background: rgba(99, 102, 241, 0.06);
-  }
-  .apds-thought-body {
-    padding: 8px 14px 12px 14px;
-    border-top: 1px dashed var(--border-color, rgba(255, 255, 255, 0.08));
-    font-size: 0.8rem;
-    line-height: 1.6;
-    color: var(--text-secondary, #cbd5e1);
-    font-family: var(--font-mono, monospace);
-  }
-
-  /* ── Docked Bottom Bar (Chat mode) ── */
-  .apds-dock-bar {
+  /* ── Bottom Dock Bar (Chat Active Mode) ── */
+  .ai-dock-bar {
     padding: 10px 20px calc(env(safe-area-inset-bottom, 0px) + 12px) 20px;
     background: var(--bg-primary, #080c16);
     border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
     flex-shrink: 0;
     z-index: 30;
   }
-  .apds-dock-bar .apds-input-deck {
+  .ai-dock-bar .ai-input-wrapper {
     max-width: 100%;
   }
 
-  /* ── Responsive Mobile Overrides ── */
+  /* ── Mobile Responsive System ── */
   @media (max-width: 768px) {
-    .apds-ai-root {
+    .ai-container {
       height: calc(100dvh - 65px - env(safe-area-inset-bottom, 0px));
       min-height: 0;
       border-radius: 16px;
       border: none;
     }
-    .apds-ai-topbar {
+    .ai-header {
       padding: 10px 14px;
     }
-    .apds-welcome-stage {
+    .ai-welcome-box {
       padding: 12px 14px 20px 14px;
       max-width: 100%;
     }
-    .apds-prompt-grid {
+    .ai-prompt-grid {
       grid-template-columns: 1fr;
       gap: 8px;
     }
-    .apds-input-card {
+    .ai-input-card {
       border-radius: 20px;
       padding: 10px 12px 8px 12px;
     }
-    .apds-textarea {
-      font-size: 16px; /* Prevents auto-zoom on iOS */
+    .ai-textarea {
+      font-size: 16px; /* Prevents auto-zoom on mobile */
       min-height: 36px;
     }
-    .apds-dock-bar {
+    .ai-dock-bar {
       padding: 8px 12px calc(env(safe-area-inset-bottom, 0px) + 8px) 12px;
     }
-    .apds-msg-row {
+    .ai-msg-item {
       padding: 0 12px;
     }
-    .apds-bubble {
+    .ai-bubble {
       max-width: 90%;
       font-size: 0.93rem;
     }
   }
 `;
 
-/* ── MODES CONFIG ── */
+/* ── Modes Config ── */
 const MODES = [
-  { id: 'instant', label: 'Neural Flash',  icon: Zap,  badge: 'Sub-second Heuristics' },
+  { id: 'instant', label: 'Neural Flash',  icon: Zap,  badge: 'Fast Heuristics' },
   { id: 'expert',  label: 'DeepThink R1', icon: Cpu,  badge: 'Chain of Thought' },
   { id: 'search',  label: 'Live Threat',  icon: Globe, badge: 'WHOIS & Threat Intel' },
-  { id: 'scan',    label: 'Forensic Audit', icon: Search, badge: 'Structural Analysis' }
+  { id: 'scan',    label: 'Forensic Scan', icon: Lock,  badge: 'Structural Analysis' }
 ];
 
-/* ── QUICK PROMPTS ── */
+/* ── Quick Starter Prompts ── */
 const QUICK_PROMPTS = [
-  { title: 'Test Phishing URL', query: 'Scan paypal-security-check.xyz', icon: '🔴', tag: 'Live Scan' },
-  { title: 'Explain Typosquatting', query: 'What is typosquatting and how does Levenshtein distance catch it?', icon: '🔤', tag: 'NLP & Strings' },
-  { title: 'Python Feature Pipeline', query: 'Show Python ML code for URL lexical feature extraction', icon: '🐍', tag: 'ML Pipeline' },
-  { title: 'Academic Project Specs', query: 'Who are the project authors and supervisor of APDS?', icon: '🎓', tag: 'University of Sargodha' }
+  { title: 'Audit Suspicious Link', query: 'Scan paypal-security-check.xyz', icon: '🔴', tag: 'Live Scan' },
+  { title: 'Typosquatting & IDN', query: 'What is typosquatting and how does Levenshtein distance catch it?', icon: '🔤', tag: 'NLP & Strings' },
+  { title: 'Feature Extraction Script', query: 'Show Python ML code for URL feature extraction', icon: '🐍', tag: 'ML Pipeline' },
+  { title: 'APDS Project Architecture', query: 'Who are the project authors and supervisor of APDS?', icon: '🎓', tag: 'Univ of Sargodha' }
 ];
 
-/* ── REASONING STEP GENERATOR FOR DEEPTHINK R1 ── */
+/* ── Step Generator for DeepThink R1 ── */
 function generateThinkingSteps(query) {
   const q = query.toLowerCase();
   if (q.includes('scan') || q.includes('http') || q.includes('.com') || q.includes('.xyz')) {
@@ -528,7 +534,7 @@ function generateThinkingSteps(query) {
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   CLEAN MARKDOWN RENDERER
+   MARKDOWN & CODE RENDERER
 ───────────────────────────────────────────────────────────────── */
 function MarkdownRenderer({ text, msgId, onCopy, copiedId }) {
   const parts = text.split(/(```[\s\S]*?```)/g);
@@ -559,7 +565,7 @@ function MarkdownRenderer({ text, msgId, onCopy, copiedId }) {
                 color: 'var(--text-muted, #8493a8)'
               }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontFamily: 'monospace', fontWeight: 700 }}>
-                  <Terminal size={13} color="#6366f1" /> {lang}
+                  <Terminal size={13} color="#3b82f6" /> {lang}
                 </span>
                 <button
                   onMouseDown={e => e.preventDefault()}
@@ -584,7 +590,7 @@ function MarkdownRenderer({ text, msgId, onCopy, copiedId }) {
                 padding: '12px 14px',
                 fontFamily: 'var(--font-mono, monospace)',
                 fontSize: '0.82rem',
-                color: '#818cf8',
+                color: '#93c5fd',
                 overflowX: 'auto',
                 lineHeight: 1.55
               }}>
@@ -609,9 +615,9 @@ function MarkdownRenderer({ text, msgId, onCopy, copiedId }) {
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   MAIN COMPONENT (APDS SENTINEL AI 3.0)
+   MAIN AI ASSISTANT COMPONENT
 ───────────────────────────────────────────────────────────────── */
-export default function AiChatbot({ t, language = 'English', currentUser }) {
+export default function AiChatbot({ t, language = 'English', currentUser, onMenuToggle }) {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [activeMode, setActiveMode] = useState('instant');
@@ -619,7 +625,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
   const [copiedId, setCopiedId] = useState(null);
   const [attachedFile, setAttachedFile] = useState(null);
 
-  // DeepThink & Search inner chips
+  // DeepThink & Search chips
   const [deepThinkActive, setDeepThinkActive] = useState(false);
   const [searchActive, setSearchActive] = useState(false);
 
@@ -629,7 +635,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
   const [expandedThoughts, setExpandedThoughts] = useState({});
   const [isListening, setIsListening] = useState(false);
 
-  // Single stable refs to guarantee no mobile keyboard focus loss
+  // Single persistent stable refs to guarantee no focus/keyboard blur
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -638,19 +644,19 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
   const hasMessages = messages.length > 0;
   const canSend = (inputText.trim().length > 0 || !!attachedFile) && !isTyping;
 
-  // Derive Display Name
+  // Display Name
   const getUserName = () => {
     if (currentUser?.name) return currentUser.name.split(' ')[0];
     if (currentUser?.username) return currentUser.username;
     return 'Security Analyst';
   };
 
-  // Auto-scroll
+  // Auto-scroll to latest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  // Clean up SpeechSynthesis
+  // Clean up SpeechSynthesis on unmount
   useEffect(() => {
     return () => {
       if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -665,7 +671,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
     if (!el) return;
     el.style.height = 'auto';
     const minH = window.innerWidth <= 768 ? 36 : 38;
-    const maxH = window.innerWidth <= 768 ? 200 : 240;
+    const maxH = window.innerWidth <= 768 ? 200 : 220;
     const targetH = Math.min(Math.max(el.scrollHeight, minH), maxH);
     el.style.height = `${targetH}px`;
   }, []);
@@ -678,7 +684,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
   const toggleVoiceInput = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert('Speech recognition is not supported in this browser. Please use Chrome or Edge.');
+      alert('Speech recognition is not supported in this browser.');
       return;
     }
 
@@ -700,25 +706,13 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
         setInputText(prev => (prev ? `${prev} ${transcript}` : transcript));
         setIsListening(false);
       };
-      recognition.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
-        setIsListening(false);
-        if (event.error === 'not-allowed') {
-          alert('Microphone access denied. Please allow microphone access in your browser settings and try again.');
-        } else if (event.error === 'no-speech') {
-          alert('No speech detected. Please try again.');
-        } else if (event.error === 'network') {
-          alert('Network error occurred. Please check your connection and try again.');
-        }
-      };
+      recognition.onerror = () => setIsListening(false);
       recognition.onend = () => setIsListening(false);
 
       recognitionRef.current = recognition;
       recognition.start();
-    } catch (err) {
-      console.error('Speech recognition error:', err);
+    } catch {
       setIsListening(false);
-      alert('Could not start speech recognition. Please make sure you are using a supported browser (Chrome or Edge) and have granted microphone permissions.');
     }
   };
 
@@ -881,11 +875,11 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
   };
 
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     INLINE COMMAND DECK JSX (STABLE & NON-REMOUNTING)
+     INLINE COMMAND DECK (STABLE & NON-REMOUNTING)
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-  const CommandDeckJSX = (
-    <div className="apds-input-deck">
-      <div className="apds-input-card">
+  const InputDeckJSX = (
+    <div className="ai-input-wrapper">
+      <div className="ai-input-card">
         {/* Attached file chip preview */}
         {attachedFile && (
           <div style={{
@@ -894,8 +888,8 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
             gap: '8px',
             padding: '5px 12px',
             marginBottom: '8px',
-            background: 'rgba(99, 102, 241, 0.15)',
-            border: '1px solid rgba(99, 102, 241, 0.35)',
+            background: 'rgba(59, 130, 246, 0.15)',
+            border: '1px solid rgba(59, 130, 246, 0.35)',
             borderRadius: '10px',
             fontSize: '0.8rem',
             color: '#93c5fd',
@@ -918,12 +912,12 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
         {/* Stable Textarea Input */}
         <textarea
           ref={textareaRef}
-          className="apds-textarea"
+          className="ai-textarea"
           value={inputText}
           onInput={autoResize}
           onChange={e => setInputText(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={activeMode === 'scan' ? 'Paste URL or email headers for live forensic scan...' : 'Ask APDS Sentinel AI...'}
+          placeholder={activeMode === 'scan' ? 'Paste URL or email headers for live forensic scan...' : 'Message APDS AI...'}
           rows={1}
           autoComplete="off"
           autoCorrect="off"
@@ -931,15 +925,15 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
           spellCheck={false}
         />
 
-        {/* Card Actions Row */}
-        <div className="apds-card-row">
+        {/* Card Controls Row */}
+        <div className="ai-controls-row">
           {/* Left Action Chips */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+          <div className="ai-chips-group">
             <button
               type="button"
               onMouseDown={e => e.preventDefault()}
               onClick={() => setDeepThinkActive(!deepThinkActive)}
-              className={`apds-inner-chip ${deepThinkActive ? 'active' : ''}`}
+              className={`ai-chip-btn ${deepThinkActive ? 'active' : ''}`}
               title="Toggle DeepThink R1 chain-of-thought reasoning"
             >
               <Cpu size={13} />
@@ -950,7 +944,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
               type="button"
               onMouseDown={e => e.preventDefault()}
               onClick={() => setSearchActive(!searchActive)}
-              className={`apds-inner-chip ${searchActive ? 'active' : ''}`}
+              className={`ai-chip-btn ${searchActive ? 'active' : ''}`}
               title="Toggle live threat intel search"
             >
               <Globe size={13} />
@@ -962,8 +956,8 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
               type="button"
               onMouseDown={e => e.preventDefault()}
               onClick={handleEnhancePrompt}
-              className="apds-inner-chip"
-              title="Enhance prompt with forensic context"
+              className="ai-chip-btn"
+              title="Enhance prompt with security context"
             >
               <Wand2 size={13} color="#f59e0b" />
             </button>
@@ -1026,7 +1020,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
               onMouseDown={e => e.preventDefault()}
               onClick={() => handleSendMessage()}
               disabled={!canSend}
-              className={`apds-send-btn ${canSend ? 'ready' : 'disabled'}`}
+              className={`ai-send-btn ${canSend ? 'ready' : 'disabled'}`}
               title="Send prompt"
               aria-label="Send prompt"
             >
@@ -1040,33 +1034,31 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
 
   return (
     <>
-      <style>{CHAT_CSS}</style>
-      <div className="apds-ai-root">
+      <style>{CHATBOT_STYLES}</style>
+      <div className="ai-container">
 
         {/* ── Top Bar ── */}
-        <div className="apds-ai-topbar">
-          <div className="apds-ai-brand">
-            <div className="apds-ai-brand-badge">
+        <div className="ai-header">
+          <div className="ai-header-brand">
+            <div className="ai-header-icon">
               <Shield size={18} />
             </div>
-            <div>
-              <div style={{ fontWeight: 800, fontSize: '0.92rem', color: 'var(--text-primary, #f8fafc)', lineHeight: 1.1 }}>
-                APDS Sentinel AI
-              </div>
-              <div className="apds-ai-status-pill">
-                <span className="apds-ai-status-dot" />
+            <div className="ai-header-info">
+              <span className="ai-header-title">APDS Sentinel AI</span>
+              <span className="ai-header-status">
+                <span className="ai-status-dot" />
                 Neural ML Online (94.6%)
-              </div>
+              </span>
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="ai-header-actions">
             {hasMessages && (
               <>
                 <button
                   onMouseDown={e => e.preventDefault()}
                   onClick={handleExportChat}
-                  className="apds-ai-btn"
+                  className="ai-btn-ghost"
                   title="Export session report (.md)"
                 >
                   <Download size={13} />
@@ -1076,7 +1068,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                 <button
                   onMouseDown={e => e.preventDefault()}
                   onClick={handleResetChat}
-                  className="apds-ai-btn"
+                  className="ai-btn-ghost"
                   title="Start new conversation"
                 >
                   <RefreshCw size={13} />
@@ -1084,48 +1076,44 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                 </button>
               </>
             )}
+
+            <button
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => {
+                if (onMenuToggle) onMenuToggle();
+                else {
+                  const menuBtn = document.querySelector('.hamburger-btn');
+                  if (menuBtn) menuBtn.click();
+                }
+              }}
+              className="ai-btn-ghost"
+              title="Toggle navigation"
+            >
+              <Menu size={18} strokeWidth={2.2} />
+            </button>
           </div>
         </div>
 
-        {/* ── Scroll Area: Welcome Stage or Active Chat ── */}
-        <div className="apds-ai-scroll">
+        {/* ── Viewport Area: Welcome or Active Chat ── */}
+        <div className="ai-viewport">
           {!hasMessages ? (
             /* ── Welcome Stage ── */
-            <div className="apds-welcome-stage">
-              {/* Holographic Core */}
-              <div className="apds-holo-core">
-                <div className="apds-holo-orbit" />
+            <div className="ai-welcome-box">
+              {/* Glowing Avatar */}
+              <div className="ai-welcome-avatar">
                 <Sparkles size={34} strokeWidth={2.2} />
               </div>
 
               {/* Title & Greeting */}
-              <h1 style={{
-                fontSize: 'clamp(1.4rem, 6vw, 1.85rem)',
-                fontWeight: 800,
-                color: 'var(--text-primary, #f8fafc)',
-                margin: '0 0 4px 0',
-                letterSpacing: '-0.025em',
-                lineHeight: 1.25
-              }}>
-                Welcome,{' '}
-                <span style={{
-                  background: 'linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent'
-                }}>
-                  {getUserName()}
-                </span>
+              <h1 className="ai-welcome-title">
+                Welcome, <span>{getUserName()}</span>
               </h1>
-              <p style={{
-                fontSize: '0.86rem',
-                color: 'var(--text-muted, #8493a8)',
-                margin: '0 0 20px 0'
-              }}>
+              <p className="ai-welcome-sub">
                 How can APDS Neural Intelligence assist your cybersecurity today?
               </p>
 
-              {/* Mode Selection Pills */}
-              <div className="apds-mode-bar">
+              {/* Mode Selection Strip */}
+              <div className="ai-mode-strip">
                 {MODES.map(m => {
                   const Icon = m.icon;
                   const isActive = activeMode === m.id;
@@ -1134,7 +1122,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                       key={m.id}
                       onMouseDown={e => e.preventDefault()}
                       onClick={() => setActiveMode(m.id)}
-                      className={`apds-mode-pill ${isActive ? 'active' : 'inactive'}`}
+                      className={`ai-mode-item ${isActive ? 'active' : 'inactive'}`}
                     >
                       <Icon size={13} strokeWidth={isActive ? 2.5 : 2} />
                       {m.label}
@@ -1143,17 +1131,17 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                 })}
               </div>
 
-              {/* Centered Command Deck */}
-              {CommandDeckJSX}
+              {/* Centered Input Deck */}
+              {InputDeckJSX}
 
-              {/* Quick Prompt Tiles Grid */}
-              <div className="apds-prompt-grid">
+              {/* Quick Prompt Cards Grid */}
+              <div className="ai-prompt-grid">
                 {QUICK_PROMPTS.map((item, i) => (
                   <button
                     key={i}
                     onMouseDown={e => e.preventDefault()}
                     onClick={() => handleSendMessage(item.query)}
-                    className="apds-prompt-tile"
+                    className="ai-prompt-card"
                   >
                     <span style={{ fontSize: '1.2rem', marginTop: '2px' }}>{item.icon}</span>
                     <div style={{ overflow: 'hidden' }}>
@@ -1165,7 +1153,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                           fontSize: '0.66rem',
                           padding: '1px 6px',
                           borderRadius: '6px',
-                          background: 'rgba(99, 102, 241, 0.15)',
+                          background: 'rgba(59, 130, 246, 0.15)',
                           color: '#93c5fd',
                           fontWeight: 700
                         }}>
@@ -1191,7 +1179,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
             /* ── Active Conversation Stream ── */
             <div style={{ padding: '12px 0', display: 'flex', flexDirection: 'column' }}>
               {messages.map(msg => (
-                <div key={msg.id} className="apds-msg-row">
+                <div key={msg.id} className="ai-msg-item">
                   {/* Bot Header */}
                   {msg.sender === 'bot' && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
@@ -1216,20 +1204,45 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
 
                   {/* DeepThink R1 Collapsible Accordion */}
                   {msg.sender === 'bot' && msg.thinkingSteps && (
-                    <div className="apds-thought-box" style={{ maxWidth: '92%', width: '100%' }}>
+                    <div style={{
+                      maxWidth: '92%',
+                      width: '100%',
+                      marginBottom: '10px',
+                      borderRadius: '12px',
+                      border: '1px solid var(--border-color, rgba(255, 255, 255, 0.1))',
+                      background: 'var(--bg-input, rgba(255, 255, 255, 0.03))',
+                      overflow: 'hidden'
+                    }}>
                       <div
-                        className="apds-thought-head"
                         onMouseDown={e => e.preventDefault()}
                         onClick={() => setExpandedThoughts(prev => ({ ...prev, [msg.id]: !prev[msg.id] }))}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '8px 12px',
+                          cursor: 'pointer',
+                          fontSize: '0.78rem',
+                          fontWeight: 700,
+                          color: 'var(--text-muted, #8493a8)',
+                          userSelect: 'none'
+                        }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <Cpu size={14} color="#6366f1" />
+                          <Cpu size={14} color="#3b82f6" />
                           <span>🧠 Reasoning Process ({msg.thinkingSteps.length} steps)</span>
                         </div>
                         {expandedThoughts[msg.id] ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                       </div>
                       {expandedThoughts[msg.id] && (
-                        <div className="apds-thought-body">
+                        <div style={{
+                          padding: '8px 14px 12px 14px',
+                          borderTop: '1px dashed var(--border-color, rgba(255, 255, 255, 0.08))',
+                          fontSize: '0.8rem',
+                          lineHeight: '1.6',
+                          color: 'var(--text-secondary, #cbd5e1)',
+                          fontFamily: 'var(--font-mono, monospace)'
+                        }}>
                           {msg.thinkingSteps.map((step, si) => (
                             <div key={si} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', marginBottom: '4px' }}>
                               <span style={{ color: '#10b981', fontWeight: 700 }}>✓</span>
@@ -1242,7 +1255,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                   )}
 
                   {/* Bubble Content */}
-                  <div className={`apds-bubble ${msg.sender === 'user' ? 'apds-bubble-user' : 'apds-bubble-bot'}`}>
+                  <div className={`ai-bubble ${msg.sender === 'user' ? 'ai-bubble-user' : 'ai-bubble-bot'}`}>
                     {msg.fileInfo && (
                       <div style={{
                         display: 'flex',
@@ -1290,7 +1303,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                           background: 'none',
                           border: 'none',
                           cursor: 'pointer',
-                          color: speakingMsgId === msg.id ? '#6366f1' : 'inherit',
+                          color: speakingMsgId === msg.id ? '#3b82f6' : 'inherit',
                           display: 'flex',
                           alignItems: 'center',
                           gap: '3px',
@@ -1298,7 +1311,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                         }}
                         title={speakingMsgId === msg.id ? 'Stop reading' : 'Read aloud'}
                       >
-                        {speakingMsgId === msg.id ? <VolumeX size={12} color="#6366f1" /> : <Volume2 size={12} />}
+                        {speakingMsgId === msg.id ? <VolumeX size={12} color="#3b82f6" /> : <Volume2 size={12} />}
                         <span>{speakingMsgId === msg.id ? 'Speaking...' : 'Listen'}</span>
                       </button>
 
@@ -1345,9 +1358,9 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                 </div>
               ))}
 
-              {/* Typing State */}
+              {/* Typing Animation */}
               {isTyping && (
-                <div className="apds-msg-row">
+                <div className="ai-msg-item">
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                     <div style={{
                       width: '24px',
@@ -1365,7 +1378,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                       APDS Sentinel AI
                     </span>
                   </div>
-                  <div className="apds-bubble apds-bubble-bot" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 16px' }}>
+                  <div className="ai-bubble ai-bubble-bot" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 16px' }}>
                     {[0, 1, 2].map(i => (
                       <span
                         key={i}
@@ -1373,9 +1386,9 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                           width: '6px',
                           height: '6px',
                           borderRadius: '50%',
-                          background: '#6366f1',
+                          background: '#3b82f6',
                           display: 'inline-block',
-                          animation: `apds-dot-bounce 1s ease-in-out ${i * 0.18}s infinite`
+                          animation: `ai-dot-wave 1s ease-in-out ${i * 0.18}s infinite`
                         }}
                       />
                     ))}
@@ -1387,10 +1400,10 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
           )}
         </div>
 
-        {/* ── Bottom Dock Bar (Chat mode) ── */}
+        {/* ── Bottom Dock Bar (Chat Active Mode) ── */}
         {hasMessages && (
-          <div className="apds-dock-bar">
-            {CommandDeckJSX}
+          <div className="ai-dock-bar">
+            {InputDeckJSX}
           </div>
         )}
 
