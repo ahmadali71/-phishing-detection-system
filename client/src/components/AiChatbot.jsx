@@ -8,23 +8,23 @@ import {
 import { generateChatbotResponse } from '../utils/chatbotEngine';
 
 /* ─────────────────────────────────────────────────────────────────
-   EXACT 1:1 REPLICA CSS (SEAMLESS INTEGRATION WITH WEBSITE & MOBILE)
+   EXACT 1:1 REPLICA CSS (PIXEL-PERFECT FIT ON ALL SCREEN SIZES)
 ───────────────────────────────────────────────────────────────── */
 const SCREENSHOT_CSS = `
   @keyframes orb-pulse-glow {
     0%, 100% {
-      box-shadow: 0 0 28px rgba(99, 102, 241, 0.4), 0 0 60px rgba(59, 130, 246, 0.2);
+      box-shadow: 0 0 28px rgba(99, 102, 241, 0.5), 0 0 50px rgba(56, 189, 248, 0.35);
       transform: scale(1);
     }
     50% {
-      box-shadow: 0 0 42px rgba(99, 102, 241, 0.65), 0 0 80px rgba(168, 85, 247, 0.35);
-      transform: scale(1.03);
+      box-shadow: 0 0 40px rgba(99, 102, 241, 0.75), 0 0 75px rgba(168, 85, 247, 0.5);
+      transform: scale(1.04);
     }
   }
 
   @keyframes sparkle-twinkle {
     0%, 100% { opacity: 0.3; transform: scale(0.8); }
-    50%      { opacity: 1; transform: scale(1.2); }
+    50%      { opacity: 1; transform: scale(1.25); }
   }
 
   @keyframes msg-fade-in {
@@ -32,19 +32,20 @@ const SCREENSHOT_CSS = `
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* ── Canvas Background (Matches Website Theme & Mobile Screen) ── */
+  /* ── Canvas Background: Deep Midnight Navy/Black ── */
   .app-ai-canvas {
     display: flex;
     flex-direction: column;
     height: 100%;
     width: 100%;
-    background: #060913;
+    background: #070a14;
     color: #ffffff;
     position: relative;
     box-sizing: border-box;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     overflow: hidden;
-    border-radius: 16px;
+    flex: 1 1 0;
+    min-height: 0;
   }
   .light-theme .app-ai-canvas {
     background: #f8fafc;
@@ -61,44 +62,46 @@ const SCREENSHOT_CSS = `
     -webkit-overflow-scrolling: touch;
   }
 
-  /* ── Welcome Stage ── */
+  /* ── Welcome Stage (Compact Vertical Flow) ── */
   .app-ai-welcome {
-    flex: 1;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 16px 16px 12px 16px;
+    padding: 8px 14px 4px 14px;
     text-align: center;
-    max-width: 480px;
+    max-width: 460px;
     margin: 0 auto;
     width: 100%;
     box-sizing: border-box;
   }
 
-  /* ── Central Glowing Star Orb ── */
+  /* ── Central Glowing Star Orb (High Contrast & Vibrant) ── */
   .app-ai-orb-wrap {
     position: relative;
-    width: 86px;
-    height: 86px;
-    margin-bottom: 14px;
+    width: 74px;
+    height: 74px;
+    margin-bottom: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
   }
   .app-ai-orb {
-    width: 76px;
-    height: 76px;
+    width: 66px;
+    height: 66px;
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #1e1b4b 0%, #0f172a 60%, #030712 100%);
-    border: 2px solid transparent;
-    background-clip: padding-box;
+    background: radial-gradient(circle at 35% 35%, #1e1b4b 0%, #0f172a 65%, #030712 100%);
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     animation: orb-pulse-glow 3.6s infinite ease-in-out;
+    box-shadow: 0 0 24px rgba(99, 102, 241, 0.6);
+  }
+  .light-theme .app-ai-orb {
+    background: radial-gradient(circle at 35% 35%, #1e293b 0%, #0f172a 75%, #020617 100%);
   }
   .app-ai-orb::before {
     content: '';
@@ -118,7 +121,7 @@ const SCREENSHOT_CSS = `
 
   /* ── Headlines ── */
   .app-ai-greeting {
-    font-size: clamp(1.45rem, 5.5vw, 1.85rem);
+    font-size: clamp(1.4rem, 5.2vw, 1.75rem);
     font-weight: 800;
     color: #ffffff;
     margin: 0 0 2px 0;
@@ -138,10 +141,10 @@ const SCREENSHOT_CSS = `
     background-clip: text;
   }
   .app-ai-question {
-    font-size: clamp(1.05rem, 4vw, 1.3rem);
+    font-size: clamp(1rem, 3.8vw, 1.22rem);
     font-weight: 700;
     color: #ffffff;
-    margin: 0 0 16px 0;
+    margin: 0 0 10px 0;
     letter-spacing: -0.01em;
   }
   .light-theme .app-ai-question {
@@ -156,8 +159,9 @@ const SCREENSHOT_CSS = `
     padding: 3px;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    margin-bottom: 16px;
+    gap: 3px;
+    margin-bottom: 10px;
+    flex-shrink: 0;
   }
   .light-theme .app-ai-mode-container {
     background: #e2e8f0;
@@ -167,16 +171,16 @@ const SCREENSHOT_CSS = `
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    padding: 6px 16px;
+    padding: 5px 14px;
     border-radius: 9999px;
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     font-weight: 700;
     cursor: pointer;
     font-family: inherit;
     border: none;
     background: transparent;
     color: #94a3b8;
-    transition: all 0.2s ease;
+    transition: all 0.18s ease;
     -webkit-tap-highlight-color: transparent;
   }
   .light-theme .app-ai-mode-btn {
@@ -186,7 +190,7 @@ const SCREENSHOT_CSS = `
     background: #1e3a8a;
     color: #60a5fa;
     border: 1px solid #3b82f6;
-    box-shadow: 0 0 14px rgba(59, 130, 246, 0.35);
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.35);
   }
   .light-theme .app-ai-mode-btn.active {
     background: #ffffff;
@@ -199,33 +203,34 @@ const SCREENSHOT_CSS = `
   .app-ai-grid-2x2 {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    gap: 6px;
     width: 100%;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
+    flex-shrink: 0;
   }
   .app-ai-action-card {
     background: #0d1322;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    padding: 10px 12px;
+    border-radius: 14px;
+    padding: 8px 10px;
     display: flex;
     align-items: center;
     gap: 8px;
     cursor: pointer;
     text-align: left;
-    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.16s cubic-bezier(0.4, 0, 0.2, 1);
     -webkit-tap-highlight-color: transparent;
   }
   .light-theme .app-ai-action-card {
     background: #ffffff;
     border-color: #e2e8f0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   }
   .app-ai-action-card:hover {
     border-color: rgba(99, 102, 241, 0.5);
     background: #131b2e;
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
   }
   .light-theme .app-ai-action-card:hover {
     background: #f1f5f9;
@@ -235,9 +240,9 @@ const SCREENSHOT_CSS = `
     transform: scale(0.97);
   }
   .app-ai-card-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 10px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -248,25 +253,28 @@ const SCREENSHOT_CSS = `
     overflow: hidden;
   }
   .app-ai-card-title {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 700;
     color: #ffffff;
     line-height: 1.2;
-    margin-bottom: 2px;
+    margin-bottom: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .light-theme .app-ai-card-title {
     color: #0f172a;
   }
   .app-ai-card-desc {
-    font-size: 0.68rem;
+    font-size: 0.66rem;
     color: #64748b;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .app-ai-card-arrow {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.05);
     display: flex;
@@ -276,26 +284,26 @@ const SCREENSHOT_CSS = `
     flex-shrink: 0;
   }
 
-  /* ── Glowing Floating Input Card (Docked Bottom) ── */
+  /* ── Glowing Floating Input Card (Always Docked & Visible) ── */
   .app-ai-input-dock {
-    padding: 6px 14px calc(env(safe-area-inset-bottom, 0px) + 8px) 14px;
+    padding: 4px 12px calc(env(safe-area-inset-bottom, 0px) + 6px) 12px;
     flex-shrink: 0;
     background: transparent;
     z-index: 30;
     width: 100%;
-    max-width: 520px;
+    max-width: 480px;
     margin: 0 auto;
     box-sizing: border-box;
   }
   .app-ai-input-card {
     background: #0a0f1d;
     border: 1.5px solid transparent;
-    border-radius: 22px;
+    border-radius: 20px;
     background-image: linear-gradient(#0a0f1d, #0a0f1d), linear-gradient(135deg, #38bdf8 0%, #6366f1 50%, #a855f7 100%);
     background-origin: border-box;
     background-clip: padding-box, border-box;
-    padding: 10px 12px 8px 12px;
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.2), 0 6px 24px rgba(0, 0, 0, 0.4);
+    padding: 8px 12px 6px 12px;
+    box-shadow: 0 0 18px rgba(99, 102, 241, 0.22), 0 4px 18px rgba(0, 0, 0, 0.4);
     box-sizing: border-box;
     width: 100%;
     transition: box-shadow 0.2s;
@@ -303,10 +311,10 @@ const SCREENSHOT_CSS = `
   .light-theme .app-ai-input-card {
     background: #ffffff;
     background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(135deg, #38bdf8 0%, #6366f1 50%, #a855f7 100%);
-    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 4px 18px rgba(99, 102, 241, 0.15);
   }
   .app-ai-input-card:focus-within {
-    box-shadow: 0 0 28px rgba(99, 102, 241, 0.38), 0 8px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 26px rgba(99, 102, 241, 0.4), 0 6px 24px rgba(0, 0, 0, 0.5);
   }
 
   /* ── Auto-Growing Textarea (Never remounts) ── */
@@ -317,12 +325,12 @@ const SCREENSHOT_CSS = `
     resize: none;
     background: transparent;
     color: #ffffff;
-    font-size: 1rem;
-    line-height: 1.45;
+    font-size: 0.96rem;
+    line-height: 1.4;
     font-family: inherit;
-    min-height: 32px;
-    max-height: 180px;
-    padding: 0 0 4px 0;
+    min-height: 28px;
+    max-height: 140px;
+    padding: 0 0 2px 0;
     box-sizing: border-box;
     display: block;
     overflow-y: auto;
@@ -333,7 +341,7 @@ const SCREENSHOT_CSS = `
   }
   .app-ai-textarea::placeholder {
     color: #64748b;
-    font-size: 0.92rem;
+    font-size: 0.9rem;
   }
 
   /* ── Input Bottom Action Row ── */
@@ -348,9 +356,9 @@ const SCREENSHOT_CSS = `
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 4px 10px;
+    padding: 3px 9px;
     border-radius: 9999px;
-    font-size: 0.76rem;
+    font-size: 0.74rem;
     font-weight: 700;
     cursor: pointer;
     font-family: inherit;
@@ -379,8 +387,8 @@ const SCREENSHOT_CSS = `
 
   /* ── Purple Soundwaves / Send Button ── */
   .app-ai-btn-purple-circle {
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     border: none;
     background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
@@ -389,14 +397,14 @@ const SCREENSHOT_CSS = `
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 0 14px rgba(168, 85, 247, 0.4);
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
     transition: transform 0.18s, box-shadow 0.18s;
     flex-shrink: 0;
     -webkit-tap-highlight-color: transparent;
   }
   .app-ai-btn-purple-circle:hover {
     transform: scale(1.08);
-    box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+    box-shadow: 0 0 18px rgba(168, 85, 247, 0.6);
   }
   .app-ai-btn-purple-circle:active {
     transform: scale(0.92);
@@ -407,16 +415,16 @@ const SCREENSHOT_CSS = `
     display: flex;
     flex-direction: column;
     width: 100%;
-    margin-bottom: 12px;
-    padding: 0 16px;
+    margin-bottom: 10px;
+    padding: 0 14px;
     box-sizing: border-box;
     animation: msg-fade-in 0.2s ease-out both;
   }
   .app-ai-bubble {
     max-width: 86%;
-    padding: 10px 15px;
-    font-size: 0.94rem;
-    line-height: 1.55;
+    padding: 10px 14px;
+    font-size: 0.92rem;
+    line-height: 1.5;
     border-radius: 18px;
     word-break: break-word;
   }
@@ -448,44 +456,26 @@ const SCREENSHOT_CSS = `
       border-radius: 0;
       border: none;
     }
-    .app-ai-welcome {
-      padding: 8px 12px 8px 12px;
-    }
-    .app-ai-greeting {
-      font-size: 1.55rem;
-    }
-    .app-ai-question {
-      font-size: 1.12rem;
-      margin-bottom: 12px;
-    }
-    .app-ai-grid-2x2 {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 6px;
-    }
-    .app-ai-action-card {
-      padding: 8px 10px;
-    }
-    .app-ai-input-dock {
-      padding: 4px 10px calc(env(safe-area-inset-bottom, 0px) + 6px) 10px;
-    }
     .app-ai-textarea {
       font-size: 16px; /* Prevents auto-zoom on iOS */
     }
   }
 `;
 
-/* ── 4-Pointed Glowing Star SVG for the Orb Center ── */
-function GlowingStar({ size = 32 }) {
+/* ── 4-Pointed Glowing Star SVG for the Orb Center (Crisp White/Cyan) ── */
+function GlowingStar({ size = 30 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
         d="M50 0C50 27.614 27.614 50 0 50C27.614 50 50 72.386 50 100C50 72.386 72.386 50 100 50C72.386 50 50 27.614 50 0Z"
-        fill="url(#star_grad_cyan_blue)"
+        fill="url(#star_crisp_glow)"
       />
+      <circle cx="50" cy="50" r="8" fill="#ffffff" />
       <defs>
-        <linearGradient id="star_grad_cyan_blue" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#38bdf8" />
-          <stop offset="50%" stopColor="#818cf8" />
+        <linearGradient id="star_crisp_glow" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="30%" stopColor="#38bdf8" />
+          <stop offset="70%" stopColor="#818cf8" />
           <stop offset="100%" stopColor="#c084fc" />
         </linearGradient>
       </defs>
@@ -494,7 +484,7 @@ function GlowingStar({ size = 32 }) {
 }
 
 /* ── Soundwave Bars Icon ── */
-function SoundwavesIcon({ size = 16 }) {
+function SoundwavesIcon({ size = 15 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
       <line x1="5" y1="9" x2="5" y2="15" />
@@ -566,15 +556,12 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
   const hasMessages = messages.length > 0;
   const canSend = (inputText.trim().length > 0 || !!attachedFile) && !isTyping;
 
-  // User Display Name (e.g. "Ahmad")
+  // Clean User Name: display real name or fallback to "Ahmad"
   const getUserName = () => {
-    if (currentUser?.name) {
-      const first = currentUser.name.split(' ')[0];
+    const raw = currentUser?.name || currentUser?.username;
+    if (raw && !raw.toLowerCase().includes('system') && !raw.toLowerCase().includes('admin')) {
+      const first = raw.split(' ')[0];
       return first.charAt(0).toUpperCase() + first.slice(1);
-    }
-    if (currentUser?.username) {
-      const u = currentUser.username;
-      return u.charAt(0).toUpperCase() + u.slice(1);
     }
     return 'Ahmad';
   };
@@ -589,8 +576,8 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = 'auto';
-    const minH = 32;
-    const maxH = window.innerWidth <= 768 ? 160 : 180;
+    const minH = 28;
+    const maxH = window.innerWidth <= 768 ? 140 : 160;
     const targetH = Math.min(Math.max(el.scrollHeight, minH), maxH);
     el.style.height = `${targetH}px`;
   }, []);
@@ -688,7 +675,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
   };
 
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     INLINE FLOATING INPUT CARD (NEON GLOW DOCKED BOTTOM)
+     INLINE FLOATING INPUT CARD (100% VISIBLE AT BOTTOM)
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   const InputCardJSX = (
     <div className="app-ai-input-dock">
@@ -699,16 +686,16 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
-            padding: '4px 10px',
-            marginBottom: '6px',
+            padding: '3px 8px',
+            marginBottom: '4px',
             background: 'rgba(59, 130, 246, 0.18)',
             border: '1px solid rgba(59, 130, 246, 0.35)',
             borderRadius: '8px',
-            fontSize: '0.78rem',
+            fontSize: '0.74rem',
             color: '#60a5fa',
             fontWeight: 600
           }}>
-            <FileText size={13} />
+            <FileText size={12} />
             <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {attachedFile.name}
             </span>
@@ -717,7 +704,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
               onClick={() => setAttachedFile(null)}
               style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#60a5fa', padding: 0 }}
             >
-              <X size={13} />
+              <X size={12} />
             </button>
           </div>
         )}
@@ -741,14 +728,14 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
         {/* Bottom Control Row */}
         <div className="app-ai-action-row">
           {/* Left Chips: Think & Search */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
             <button
               type="button"
               onMouseDown={e => e.preventDefault()}
               onClick={() => setThinkActive(!thinkActive)}
               className={`app-ai-chip ${thinkActive ? 'active' : ''}`}
             >
-              <Atom size={13} />
+              <Atom size={12} />
               <span>Think</span>
             </button>
 
@@ -758,13 +745,13 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
               onClick={() => setSearchActive(!searchActive)}
               className={`app-ai-chip ${searchActive ? 'active' : ''}`}
             >
-              <Globe size={13} />
+              <Globe size={12} />
               <span>Search</span>
             </button>
           </div>
 
           {/* Right Controls: Plus & Soundwaves / Send button */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <input
               ref={fileInputRef}
               type="file"
@@ -784,11 +771,11 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: '4px'
+                padding: '3px'
               }}
               title="Add attachment"
             >
-              <PlusCircle size={20} />
+              <PlusCircle size={18} />
             </button>
 
             {/* Circular Purple Soundwaves or Send Arrow */}
@@ -802,9 +789,9 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
               aria-label="Send message"
             >
               {inputText.trim().length > 0 || attachedFile ? (
-                <ArrowUp size={18} strokeWidth={2.8} />
+                <ArrowUp size={16} strokeWidth={2.8} />
               ) : (
-                <SoundwavesIcon size={18} />
+                <SoundwavesIcon size={15} />
               )}
             </button>
           </div>
@@ -818,20 +805,20 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
       <style>{SCREENSHOT_CSS}</style>
       <div className="app-ai-canvas">
 
-        {/* ── Scrollable Body Area (No Duplicate Top Navbar) ── */}
+        {/* ── Scrollable Body Area ── */}
         <div className="app-ai-scroll">
           {!hasMessages ? (
-            /* ── Welcome Stage (Clean, No Clutter Text) ── */
+            /* ── Welcome Stage (100% Fit on Mobile Screen) ── */
             <div className="app-ai-welcome">
               {/* Glowing Orb with Star & Twinkles */}
               <div className="app-ai-orb-wrap">
-                <span className="app-ai-twinkle" style={{ top: '8%', left: '12%', fontSize: '10px' }}>✦</span>
-                <span className="app-ai-twinkle" style={{ top: '15%', right: '10%', fontSize: '12px', animationDelay: '0.8s' }}>✦</span>
-                <span className="app-ai-twinkle" style={{ bottom: '10%', left: '16%', fontSize: '11px', animationDelay: '1.4s' }}>✦</span>
-                <span className="app-ai-twinkle" style={{ bottom: '15%', right: '14%', fontSize: '9px', animationDelay: '1.9s' }}>✦</span>
+                <span className="app-ai-twinkle" style={{ top: '6%', left: '8%', fontSize: '10px' }}>✦</span>
+                <span className="app-ai-twinkle" style={{ top: '12%', right: '6%', fontSize: '12px', animationDelay: '0.8s' }}>✦</span>
+                <span className="app-ai-twinkle" style={{ bottom: '8%', left: '10%', fontSize: '11px', animationDelay: '1.4s' }}>✦</span>
+                <span className="app-ai-twinkle" style={{ bottom: '12%', right: '8%', fontSize: '9px', animationDelay: '1.9s' }}>✦</span>
 
                 <div className="app-ai-orb">
-                  <GlowingStar size={34} />
+                  <GlowingStar size={32} />
                 </div>
               </div>
 
@@ -851,7 +838,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                   onClick={() => setActiveMode('instant')}
                   className={`app-ai-mode-btn ${activeMode === 'instant' ? 'active' : ''}`}
                 >
-                  <Zap size={13} strokeWidth={2.5} />
+                  <Zap size={12} strokeWidth={2.5} />
                   <span>Instant</span>
                 </button>
                 <button
@@ -860,7 +847,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                   onClick={() => setActiveMode('expert')}
                   className={`app-ai-mode-btn ${activeMode === 'expert' ? 'active' : ''}`}
                 >
-                  <Gem size={13} strokeWidth={2} />
+                  <Gem size={12} strokeWidth={2} />
                   <span>Expert</span>
                 </button>
                 <button
@@ -869,7 +856,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                   onClick={() => setActiveMode('vision')}
                   className={`app-ai-mode-btn ${activeMode === 'vision' ? 'active' : ''}`}
                 >
-                  <ImageIcon size={13} strokeWidth={2} />
+                  <ImageIcon size={12} strokeWidth={2} />
                   <span>Vision</span>
                 </button>
               </div>
@@ -886,14 +873,14 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                       onClick={() => handleSend(card.query)}
                     >
                       <div className="app-ai-card-icon" style={{ background: card.iconBg, color: card.iconColor }}>
-                        <Icon size={16} strokeWidth={2.2} />
+                        <Icon size={15} strokeWidth={2.2} />
                       </div>
                       <div className="app-ai-card-content">
                         <div className="app-ai-card-title">{card.title}</div>
                         <div className="app-ai-card-desc">{card.desc}</div>
                       </div>
                       <div className="app-ai-card-arrow">
-                        <ArrowRight size={11} strokeWidth={2.5} />
+                        <ArrowRight size={10} strokeWidth={2.5} />
                       </div>
                     </div>
                   );
@@ -902,8 +889,8 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
             </div>
           ) : (
             /* ── Active Chat Messages Stream ── */
-            <div style={{ padding: '12px 0', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '0 16px 8px 16px' }}>
+            <div style={{ padding: '10px 0', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '0 14px 6px 14px' }}>
                 <button
                   onMouseDown={e => e.preventDefault()}
                   onClick={handleNewChat}
@@ -912,8 +899,8 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                     border: '1px solid rgba(255, 255, 255, 0.12)',
                     borderRadius: '9999px',
                     color: '#94a3b8',
-                    padding: '4px 12px',
-                    fontSize: '0.75rem',
+                    padding: '3px 10px',
+                    fontSize: '0.72rem',
                     fontWeight: 600,
                     cursor: 'pointer'
                   }}
@@ -930,17 +917,17 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '5px',
-                        marginBottom: '6px',
-                        fontSize: '0.78rem',
+                        marginBottom: '4px',
+                        fontSize: '0.76rem',
                         opacity: 0.9,
                         fontWeight: 700
                       }}>
-                        <FileText size={13} /> {msg.fileInfo}
+                        <FileText size={12} /> {msg.fileInfo}
                       </div>
                     )}
                     <div style={{ whiteSpace: 'pre-line' }}>{msg.text}</div>
                     {msg.sender === 'bot' && (
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '6px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
                         <button
                           onMouseDown={e => e.preventDefault()}
                           onClick={() => handleCopy(msg.text, msg.id)}
@@ -949,7 +936,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                             border: 'none',
                             cursor: 'pointer',
                             color: '#94a3b8',
-                            fontSize: '0.74rem',
+                            fontSize: '0.72rem',
                             display: 'flex',
                             alignItems: 'center',
                             gap: '4px'
@@ -961,9 +948,9 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                     )}
                   </div>
                   <span style={{
-                    fontSize: '0.68rem',
+                    fontSize: '0.66rem',
                     color: '#64748b',
-                    marginTop: '3px',
+                    marginTop: '2px',
                     alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
                     padding: '0 4px'
                   }}>
@@ -975,8 +962,8 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
               {isTyping && (
                 <div className="app-ai-msg-item">
                   <div className="app-ai-bubble app-ai-bubble-bot" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <GlowingStar size={15} />
-                    <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Thinking...</span>
+                    <GlowingStar size={14} />
+                    <span style={{ fontSize: '0.82rem', color: '#94a3b8' }}>Thinking...</span>
                   </div>
                 </div>
               )}
@@ -985,7 +972,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
           )}
         </div>
 
-        {/* ── Floating Input Dock at Bottom ── */}
+        {/* ── Floating Input Dock at Bottom (Always 100% Visible) ── */}
         {InputCardJSX}
 
       </div>
