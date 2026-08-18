@@ -198,7 +198,7 @@ function AppInner() {
                 <EmailScanner onScanComplete={handleScanComplete} t={t} />
               )}
               {activeTab === 'ai-assistant' && (
-                <AiChatbot t={t} language={language} currentUser={currentUser} onMenuToggle={() => setSidebarOpen(v => !v)} />
+                <AiChatbot t={t} language={language} currentUser={currentUser} />
               )}
               {activeTab === 'scan-history' && (
                 <ScanHistory

@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
-  Menu, Plus, Mic, ArrowUp, Copy, Check, Terminal,
-  RefreshCw, X, Paperclip, FileText, Sparkles, Volume2, VolumeX,
-  Send, Bot, User, Wand2, Globe, Shield, Zap
+  Plus, Mic, ArrowUp, Copy, Check,
+  X, Paperclip, FileText, Sparkles
 } from 'lucide-react';
 import { generateChatbotResponse } from '../utils/chatbotEngine';
 
@@ -41,10 +40,9 @@ const CHAT_CSS = `
     display: flex;
     flex-direction: column;
     height: 100%;
-    min-height: calc(100vh - 145px);
+    min-height: 100%;
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
     position: relative;
-    overflow: hidden;
     font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Outfit', Roboto, sans-serif;
   }
   .dark-theme .chat-root,
@@ -624,7 +622,7 @@ function SuggestedPrompts({ onSelect }) {
 /* ─────────────────────────────────────────────────────────────────
    MAIN COMPONENT
 ───────────────────────────────────────────────────────────────── */
-export default function AiChatbot({ t, language = 'English', currentUser, onMenuToggle }) {
+export default function AiChatbot({ t, language = 'English', currentUser }) {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -671,7 +669,7 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
   const toggleVoiceInput = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert('Speech recognition is not supported in this browser.');
+      alert('Speech recognition is not supported in this browser. Please use Chrome or Edge.');
       return;
     }
 
@@ -693,13 +691,21 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
         setInputText(prev => (prev ? `${prev} ${transcript}` : transcript));
         setIsListening(false);
       };
-      recognition.onerror = () => setIsListening(false);
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+        if (event.error === 'not-allowed') {
+          alert('Microphone access denied. Please allow microphone access in your browser settings.');
+        }
+      };
       recognition.onend = () => setIsListening(false);
 
       recognitionRef.current = recognition;
       recognition.start();
-    } catch {
+    } catch (err) {
+      console.error('Speech recognition error:', err);
       setIsListening(false);
+      alert('Could not start speech recognition. Please try again.');
     }
   };
 
@@ -801,19 +807,6 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
         {/* Top Bar */}
         <div className="chat-top-bar">
           <div className="chat-top-bar-left">
-            <button
-              className="chat-top-btn"
-              title="Menu"
-              onClick={() => {
-                if (onMenuToggle) onMenuToggle();
-                else {
-                  const menuBtn = document.querySelector('.hamburger-btn');
-                  if (menuBtn) menuBtn.click();
-                }
-              }}
-            >
-              <Menu size={22} strokeWidth={2} />
-            </button>
             <div>
               <div className="chat-top-bar-title">APDS Assistant</div>
             </div>
