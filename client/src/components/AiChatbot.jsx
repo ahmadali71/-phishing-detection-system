@@ -1,24 +1,23 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
-  Menu, Plus, Zap, Gem, Image as ImageIcon,
+  Zap, Gem, Image as ImageIcon,
   MessageSquare, Lightbulb, Code2, PenTool,
   Atom, Globe, PlusCircle, ArrowUp, Copy, Check,
-  Terminal, X, Paperclip, FileText, Sparkles, Mic,
-  Volume2, VolumeX, ArrowRight
+  Terminal, X, Paperclip, FileText, ArrowRight
 } from 'lucide-react';
 import { generateChatbotResponse } from '../utils/chatbotEngine';
 
 /* ─────────────────────────────────────────────────────────────────
-   EXACT 1:1 REPLICA CSS OF THE USER'S MOBILE REFERENCE SCREENSHOT
+   EXACT 1:1 REPLICA CSS (SEAMLESS INTEGRATION WITH WEBSITE & MOBILE)
 ───────────────────────────────────────────────────────────────── */
 const SCREENSHOT_CSS = `
   @keyframes orb-pulse-glow {
     0%, 100% {
-      box-shadow: 0 0 35px rgba(99, 102, 241, 0.45), 0 0 70px rgba(59, 130, 246, 0.25);
+      box-shadow: 0 0 28px rgba(99, 102, 241, 0.4), 0 0 60px rgba(59, 130, 246, 0.2);
       transform: scale(1);
     }
     50% {
-      box-shadow: 0 0 50px rgba(99, 102, 241, 0.7), 0 0 90px rgba(168, 85, 247, 0.4);
+      box-shadow: 0 0 42px rgba(99, 102, 241, 0.65), 0 0 80px rgba(168, 85, 247, 0.35);
       transform: scale(1.03);
     }
   }
@@ -29,68 +28,27 @@ const SCREENSHOT_CSS = `
   }
 
   @keyframes msg-fade-in {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* ── Canvas Background: Deep Midnight Navy/Black ── */
+  /* ── Canvas Background (Matches Website Theme & Mobile Screen) ── */
   .app-ai-canvas {
     display: flex;
     flex-direction: column;
     height: 100%;
-    min-height: calc(100vh - 145px);
+    width: 100%;
     background: #060913;
     color: #ffffff;
     position: relative;
     box-sizing: border-box;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     overflow: hidden;
+    border-radius: 16px;
   }
-
-  /* ── Top Bar ── */
-  .app-ai-topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px 8px 20px;
-    background: transparent;
-    flex-shrink: 0;
-    z-index: 20;
-  }
-  .app-ai-icon-square {
-    width: 42px;
-    height: 42px;
-    border-radius: 14px;
-    background: #111827;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ffffff;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.15s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .app-ai-icon-square:active {
-    transform: scale(0.92);
-  }
-  .app-ai-icon-circle {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    background: #111827;
-    border: 1.5px solid #a855f7;
-    box-shadow: 0 0 14px rgba(168, 85, 247, 0.35);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ffffff;
-    cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.15s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .app-ai-icon-circle:active {
-    transform: scale(0.92);
+  .light-theme .app-ai-canvas {
+    background: #f8fafc;
+    color: #0f172a;
   }
 
   /* ── Scroll Area ── */
@@ -110,7 +68,7 @@ const SCREENSHOT_CSS = `
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 10px 20px 24px 20px;
+    padding: 16px 16px 12px 16px;
     text-align: center;
     max-width: 480px;
     margin: 0 auto;
@@ -121,16 +79,17 @@ const SCREENSHOT_CSS = `
   /* ── Central Glowing Star Orb ── */
   .app-ai-orb-wrap {
     position: relative;
-    width: 110px;
-    height: 110px;
-    margin-bottom: 20px;
+    width: 86px;
+    height: 86px;
+    margin-bottom: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
   }
   .app-ai-orb {
-    width: 96px;
-    height: 96px;
+    width: 76px;
+    height: 76px;
     border-radius: 50%;
     background: radial-gradient(circle at 35% 35%, #1e1b4b 0%, #0f172a 60%, #030712 100%);
     border: 2px solid transparent;
@@ -159,15 +118,18 @@ const SCREENSHOT_CSS = `
 
   /* ── Headlines ── */
   .app-ai-greeting {
-    font-size: clamp(1.75rem, 6.5vw, 2.25rem);
+    font-size: clamp(1.45rem, 5.5vw, 1.85rem);
     font-weight: 800;
     color: #ffffff;
-    margin: 0 0 4px 0;
+    margin: 0 0 2px 0;
     letter-spacing: -0.02em;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
+  }
+  .light-theme .app-ai-greeting {
+    color: #0f172a;
   }
   .app-ai-name {
     background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
@@ -176,18 +138,14 @@ const SCREENSHOT_CSS = `
     background-clip: text;
   }
   .app-ai-question {
-    font-size: clamp(1.2rem, 4.5vw, 1.5rem);
+    font-size: clamp(1.05rem, 4vw, 1.3rem);
     font-weight: 700;
     color: #ffffff;
-    margin: 0 0 10px 0;
+    margin: 0 0 16px 0;
     letter-spacing: -0.01em;
   }
-  .app-ai-subtext {
-    font-size: 0.88rem;
-    color: #94a3b8;
-    max-width: 320px;
-    line-height: 1.45;
-    margin: 0 0 24px 0;
+  .light-theme .app-ai-question {
+    color: #1e293b;
   }
 
   /* ── 3 Mode Selector Bar ── */
@@ -195,19 +153,23 @@ const SCREENSHOT_CSS = `
     background: #0f172a;
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 9999px;
-    padding: 4px;
+    padding: 3px;
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    margin-bottom: 8px;
+    margin-bottom: 16px;
+  }
+  .light-theme .app-ai-mode-container {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
   }
   .app-ai-mode-btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 18px;
+    gap: 5px;
+    padding: 6px 16px;
     border-radius: 9999px;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 700;
     cursor: pointer;
     font-family: inherit;
@@ -217,52 +179,65 @@ const SCREENSHOT_CSS = `
     transition: all 0.2s ease;
     -webkit-tap-highlight-color: transparent;
   }
+  .light-theme .app-ai-mode-btn {
+    color: #64748b;
+  }
   .app-ai-mode-btn.active {
     background: #1e3a8a;
     color: #60a5fa;
     border: 1px solid #3b82f6;
-    box-shadow: 0 0 16px rgba(59, 130, 246, 0.35);
+    box-shadow: 0 0 14px rgba(59, 130, 246, 0.35);
   }
-  .app-ai-mode-caption {
-    font-size: 0.78rem;
-    color: #64748b;
-    margin: 0 0 22px 0;
+  .light-theme .app-ai-mode-btn.active {
+    background: #ffffff;
+    color: #2563eb;
+    border-color: #93c5fd;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
   }
 
   /* ── 2x2 Quick Action Cards ── */
   .app-ai-grid-2x2 {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    gap: 8px;
     width: 100%;
     margin-bottom: 6px;
   }
   .app-ai-action-card {
     background: #0d1322;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 18px;
-    padding: 12px 14px;
+    border-radius: 16px;
+    padding: 10px 12px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     cursor: pointer;
     text-align: left;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
     -webkit-tap-highlight-color: transparent;
+  }
+  .light-theme .app-ai-action-card {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   }
   .app-ai-action-card:hover {
     border-color: rgba(99, 102, 241, 0.5);
     background: #131b2e;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+  .light-theme .app-ai-action-card:hover {
+    background: #f1f5f9;
+    border-color: #93c5fd;
   }
   .app-ai-action-card:active {
     transform: scale(0.97);
   }
   .app-ai-card-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 12px;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -273,22 +248,25 @@ const SCREENSHOT_CSS = `
     overflow: hidden;
   }
   .app-ai-card-title {
-    font-size: 0.84rem;
+    font-size: 0.8rem;
     font-weight: 700;
     color: #ffffff;
     line-height: 1.2;
     margin-bottom: 2px;
   }
+  .light-theme .app-ai-card-title {
+    color: #0f172a;
+  }
   .app-ai-card-desc {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     color: #64748b;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .app-ai-card-arrow {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.05);
     display: flex;
@@ -298,9 +276,9 @@ const SCREENSHOT_CSS = `
     flex-shrink: 0;
   }
 
-  /* ── Glowing Floating Input Card (Exact Replica) ── */
+  /* ── Glowing Floating Input Card (Docked Bottom) ── */
   .app-ai-input-dock {
-    padding: 8px 16px calc(env(safe-area-inset-bottom, 0px) + 12px) 16px;
+    padding: 6px 14px calc(env(safe-area-inset-bottom, 0px) + 8px) 14px;
     flex-shrink: 0;
     background: transparent;
     z-index: 30;
@@ -312,18 +290,23 @@ const SCREENSHOT_CSS = `
   .app-ai-input-card {
     background: #0a0f1d;
     border: 1.5px solid transparent;
-    border-radius: 24px;
+    border-radius: 22px;
     background-image: linear-gradient(#0a0f1d, #0a0f1d), linear-gradient(135deg, #38bdf8 0%, #6366f1 50%, #a855f7 100%);
     background-origin: border-box;
     background-clip: padding-box, border-box;
-    padding: 12px 14px 10px 14px;
-    box-shadow: 0 0 24px rgba(99, 102, 241, 0.22), 0 8px 32px rgba(0, 0, 0, 0.5);
+    padding: 10px 12px 8px 12px;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.2), 0 6px 24px rgba(0, 0, 0, 0.4);
     box-sizing: border-box;
     width: 100%;
     transition: box-shadow 0.2s;
   }
+  .light-theme .app-ai-input-card {
+    background: #ffffff;
+    background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(135deg, #38bdf8 0%, #6366f1 50%, #a855f7 100%);
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15);
+  }
   .app-ai-input-card:focus-within {
-    box-shadow: 0 0 32px rgba(99, 102, 241, 0.4), 0 8px 36px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0 28px rgba(99, 102, 241, 0.38), 0 8px 30px rgba(0, 0, 0, 0.5);
   }
 
   /* ── Auto-Growing Textarea (Never remounts) ── */
@@ -337,17 +320,20 @@ const SCREENSHOT_CSS = `
     font-size: 1rem;
     line-height: 1.45;
     font-family: inherit;
-    min-height: 36px;
-    max-height: 200px;
-    padding: 0 0 6px 0;
+    min-height: 32px;
+    max-height: 180px;
+    padding: 0 0 4px 0;
     box-sizing: border-box;
     display: block;
     overflow-y: auto;
     -webkit-tap-highlight-color: transparent;
   }
+  .light-theme .app-ai-textarea {
+    color: #0f172a;
+  }
   .app-ai-textarea::placeholder {
     color: #64748b;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
   }
 
   /* ── Input Bottom Action Row ── */
@@ -355,40 +341,46 @@ const SCREENSHOT_CSS = `
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: 4px;
-    gap: 8px;
+    padding-top: 2px;
+    gap: 6px;
   }
   .app-ai-chip {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: 5px 12px;
+    gap: 4px;
+    padding: 4px 10px;
     border-radius: 9999px;
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     font-weight: 700;
     cursor: pointer;
     font-family: inherit;
     border: 1px solid rgba(255, 255, 255, 0.12);
     background: #111827;
     color: #cbd5e1;
-    transition: all 0.16s ease;
+    transition: all 0.15s ease;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
+  }
+  .light-theme .app-ai-chip {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #475569;
   }
   .app-ai-chip.active {
     background: #1e3a8a;
     color: #60a5fa;
     border-color: #3b82f6;
   }
-  .app-ai-chip:hover {
-    color: #ffffff;
-    border-color: #6366f1;
+  .light-theme .app-ai-chip.active {
+    background: #dbeafe;
+    color: #1d4ed8;
+    border-color: #93c5fd;
   }
 
   /* ── Purple Soundwaves / Send Button ── */
   .app-ai-btn-purple-circle {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     border: none;
     background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
@@ -397,14 +389,14 @@ const SCREENSHOT_CSS = `
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 0 16px rgba(168, 85, 247, 0.45);
+    box-shadow: 0 0 14px rgba(168, 85, 247, 0.4);
     transition: transform 0.18s, box-shadow 0.18s;
     flex-shrink: 0;
     -webkit-tap-highlight-color: transparent;
   }
   .app-ai-btn-purple-circle:hover {
     transform: scale(1.08);
-    box-shadow: 0 0 22px rgba(168, 85, 247, 0.65);
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
   }
   .app-ai-btn-purple-circle:active {
     transform: scale(0.92);
@@ -415,17 +407,17 @@ const SCREENSHOT_CSS = `
     display: flex;
     flex-direction: column;
     width: 100%;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     padding: 0 16px;
     box-sizing: border-box;
     animation: msg-fade-in 0.2s ease-out both;
   }
   .app-ai-bubble {
     max-width: 86%;
-    padding: 12px 16px;
-    font-size: 0.95rem;
-    line-height: 1.6;
-    border-radius: 20px;
+    padding: 10px 15px;
+    font-size: 0.94rem;
+    line-height: 1.55;
+    border-radius: 18px;
     word-break: break-word;
   }
   .app-ai-bubble-user {
@@ -433,7 +425,7 @@ const SCREENSHOT_CSS = `
     background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
     color: #ffffff;
     border-bottom-right-radius: 4px;
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.28);
   }
   .app-ai-bubble-bot {
     align-self: flex-start;
@@ -441,46 +433,49 @@ const SCREENSHOT_CSS = `
     color: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-bottom-left-radius: 4px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  }
+  .light-theme .app-ai-bubble-bot {
+    background: #ffffff;
+    color: #0f172a;
+    border-color: #e2e8f0;
   }
 
   /* ── Responsive Mobile ── */
   @media (max-width: 768px) {
     .app-ai-canvas {
-      height: calc(100dvh - 65px - env(safe-area-inset-bottom, 0px));
-      min-height: 0;
+      height: 100%;
+      border-radius: 0;
+      border: none;
     }
-    .app-ai-topbar {
-      padding: 12px 16px 4px 16px;
+    .app-ai-welcome {
+      padding: 8px 12px 8px 12px;
     }
     .app-ai-greeting {
-      font-size: 1.85rem;
+      font-size: 1.55rem;
     }
     .app-ai-question {
-      font-size: 1.25rem;
+      font-size: 1.12rem;
+      margin-bottom: 12px;
     }
     .app-ai-grid-2x2 {
       grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
+      gap: 6px;
     }
     .app-ai-action-card {
-      padding: 10px 12px;
+      padding: 8px 10px;
     }
     .app-ai-input-dock {
-      padding: 6px 12px calc(env(safe-area-inset-bottom, 0px) + 8px) 12px;
+      padding: 4px 10px calc(env(safe-area-inset-bottom, 0px) + 6px) 10px;
     }
     .app-ai-textarea {
       font-size: 16px; /* Prevents auto-zoom on iOS */
-    }
-    .app-ai-bubble {
-      max-width: 90%;
-      font-size: 0.92rem;
     }
   }
 `;
 
 /* ── 4-Pointed Glowing Star SVG for the Orb Center ── */
-function GlowingStar({ size = 36 }) {
+function GlowingStar({ size = 32 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
@@ -499,7 +494,7 @@ function GlowingStar({ size = 36 }) {
 }
 
 /* ── Soundwave Bars Icon ── */
-function SoundwavesIcon({ size = 18 }) {
+function SoundwavesIcon({ size = 16 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
       <line x1="5" y1="9" x2="5" y2="15" />
@@ -511,7 +506,7 @@ function SoundwavesIcon({ size = 18 }) {
   );
 }
 
-/* ── 4 Quick Actions (Exact Match to Screenshot) ── */
+/* ── 4 Quick Actions (Exact Match to Reference Screenshot) ── */
 const ACTION_CARDS = [
   {
     id: 'explain',
@@ -554,7 +549,7 @@ const ACTION_CARDS = [
 /* ─────────────────────────────────────────────────────────────────
    MAIN COMPONENT
 ───────────────────────────────────────────────────────────────── */
-export default function AiChatbot({ t, language = 'English', currentUser, onMenuToggle }) {
+export default function AiChatbot({ t, language = 'English', currentUser }) {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [activeMode, setActiveMode] = useState('instant');
@@ -563,17 +558,15 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
   const [attachedFile, setAttachedFile] = useState(null);
   const [thinkActive, setThinkActive] = useState(false);
   const [searchActive, setSearchActive] = useState(true);
-  const [isListening, setIsListening] = useState(false);
 
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
-  const recognitionRef = useRef(null);
 
   const hasMessages = messages.length > 0;
   const canSend = (inputText.trim().length > 0 || !!attachedFile) && !isTyping;
 
-  // Derive User Display Name (e.g. "Ahmad")
+  // User Display Name (e.g. "Ahmad")
   const getUserName = () => {
     if (currentUser?.name) {
       const first = currentUser.name.split(' ')[0];
@@ -596,8 +589,8 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = 'auto';
-    const minH = 36;
-    const maxH = window.innerWidth <= 768 ? 180 : 200;
+    const minH = 32;
+    const maxH = window.innerWidth <= 768 ? 160 : 180;
     const targetH = Math.min(Math.max(el.scrollHeight, minH), maxH);
     el.style.height = `${targetH}px`;
   }, []);
@@ -605,42 +598,6 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
   useEffect(() => {
     autoResize();
   }, [inputText, autoResize]);
-
-  // Voice speech recognition
-  const toggleVoiceInput = () => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert('Speech recognition is not supported in this browser.');
-      return;
-    }
-
-    if (isListening) {
-      recognitionRef.current?.stop();
-      setIsListening(false);
-      return;
-    }
-
-    try {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = language === 'Urdu' ? 'ur-PK' : 'en-US';
-
-      recognition.onstart = () => setIsListening(true);
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        setInputText(prev => (prev ? `${prev} ${transcript}` : transcript));
-        setIsListening(false);
-      };
-      recognition.onerror = () => setIsListening(false);
-      recognition.onend = () => setIsListening(false);
-
-      recognitionRef.current = recognition;
-      recognition.start();
-    } catch {
-      setIsListening(false);
-    }
-  };
 
   /* ── Send Message ── */
   const handleSend = async (overrideText) => {
@@ -686,7 +643,7 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
         sender: 'bot',
-        text: '⚠️ Connection issue. Please try again.',
+        text: '⚠️ Connection notice. Please try again.',
         time: tsBot
       }]);
     }
@@ -731,7 +688,7 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
   };
 
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     INLINE FLOATING INPUT CARD (EXACT MATCH TO SCREENSHOT)
+     INLINE FLOATING INPUT CARD (NEON GLOW DOCKED BOTTOM)
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   const InputCardJSX = (
     <div className="app-ai-input-dock">
@@ -835,30 +792,21 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
             </button>
 
             {/* Circular Purple Soundwaves or Send Arrow */}
-            {inputText.trim().length > 0 || attachedFile ? (
-              <button
-                type="button"
-                className="app-ai-btn-purple-circle"
-                onMouseDown={e => e.preventDefault()}
-                onClick={() => handleSend()}
-                disabled={!canSend}
-                title="Send message"
-                aria-label="Send message"
-              >
+            <button
+              type="button"
+              className="app-ai-btn-purple-circle"
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => handleSend()}
+              disabled={!canSend}
+              title="Send message"
+              aria-label="Send message"
+            >
+              {inputText.trim().length > 0 || attachedFile ? (
                 <ArrowUp size={18} strokeWidth={2.8} />
-              </button>
-            ) : (
-              <button
-                type="button"
-                className="app-ai-btn-purple-circle"
-                onMouseDown={e => e.preventDefault()}
-                onClick={toggleVoiceInput}
-                title={isListening ? 'Listening...' : 'Voice message'}
-                aria-label="Voice message"
-              >
+              ) : (
                 <SoundwavesIcon size={18} />
-              </button>
-            )}
+              )}
+            </button>
           </div>
         </div>
       </div>
@@ -870,37 +818,10 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
       <style>{SCREENSHOT_CSS}</style>
       <div className="app-ai-canvas">
 
-        {/* ── Top Bar: Rounded Hamburger Left, Purple Plus Circle Right ── */}
-        <div className="app-ai-topbar">
-          <button
-            className="app-ai-icon-square"
-            title="Menu"
-            onMouseDown={e => e.preventDefault()}
-            onClick={() => {
-              if (onMenuToggle) onMenuToggle();
-              else {
-                const menuBtn = document.querySelector('.hamburger-btn');
-                if (menuBtn) menuBtn.click();
-              }
-            }}
-          >
-            <Menu size={20} strokeWidth={2.2} />
-          </button>
-
-          <button
-            className="app-ai-icon-circle"
-            title="New Chat"
-            onMouseDown={e => e.preventDefault()}
-            onClick={handleNewChat}
-          >
-            <Plus size={22} strokeWidth={2.4} />
-          </button>
-        </div>
-
-        {/* ── Scrollable Body Area ── */}
+        {/* ── Scrollable Body Area (No Duplicate Top Navbar) ── */}
         <div className="app-ai-scroll">
           {!hasMessages ? (
-            /* ── Welcome Stage (Exact 1:1 Match to Reference Screenshot) ── */
+            /* ── Welcome Stage (Clean, No Clutter Text) ── */
             <div className="app-ai-welcome">
               {/* Glowing Orb with Star & Twinkles */}
               <div className="app-ai-orb-wrap">
@@ -910,7 +831,7 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
                 <span className="app-ai-twinkle" style={{ bottom: '15%', right: '14%', fontSize: '9px', animationDelay: '1.9s' }}>✦</span>
 
                 <div className="app-ai-orb">
-                  <GlowingStar size={42} />
+                  <GlowingStar size={34} />
                 </div>
               </div>
 
@@ -921,9 +842,6 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
               <h2 className="app-ai-question">
                 How can I help you today?
               </h2>
-              <p className="app-ai-subtext">
-                Your AI assistant for instant answers, creative ideas, and everyday tasks.
-              </p>
 
               {/* Mode Selector Pill Bar */}
               <div className="app-ai-mode-container">
@@ -933,7 +851,7 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
                   onClick={() => setActiveMode('instant')}
                   className={`app-ai-mode-btn ${activeMode === 'instant' ? 'active' : ''}`}
                 >
-                  <Zap size={14} strokeWidth={2.5} />
+                  <Zap size={13} strokeWidth={2.5} />
                   <span>Instant</span>
                 </button>
                 <button
@@ -942,7 +860,7 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
                   onClick={() => setActiveMode('expert')}
                   className={`app-ai-mode-btn ${activeMode === 'expert' ? 'active' : ''}`}
                 >
-                  <Gem size={14} strokeWidth={2} />
+                  <Gem size={13} strokeWidth={2} />
                   <span>Expert</span>
                 </button>
                 <button
@@ -951,15 +869,9 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
                   onClick={() => setActiveMode('vision')}
                   className={`app-ai-mode-btn ${activeMode === 'vision' ? 'active' : ''}`}
                 >
-                  <ImageIcon size={14} strokeWidth={2} />
+                  <ImageIcon size={13} strokeWidth={2} />
                   <span>Vision</span>
                 </button>
-              </div>
-
-              <div className="app-ai-mode-caption">
-                {activeMode === 'instant' && 'Instant responses for daily conversations'}
-                {activeMode === 'expert' && 'Deep reasoning & advanced analysis'}
-                {activeMode === 'vision' && 'Visual scanning & document inspection'}
               </div>
 
               {/* 2x2 Action Cards */}
@@ -974,14 +886,14 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
                       onClick={() => handleSend(card.query)}
                     >
                       <div className="app-ai-card-icon" style={{ background: card.iconBg, color: card.iconColor }}>
-                        <Icon size={18} strokeWidth={2.2} />
+                        <Icon size={16} strokeWidth={2.2} />
                       </div>
                       <div className="app-ai-card-content">
                         <div className="app-ai-card-title">{card.title}</div>
                         <div className="app-ai-card-desc">{card.desc}</div>
                       </div>
                       <div className="app-ai-card-arrow">
-                        <ArrowRight size={12} strokeWidth={2.5} />
+                        <ArrowRight size={11} strokeWidth={2.5} />
                       </div>
                     </div>
                   );
@@ -991,6 +903,25 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
           ) : (
             /* ── Active Chat Messages Stream ── */
             <div style={{ padding: '12px 0', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '0 16px 8px 16px' }}>
+                <button
+                  onMouseDown={e => e.preventDefault()}
+                  onClick={handleNewChat}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.08)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    borderRadius: '9999px',
+                    color: '#94a3b8',
+                    padding: '4px 12px',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  + New Chat
+                </button>
+              </div>
+
               {messages.map(msg => (
                 <div key={msg.id} className="app-ai-msg-item">
                   <div className={`app-ai-bubble ${msg.sender === 'user' ? 'app-ai-bubble-user' : 'app-ai-bubble-bot'}`}>
@@ -1044,7 +975,7 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
               {isTyping && (
                 <div className="app-ai-msg-item">
                   <div className="app-ai-bubble app-ai-bubble-bot" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <GlowingStar size={16} />
+                    <GlowingStar size={15} />
                     <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Thinking...</span>
                   </div>
                 </div>
