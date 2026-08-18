@@ -1,353 +1,623 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Menu, Plus, Mic, ArrowUp, Copy, Check, Terminal,
-  RefreshCw, X, Paperclip, FileText, Sparkles, Volume2, VolumeX
+  RefreshCw, X, Paperclip, FileText, Sparkles, Volume2, VolumeX,
+  Send, Bot, User, Wand2, Globe, Shield, Zap
 } from 'lucide-react';
 import { generateChatbotResponse } from '../utils/chatbotEngine';
 
 /* ─────────────────────────────────────────────────────────────────
-   EXACT GOOGLE GEMINI MOBILE AESTHETIC CSS
+   MODERN AI CHAT INTERFACE CSS
+   Sleek dark/light design with smooth animations
 ───────────────────────────────────────────────────────────────── */
-const GEMINI_CSS = `
-  @keyframes gemini-pulse {
-    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(59, 130, 246, 0.4)); }
-    50%      { transform: scale(1.06); filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.6)); }
-  }
-  @keyframes gemini-fade-in {
-    from { opacity: 0; transform: translateY(6px); }
+const CHAT_CSS = `
+  @keyframes chat-fade-in {
+    from { opacity: 0; transform: translateY(12px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-  @keyframes gemini-dot-pulse {
-    0%, 80%, 100% { transform: translateY(0); opacity: 0.35; }
-    40%           { transform: translateY(-5px); opacity: 1; }
+  @keyframes chat-slide-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes chat-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50%      { transform: scale(1.08); opacity: 1; }
+  }
+  @keyframes chat-dot-bounce {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+    40% { transform: translateY(-6px); opacity: 1; }
+  }
+  @keyframes chat-shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  @keyframes chat-float {
+    0%, 100% { transform: translateY(0px); }
+    50%      { transform: translateY(-8px); }
   }
 
-  /* ── Root Canvas with Gemini Soft Sky Gradient ── */
-  .gemini-root {
+  /* ── Root Container ── */
+  .chat-root {
     display: flex;
     flex-direction: column;
     height: 100%;
     min-height: calc(100vh - 145px);
-    background: linear-gradient(180deg, #ffffff 0%, #ffffff 50%, #ebf5ff 80%, #cde5fe 100%);
-    color: #1f1f1f;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
     position: relative;
-    box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, 'Google Sans', 'Outfit', 'Inter', Roboto, sans-serif;
     overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Outfit', Roboto, sans-serif;
   }
-  .dark-theme .gemini-root,
-  body:not(.light-theme) .gemini-root {
-    background: linear-gradient(180deg, #090e17 0%, #0d1527 50%, #11203d 82%, #1a325a 100%);
-    color: #f1f5f9;
+  .dark-theme .chat-root,
+  body:not(.light-theme) .chat-root {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
   }
 
-  /* ── Top Minimal Bar ── */
-  .gemini-top-bar {
+  /* ── Animated Background Orbs ── */
+  .chat-bg-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .chat-bg-orb-1 {
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.4), transparent 70%);
+    top: -100px;
+    right: -100px;
+    animation: chat-float 8s ease-in-out infinite;
+  }
+  .chat-bg-orb-2 {
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.3), transparent 70%);
+    bottom: -80px;
+    left: -80px;
+    animation: chat-float 10s ease-in-out infinite reverse;
+  }
+
+  /* ── Top Navigation Bar ── */
+  .chat-top-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 18px 6px 18px;
-    background: transparent;
+    padding: 16px 20px 8px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     flex-shrink: 0;
     z-index: 20;
+    position: relative;
   }
-  .gemini-top-btn {
+  .dark-theme .chat-top-bar,
+  body:not(.light-theme) .chat-top-bar {
+    background: rgba(15, 23, 42, 0.8);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .chat-top-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .chat-top-bar-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.01em;
+  }
+  .dark-theme .chat-top-bar-title,
+  body:not(.light-theme) .chat-top-bar-title {
+    color: #f1f5f9;
+  }
+  .chat-top-bar-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .chat-top-btn {
     background: none;
     border: none;
     cursor: pointer;
-    color: inherit;
+    color: #64748b;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 6px;
-    border-radius: 50%;
-    transition: background 0.15s, opacity 0.15s;
+    padding: 8px;
+    border-radius: 12px;
+    transition: all 0.2s;
     -webkit-tap-highlight-color: transparent;
-    opacity: 0.85;
   }
-  .gemini-top-btn:hover {
-    background: rgba(0, 0, 0, 0.05);
-    opacity: 1;
+  .chat-top-btn:hover {
+    background: rgba(0, 0, 0, 0.06);
+    color: #0f172a;
   }
-  .dark-theme .gemini-top-btn:hover,
-  body:not(.light-theme) .gemini-top-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+  .dark-theme .chat-top-btn,
+  body:not(.light-theme) .chat-top-btn {
+    color: #94a3b8;
+  }
+  .dark-theme .chat-top-btn:hover,
+  body:not(.light-theme) .chat-top-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #f1f5f9;
   }
 
-  /* ── Scroll Area ── */
-  .gemini-scroll-area {
+  /* ── Messages Area ── */
+  .chat-messages {
     flex: 1 1 0;
     min-height: 0;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    padding: 20px 0;
+    position: relative;
+    z-index: 1;
     -webkit-overflow-scrolling: touch;
   }
 
-  /* ── Welcome Stage (Vertical Center) ── */
-  .gemini-welcome-center {
+  /* ── Welcome Screen ── */
+  .chat-welcome {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 20px 24px 40px 24px;
+    padding: 40px 24px;
     text-align: center;
-    user-select: none;
+    animation: chat-fade-in 0.6s ease-out;
   }
-
-  .gemini-star-wrap {
+  .chat-welcome-icon {
+    position: relative;
     margin-bottom: 24px;
-    animation: gemini-pulse 4s infinite ease-in-out;
+    animation: chat-pulse 3s ease-in-out infinite;
   }
-
-  .gemini-greeting-text {
-    font-size: clamp(1.6rem, 6.5vw, 2.1rem);
+  .chat-welcome-icon::before {
+    content: '';
+    position: absolute;
+    inset: -20px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.2), transparent 70%);
+    border-radius: 50%;
+    animation: chat-pulse 3s ease-in-out infinite;
+  }
+  .chat-welcome-title {
+    font-size: clamp(1.8rem, 6vw, 2.4rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 8px;
+    letter-spacing: -0.03em;
+  }
+  .chat-welcome-subtitle {
+    font-size: 1rem;
+    color: #64748b;
+    margin: 0 0 32px;
     font-weight: 500;
-    color: #1f1f1f;
-    letter-spacing: -0.025em;
-    margin: 0;
-    line-height: 1.25;
   }
-  .dark-theme .gemini-greeting-text,
-  body:not(.light-theme) .gemini-greeting-text {
-    color: #f8fafc;
+  .dark-theme .chat-welcome-subtitle,
+  body:not(.light-theme) .chat-welcome-subtitle {
+    color: #94a3b8;
   }
 
-  /* ── Floating Capsule Input Bar (Gemini Pill) ── */
-  .gemini-input-dock {
-    padding: 8px 18px calc(env(safe-area-inset-bottom, 0px) + 16px) 18px;
-    flex-shrink: 0;
-    background: transparent;
-    z-index: 30;
+  /* ── Suggested Prompts ── */
+  .chat-suggestions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
     width: 100%;
     max-width: 600px;
-    margin: 0 auto;
-    box-sizing: border-box;
+    animation: chat-slide-up 0.6s ease-out 0.2s both;
   }
-
-  .gemini-capsule-card {
-    background: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 999px;
-    padding: 8px 12px 8px 16px;
+  .chat-suggestion {
     display: flex;
-    align-items: center;
-    gap: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-sizing: border-box;
-    min-height: 52px;
-  }
-  .gemini-capsule-card.multiline {
-    border-radius: 24px;
-    align-items: flex-end;
-  }
-  .dark-theme .gemini-capsule-card,
-  body:not(.light-theme) .gemini-capsule-card {
-    background: #1e293b;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
-  }
-  .gemini-capsule-card:focus-within {
-    box-shadow: 0 6px 28px rgba(59, 130, 246, 0.18), 0 0 0 2px #3b82f6;
-  }
-
-  /* ── Plus Button on Left ── */
-  .gemini-plus-btn {
-    background: none;
-    border: none;
-    color: #4b5563;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
     cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    font-size: 0.88rem;
+    color: #334155;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .chat-suggestion:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(99, 102, 241, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.12);
+  }
+  .dark-theme .chat-suggestion,
+  body:not(.light-theme) .chat-suggestion {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #cbd5e1;
+  }
+  .dark-theme .chat-suggestion:hover,
+  body:not(.light-theme) .chat-suggestion:hover {
+    background: rgba(30, 41, 59, 0.95);
+    border-color: rgba(99, 102, 241, 0.4);
+  }
+  .chat-suggestion-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 6px;
-    border-radius: 50%;
-    transition: transform 0.15s, color 0.15s;
     flex-shrink: 0;
-    -webkit-tap-highlight-color: transparent;
   }
-  .gemini-plus-btn:hover {
-    color: #1f1f1f;
-    background: rgba(0, 0, 0, 0.05);
+  .chat-suggestion-icon.purple { background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; }
+  .chat-suggestion-icon.blue   { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; }
+  .chat-suggestion-icon.green  { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+  .chat-suggestion-icon.orange { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+
+  /* ── Message Bubbles ── */
+  .chat-msg-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    padding: 0 20px;
+    animation: chat-fade-in 0.3s ease-out;
   }
-  .dark-theme .gemini-plus-btn,
-  body:not(.light-theme) .gemini-plus-btn {
-    color: #94a3b8;
+  .chat-msg-row.user  { align-items: flex-end; }
+  .chat-msg-row.bot   { align-items: flex-start; }
+
+  .chat-bubble {
+    max-width: 85%;
+    padding: 14px 18px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    word-break: break-word;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   }
-  .dark-theme .gemini-plus-btn:hover,
-  body:not(.light-theme) .gemini-plus-btn:hover {
+  .chat-bubble-user {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    border-bottom-right-radius: 6px;
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+  }
+  .chat-bubble-bot {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    color: #1f2937;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom-left-radius: 6px;
+  }
+  .dark-theme .chat-bubble-bot,
+  body:not(.light-theme) .chat-bubble-bot {
+    background: rgba(30, 41, 59, 0.9);
     color: #f1f5f9;
-    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  /* ── Auto-Growing Input Box (Stable, Non-Remounting) ── */
-  .gemini-textarea {
+  .chat-msg-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    padding: 0 4px;
+    font-size: 0.7rem;
+    color: #94a3b8;
+    font-weight: 500;
+  }
+  .chat-msg-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+  .chat-msg-avatar.user-avatar {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+  }
+  .chat-msg-avatar.bot-avatar {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+  }
+
+  /* ── Typing Indicator ── */
+  .chat-typing {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 20px;
+    margin-bottom: 20px;
+    animation: chat-fade-in 0.3s ease-out;
+  }
+  .chat-typing-dots {
+    display: flex;
+    gap: 4px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 20px;
+    border-bottom-left-radius: 6px;
+  }
+  .dark-theme .chat-typing-dots,
+  body:not(.light-theme) .chat-typing-dots {
+    background: rgba(30, 41, 59, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .chat-typing-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #6366f1;
+    animation: chat-dot-bounce 1.4s ease-in-out infinite;
+  }
+  .chat-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .chat-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  /* ── Input Area ── */
+  .chat-input-area {
+    padding: 12px 20px calc(env(safe-area-inset-bottom, 0px) + 16px);
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 20;
+  }
+  .dark-theme .chat-input-area,
+  body:not(.light-theme) .chat-input-area {
+    background: rgba(15, 23, 42, 0.8);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .chat-input-card {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    background: white;
+    border: 1.5px solid rgba(0, 0, 0, 0.08);
+    border-radius: 24px;
+    padding: 8px 8px 8px 18px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    transition: all 0.2s;
+  }
+  .chat-input-card:focus-within {
+    border-color: #6366f1;
+    box-shadow: 0 6px 28px rgba(99, 102, 241, 0.15), 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+  .dark-theme .chat-input-card,
+  body:not(.light-theme) .chat-input-card {
+    background: #1e293b;
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  }
+  .chat-input-textarea {
     flex: 1 1 0;
     min-width: 0;
     border: none;
     outline: none;
     resize: none;
     background: transparent;
-    color: #1f1f1f;
-    font-size: 1.02rem;
-    line-height: 1.45;
+    color: #0f172a;
+    font-size: 0.95rem;
+    line-height: 1.5;
     font-family: inherit;
-    min-height: 26px;
-    max-height: 180px;
-    padding: 3px 0;
-    box-sizing: border-box;
-    display: block;
-    overflow-y: auto;
-    -webkit-tap-highlight-color: transparent;
+    padding: 8px 0;
+    max-height: 140px;
+    min-height: 24px;
   }
-  .dark-theme .gemini-textarea,
-  body:not(.light-theme) .gemini-textarea {
-    color: #f8fafc;
+  .dark-theme .chat-input-textarea,
+  body:not(.light-theme) .chat-input-textarea {
+    color: #f1f5f9;
   }
-  .gemini-textarea::placeholder {
-    color: #757575;
-    font-size: 1.02rem;
-  }
-  .dark-theme .gemini-textarea::placeholder,
-  body:not(.light-theme) .gemini-textarea::placeholder {
+  .chat-input-textarea::placeholder {
     color: #94a3b8;
+    font-size: 0.95rem;
   }
-
-  /* ── Right Action (Mic or Send Arrow) ── */
-  .gemini-action-btn {
-    width: 38px;
-    height: 38px;
+  .chat-input-btn {
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     border: none;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s;
     flex-shrink: 0;
     -webkit-tap-highlight-color: transparent;
   }
-  .gemini-mic-btn {
-    background: none;
-    color: #4b5563;
+  .chat-input-btn.attach {
+    background: transparent;
+    color: #64748b;
   }
-  .gemini-mic-btn:hover {
+  .chat-input-btn.attach:hover {
     background: rgba(0, 0, 0, 0.05);
-    color: #1f1f1f;
+    color: #0f172a;
   }
-  .gemini-mic-btn.listening {
-    background: #ef4444 !important;
-    color: #ffffff !important;
-    animation: gemini-pulse 1.5s infinite;
-  }
-  .dark-theme .gemini-mic-btn,
-  body:not(.light-theme) .gemini-mic-btn {
+  .dark-theme .chat-input-btn.attach,
+  body:not(.light-theme) .chat-input-btn.attach {
     color: #94a3b8;
   }
-  .dark-theme .gemini-mic-btn:hover,
-  body:not(.light-theme) .gemini-mic-btn:hover {
-    color: #f8fafc;
+  .dark-theme .chat-input-btn.attach:hover,
+  body:not(.light-theme) .chat-input-btn.attach:hover {
     background: rgba(255, 255, 255, 0.08);
+    color: #f1f5f9;
   }
-  .gemini-send-btn {
-    background: #2563eb;
-    color: #ffffff;
-    box-shadow: 0 2px 10px rgba(37, 99, 235, 0.35);
-    transform: scale(1.02);
+  .chat-input-btn.send {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    box-shadow: 0 2px 10px rgba(99, 102, 241, 0.35);
   }
-  .gemini-send-btn:hover {
-    background: #1d4ed8;
+  .chat-input-btn.send:hover {
     transform: scale(1.08);
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.5);
   }
-  .gemini-send-btn:active {
-    transform: scale(0.92);
+  .chat-input-btn.send:active {
+    transform: scale(0.95);
+  }
+  .chat-input-btn.send:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .chat-input-btn.mic.listening {
+    background: #ef4444;
+    color: white;
+    animation: chat-pulse 1.5s ease-in-out infinite;
   }
 
-  /* ── Chat Messages ── */
-  .gemini-msg-row {
+  /* ── File Preview ── */
+  .chat-file-preview {
     display: flex;
-    flex-direction: column;
-    width: 100%;
-    margin-bottom: 16px;
-    padding: 0 18px;
-    box-sizing: border-box;
-    animation: gemini-fade-in 0.2s ease-out both;
-  }
-  .gemini-bubble {
-    max-width: 86%;
-    padding: 12px 18px;
-    font-size: 0.98rem;
-    line-height: 1.6;
-    border-radius: 22px;
-    word-break: break-word;
-  }
-  .gemini-bubble-user {
-    align-self: flex-end;
-    background: #2563eb;
-    color: #ffffff;
-    border-bottom-right-radius: 6px;
-    box-shadow: 0 3px 12px rgba(37, 99, 235, 0.25);
-  }
-  .gemini-bubble-bot {
-    align-self: flex-start;
-    background: #ffffff;
-    color: #1f1f1f;
-    border: 1px solid rgba(0, 0, 0, 0.07);
-    border-bottom-left-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  }
-  .dark-theme .gemini-bubble-bot,
-  body:not(.light-theme) .gemini-bubble-bot {
-    background: #1e293b;
-    color: #f8fafc;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    margin: 0 20px 8px;
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 16px;
+    font-size: 0.82rem;
+    color: #6366f1;
+    font-weight: 600;
   }
 
-  /* ── Responsive Mobile ── */
+  /* ── Mobile Responsive ── */
   @media (max-width: 768px) {
-    .gemini-root {
-      height: calc(100dvh - 65px - env(safe-area-inset-bottom, 0px));
-      min-height: 0;
+    .chat-root {
+      min-height: calc(100dvh - 65px - env(safe-area-inset-bottom, 0px));
     }
-    .gemini-top-bar {
-      padding: 10px 14px 4px 14px;
+    .chat-top-bar {
+      padding: 12px 16px 6px;
     }
-    .gemini-greeting-text {
-      font-size: 1.75rem;
+    .chat-welcome {
+      padding: 30px 16px;
     }
-    .gemini-input-dock {
-      padding: 6px 12px calc(env(safe-area-inset-bottom, 0px) + 12px) 12px;
+    .chat-welcome-title {
+      font-size: 1.6rem;
     }
-    .gemini-capsule-card {
-      min-height: 48px;
-      padding: 6px 10px 6px 14px;
+    .chat-suggestions {
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding: 0 4px;
     }
-    .gemini-textarea {
-      font-size: 16px; /* Prevents auto-zoom on iOS */
+    .chat-bubble {
+      max-width: 90%;
+      padding: 12px 14px;
+      font-size: 0.9rem;
+    }
+    .chat-input-area {
+      padding: 10px 12px calc(env(safe-area-inset-bottom, 0px) + 12px);
+    }
+    .chat-input-card {
+      padding: 6px 6px 6px 14px;
+      border-radius: 20px;
+    }
+    .chat-input-textarea {
+      font-size: 16px;
     }
   }
 `;
 
-/* ── Exact Multi-Color Google Gemini 4-Pointed Star SVG ── */
-function GeminiSparkleStar({ size = 46 }) {
+/* ── Modern Bot Avatar with Gradient ── */
+function BotAvatar() {
   return (
-    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path
-        d="M50 0C50 27.614 27.614 50 0 50C27.614 50 50 72.386 50 100C50 72.386 72.386 50 100 50C72.386 50 50 27.614 50 0Z"
-        fill="url(#gemini_multi_grad)"
-      />
-      <defs>
-        <linearGradient id="gemini_multi_grad" x1="10" y1="0" x2="90" y2="100" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#f43f5e" />
-          <stop offset="25%" stopColor="#fb923c" />
-          <stop offset="50%" stopColor="#22c55e" />
-          <stop offset="75%" stopColor="#3b82f6" />
-          <stop offset="100%" stopColor="#8b5cf6" />
-        </linearGradient>
-      </defs>
-    </svg>
+    <div className="chat-msg-avatar bot-avatar" style={{
+      background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}>
+      <Sparkles size={14} color="white" />
+    </div>
+  );
+}
+
+/* ── Modern User Avatar ── */
+function UserAvatar({ name }) {
+  const initial = name ? name.charAt(0).toUpperCase() : 'U';
+  return (
+    <div className="chat-msg-avatar user-avatar" style={{
+      background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}>
+      {initial}
+    </div>
+  );
+}
+
+/* ── Suggested Prompt Cards ── */
+function SuggestedPrompts({ onSelect }) {
+  const suggestions = [
+    {
+      icon: <Shield size={18} />,
+      color: 'purple',
+      title: 'Phishing Detection',
+      text: 'How can I identify a phishing email?'
+    },
+    {
+      icon: <Globe size={18} />,
+      color: 'blue',
+      title: 'URL Safety Check',
+      text: 'Check if a website is safe to visit'
+    },
+    {
+      icon: <Wand2 size={18} />,
+      color: 'green',
+      title: 'Security Tips',
+      text: 'Best practices for online safety'
+    },
+    {
+      icon: <Zap size={18} />,
+      color: 'orange',
+      title: 'Quick Scan',
+      text: 'Analyze a suspicious link or message'
+    }
+  ];
+
+  return (
+    <div className="chat-suggestions">
+      {suggestions.map((s, i) => (
+        <button
+          key={i}
+          className="chat-suggestion"
+          onClick={() => onSelect(s.text)}
+          type="button"
+        >
+          <div className={`chat-suggestion-icon ${s.color}`}>
+            {s.icon}
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: '0.85rem', marginBottom: '2px' }}>
+              {s.title}
+            </div>
+            <div style={{ fontSize: '0.78rem', opacity: 0.8, lineHeight: '1.3' }}>
+              {s.text}
+            </div>
+          </div>
+        </button>
+      ))}
+    </div>
   );
 }
 
@@ -370,29 +640,26 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
   const hasMessages = messages.length > 0;
   const canSend = (inputText.trim().length > 0 || !!attachedFile) && !isTyping;
 
-  // Derive User Display Name (e.g. "ahmad", "Ahmad", or fallback)
   const getUserName = () => {
     if (currentUser?.name) {
-      return currentUser.name.split(' ')[0].toLowerCase();
+      return currentUser.name.split(' ')[0];
     }
     if (currentUser?.username) {
-      return currentUser.username.toLowerCase();
+      return currentUser.username;
     }
-    return 'ahmad';
+    return 'there';
   };
 
-  // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  // Dynamic height for textarea without remounting
   const autoResize = useCallback(() => {
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = 'auto';
-    const minH = 26;
-    const maxH = window.innerWidth <= 768 ? 160 : 180;
+    const minH = 24;
+    const maxH = window.innerWidth <= 768 ? 120 : 160;
     const targetH = Math.min(Math.max(el.scrollHeight, minH), maxH);
     el.style.height = `${targetH}px`;
   }, []);
@@ -401,7 +668,6 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
     autoResize();
   }, [inputText, autoResize]);
 
-  // Voice speech-to-text recognition
   const toggleVoiceInput = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -437,7 +703,6 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
     }
   };
 
-  /* ── Send Message ── */
   const handleSend = async (overrideText) => {
     const baseText = typeof overrideText === 'string' ? overrideText.trim() : inputText.trim();
     const fileNote = attachedFile
@@ -487,7 +752,6 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
     }
   };
 
-  /* ── File Attach ── */
   const handleFileAttach = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -502,21 +766,18 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
     e.target.value = '';
   };
 
-  /* ── Copy to Clipboard ── */
   const handleCopy = (text, id) => {
     navigator.clipboard.writeText(text).catch(() => {});
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 1800);
   };
 
-  /* ── Reset Chat ── */
   const handleNewChat = () => {
     setMessages([]);
     setInputText('');
     setAttachedFile(null);
   };
 
-  /* ── Keydown (no mobile submit on enter) ── */
   const handleKeyDown = (e) => {
     const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     if (e.key === 'Enter' && !e.shiftKey && !isTouch) {
@@ -525,210 +786,145 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
     }
   };
 
-  const isMultiLine = inputText.includes('\n') || (textareaRef.current?.scrollHeight || 0) > 36;
-
-  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     INLINE FLOATING CAPSULE INPUT BAR (GEMINI PILL)
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-  const InputCapsuleJSX = (
-    <div className="gemini-input-dock">
-      {/* File preview if attached */}
-      {attachedFile && (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          padding: '6px 14px',
-          marginBottom: '8px',
-          background: 'rgba(59, 130, 246, 0.12)',
-          border: '1px solid rgba(59, 130, 246, 0.3)',
-          borderRadius: '999px',
-          fontSize: '0.78rem',
-          color: '#2563eb',
-          fontWeight: 700
-        }}>
-          <FileText size={13} />
-          <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {attachedFile.name}
-          </span>
-          <button
-            onClick={() => setAttachedFile(null)}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#2563eb', padding: 0 }}
-          >
-            <X size={13} />
-          </button>
-        </div>
-      )}
-
-      <div className={`gemini-capsule-card ${isMultiLine ? 'multiline' : ''}`}>
-        {/* Left Plus Attachment Button */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".txt,.eml,.csv,.json,.py,.md,.log"
-          onChange={handleFileAttach}
-          style={{ display: 'none' }}
-        />
-        <button
-          type="button"
-          className="gemini-plus-btn"
-          onMouseDown={e => e.preventDefault()}
-          onClick={() => fileInputRef.current?.click()}
-          title="Add files or scan"
-        >
-          <Plus size={20} strokeWidth={2.4} />
-        </button>
-
-        {/* Stable Textarea Input */}
-        <textarea
-          ref={textareaRef}
-          className="gemini-textarea"
-          value={inputText}
-          onInput={autoResize}
-          onChange={e => setInputText(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Ask Gemini"
-          rows={1}
-          autoComplete="off"
-          autoCorrect="off"
-          autoCapitalize="sentences"
-          spellCheck={false}
-        />
-
-        {/* Right Action Button: Mic or Elevated Send Arrow */}
-        {inputText.trim().length > 0 || attachedFile ? (
-          <button
-            type="button"
-            className="gemini-action-btn gemini-send-btn"
-            onMouseDown={e => e.preventDefault()}
-            onClick={() => handleSend()}
-            disabled={!canSend}
-            title="Send prompt"
-            aria-label="Send prompt"
-          >
-            <ArrowUp size={18} strokeWidth={2.8} />
-          </button>
-        ) : (
-          <button
-            type="button"
-            className={`gemini-action-btn gemini-mic-btn ${isListening ? 'listening' : ''}`}
-            onMouseDown={e => e.preventDefault()}
-            onClick={toggleVoiceInput}
-            title={isListening ? 'Listening...' : 'Voice input'}
-            aria-label="Voice input"
-          >
-            <Mic size={20} strokeWidth={2} />
-          </button>
-        )}
-      </div>
-    </div>
-  );
+  const handleSuggestionSelect = (text) => {
+    handleSend(text);
+  };
 
   return (
     <>
-      <style>{GEMINI_CSS}</style>
-      <div className="gemini-root">
+      <style>{CHAT_CSS}</style>
+      <div className="chat-root">
+        {/* Background Orbs */}
+        <div className="chat-bg-orb chat-bg-orb-1" />
+        <div className="chat-bg-orb chat-bg-orb-2" />
 
-        {/* ── Top Bar (Minimal Icons) ── */}
-        <div className="gemini-top-bar">
-          <button
-            className="gemini-top-btn"
-            title="Menu"
-            onClick={() => {
-              if (onMenuToggle) onMenuToggle();
-              else {
-                const menuBtn = document.querySelector('.hamburger-btn');
-                if (menuBtn) menuBtn.click();
-              }
-            }}
-          >
-            <Menu size={22} strokeWidth={2} />
-          </button>
-
+        {/* Top Bar */}
+        <div className="chat-top-bar">
+          <div className="chat-top-bar-left">
+            <button
+              className="chat-top-btn"
+              title="Menu"
+              onClick={() => {
+                if (onMenuToggle) onMenuToggle();
+                else {
+                  const menuBtn = document.querySelector('.hamburger-btn');
+                  if (menuBtn) menuBtn.click();
+                }
+              }}
+            >
+              <Menu size={22} strokeWidth={2} />
+            </button>
+            <div>
+              <div className="chat-top-bar-title">APDS Assistant</div>
+            </div>
+            <div className="chat-top-bar-badge">
+              <Sparkles size={12} />
+              AI Powered
+            </div>
+          </div>
           {hasMessages && (
             <button
-              className="gemini-top-btn"
+              className="chat-top-btn"
               title="New Chat"
               onClick={handleNewChat}
             >
-              <Plus size={22} strokeWidth={2} />
+              <Plus size={20} strokeWidth={2} />
             </button>
           )}
         </div>
 
-        {/* ── Scrollable Area ── */}
-        <div className="gemini-scroll-area">
+        {/* Messages Area */}
+        <div className="chat-messages">
           {!hasMessages ? (
-            /* ── Gemini Welcome Center Stage (Exact Match) ── */
-            <div className="gemini-welcome-center">
-              {/* Iconic Multi-Color 4-Pointed Sparkle Star */}
-              <div className="gemini-star-wrap">
-                <GeminiSparkleStar size={48} />
+            <div className="chat-welcome">
+              <div className="chat-welcome-icon">
+                <div style={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #6366f1, #8b5cf6, #3b82f6)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 8px 32px rgba(99, 102, 241, 0.4)',
+                  position: 'relative',
+                  zIndex: 1
+                }}>
+                  <Sparkles size={40} color="white" strokeWidth={2} />
+                </div>
               </div>
-
-              {/* Greeting */}
-              <h1 className="gemini-greeting-text">
-                Your move, {getUserName()}!
+              <h1 className="chat-welcome-title">
+                Hello, {getUserName()}!
               </h1>
+              <p className="chat-welcome-subtitle">
+                I'm your APDS security assistant. How can I help you today?
+              </p>
+              <SuggestedPrompts onSelect={handleSuggestionSelect} />
             </div>
           ) : (
-            /* ── Active Conversation Stream ── */
             <div style={{ padding: '10px 0', display: 'flex', flexDirection: 'column' }}>
               {messages.map(msg => (
-                <div key={msg.id} className="gemini-msg-row">
-                  <div className={`gemini-bubble ${msg.sender === 'user' ? 'gemini-bubble-user' : 'gemini-bubble-bot'}`}>
-                    {msg.fileInfo && (
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '5px',
-                        marginBottom: '6px',
-                        fontSize: '0.78rem',
-                        opacity: 0.9,
-                        fontWeight: 700
-                      }}>
-                        <FileText size={13} /> {msg.fileInfo}
-                      </div>
-                    )}
-                    <div style={{ whiteSpace: 'pre-line' }}>{msg.text}</div>
-                    {msg.sender === 'bot' && (
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '6px' }}>
-                        <button
-                          onClick={() => handleCopy(msg.text, msg.id)}
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            color: 'inherit',
-                            opacity: 0.7,
-                            fontSize: '0.74rem',
+                <div key={msg.id} className={`chat-msg-row ${msg.sender}`}>
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-end', maxWidth: '100%' }}>
+                    {msg.sender === 'bot' && <BotAvatar />}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div className={`chat-bubble ${msg.sender === 'user' ? 'chat-bubble-user' : 'chat-bubble-bot'}`}>
+                        {msg.fileInfo && (
+                          <div style={{
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '4px'
-                          }}
-                        >
-                          {copiedId === msg.id ? <><Check size={12} color="#10b981" /> Copied</> : <><Copy size={12} /> Copy</>}
-                        </button>
+                            gap: '6px',
+                            marginBottom: '8px',
+                            padding: '6px 10px',
+                            background: 'rgba(255,255,255,0.2)',
+                            borderRadius: '8px',
+                            fontSize: '0.78rem',
+                            fontWeight: 600
+                          }}>
+                            <FileText size={13} />
+                            {msg.fileInfo}
+                          </div>
+                        )}
+                        <div style={{ whiteSpace: 'pre-line' }}>{msg.text}</div>
+                        {msg.sender === 'bot' && (
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
+                            <button
+                              onClick={() => handleCopy(msg.text, msg.id)}
+                              style={{
+                                background: 'rgba(0,0,0,0.1)',
+                                border: 'none',
+                                cursor: 'pointer',
+                                color: 'inherit',
+                                padding: '4px 10px',
+                                borderRadius: '8px',
+                                fontSize: '0.74rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                fontWeight: 600
+                              }}
+                            >
+                              {copiedId === msg.id ? <><Check size={12} color="#10b981" /> Copied</> : <><Copy size={12} /> Copy</>}
+                            </button>
+                          </div>
+                        )}
                       </div>
-                    )}
+                      <div className="chat-msg-meta">
+                        <span>{msg.time}</span>
+                      </div>
+                    </div>
+                    {msg.sender === 'user' && <UserAvatar name={currentUser?.name} />}
                   </div>
-                  <span style={{
-                    fontSize: '0.68rem',
-                    opacity: 0.6,
-                    marginTop: '3px',
-                    alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
-                    padding: '0 4px'
-                  }}>
-                    {msg.time}
-                  </span>
                 </div>
               ))}
 
               {isTyping && (
-                <div className="gemini-msg-row">
-                  <div className="gemini-bubble gemini-bubble-bot" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <GeminiSparkleStar size={16} />
-                    <span style={{ fontSize: '0.85rem', opacity: 0.8 }}>Thinking...</span>
+                <div className="chat-typing">
+                  <BotAvatar />
+                  <div className="chat-typing-dots">
+                    <div className="chat-typing-dot" />
+                    <div className="chat-typing-dot" />
+                    <div className="chat-typing-dot" />
                   </div>
                 </div>
               )}
@@ -737,9 +933,86 @@ export default function AiChatbot({ t, language = 'English', currentUser, onMenu
           )}
         </div>
 
-        {/* ── Bottom Floating Capsule Input Dock ── */}
-        {InputCapsuleJSX}
-
+        {/* Input Area */}
+        <div className="chat-input-area">
+          {attachedFile && (
+            <div className="chat-file-preview">
+              <FileText size={14} />
+              <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {attachedFile.name}
+              </span>
+              <button
+                onClick={() => setAttachedFile(null)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#6366f1',
+                  padding: 0,
+                  display: 'flex'
+                }}
+              >
+                <X size={14} />
+              </button>
+            </div>
+          )}
+          <div className="chat-input-card">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".txt,.eml,.csv,.json,.py,.md,.log"
+              onChange={handleFileAttach}
+              style={{ display: 'none' }}
+            />
+            <button
+              type="button"
+              className="chat-input-btn attach"
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => fileInputRef.current?.click()}
+              title="Attach file"
+            >
+              <Paperclip size={18} strokeWidth={2} />
+            </button>
+            <textarea
+              ref={textareaRef}
+              className="chat-input-textarea"
+              value={inputText}
+              onInput={autoResize}
+              onChange={e => setInputText(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Ask APDS Assistant..."
+              rows={1}
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="sentences"
+              spellCheck={false}
+            />
+            {inputText.trim().length > 0 || attachedFile ? (
+              <button
+                type="button"
+                className="chat-input-btn send"
+                onMouseDown={e => e.preventDefault()}
+                onClick={() => handleSend()}
+                disabled={!canSend}
+                title="Send message"
+                aria-label="Send message"
+              >
+                <ArrowUp size={18} strokeWidth={2.5} />
+              </button>
+            ) : (
+              <button
+                type="button"
+                className={`chat-input-btn mic ${isListening ? 'listening' : ''}`}
+                onMouseDown={e => e.preventDefault()}
+                onClick={toggleVoiceInput}
+                title={isListening ? 'Listening...' : 'Voice input'}
+                aria-label="Voice input"
+              >
+                <Mic size={18} strokeWidth={2} />
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </>
   );
