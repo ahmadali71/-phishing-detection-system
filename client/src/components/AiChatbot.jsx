@@ -1,627 +1,593 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
-  Menu, PlusCircle, Zap, Gem, Globe, Atom,
-  Paperclip, ArrowUp, Copy, Check, X, FileText,
-  Shield, Bot, Sparkles
+  Menu, Plus, Mic, ArrowUp, Copy, Check, Terminal,
+  RefreshCw, X, Paperclip, FileText, Sparkles, Volume2, VolumeX
 } from 'lucide-react';
 import { generateChatbotResponse } from '../utils/chatbotEngine';
 
 /* ─────────────────────────────────────────────────────────────────
-   STYLES — uses app CSS tokens so they match the site theme
+   EXACT GOOGLE GEMINI MOBILE AESTHETIC CSS
 ───────────────────────────────────────────────────────────────── */
-const CSS = `
-  @keyframes ai-glow-pulse {
-    0%,100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.45); }
-    50%      { box-shadow: 0 0 0 18px rgba(59,130,246,0); }
+const GEMINI_CSS = `
+  @keyframes gemini-pulse {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(59, 130, 246, 0.4)); }
+    50%      { transform: scale(1.06); filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.6)); }
   }
-  @keyframes ai-fade-up {
-    from { opacity:0; transform:translateY(7px); }
-    to   { opacity:1; transform:translateY(0); }
+  @keyframes gemini-fade-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
-  @keyframes ai-dot-bounce {
-    0%,80%,100% { transform:translateY(0); opacity:.35; }
-    40%         { transform:translateY(-6px); opacity:1; }
+  @keyframes gemini-dot-pulse {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.35; }
+    40%           { transform: translateY(-5px); opacity: 1; }
   }
 
-  /* ── Root ── */
-  .ai-root {
+  /* ── Root Canvas with Gemini Soft Sky Gradient ── */
+  .gemini-root {
     display: flex;
     flex-direction: column;
     height: 100%;
-    min-height: calc(100dvh - 145px);
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    font-family: var(--font-sans, system-ui, sans-serif);
+    min-height: calc(100vh - 145px);
+    background: linear-gradient(180deg, #ffffff 0%, #ffffff 50%, #ebf5ff 80%, #cde5fe 100%);
+    color: #1f1f1f;
     position: relative;
-    border-radius: 20px;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Google Sans', 'Outfit', 'Inter', Roboto, sans-serif;
     overflow: hidden;
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-card);
+  }
+  .dark-theme .gemini-root,
+  body:not(.light-theme) .gemini-root {
+    background: linear-gradient(180deg, #090e17 0%, #0d1527 50%, #11203d 82%, #1a325a 100%);
+    color: #f1f5f9;
   }
 
-  /* ── Top bar ── */
-  .ai-topbar {
+  /* ── Top Minimal Bar ── */
+  .gemini-top-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 20px 10px;
+    padding: 14px 18px 6px 18px;
+    background: transparent;
     flex-shrink: 0;
-    background: var(--bg-card);
-    border-bottom: 1px solid var(--border-color);
+    z-index: 20;
   }
-  .ai-topbar-brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .ai-topbar-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    box-shadow: 0 3px 10px rgba(37,99,235,0.4);
-    flex-shrink: 0;
-  }
-  .ai-topbar-info { line-height: 1.2; }
-  .ai-topbar-name { font-weight: 800; font-size: 0.92rem; font-family: var(--font-display, 'Outfit', sans-serif); }
-  .ai-topbar-status {
-    font-size: 0.68rem;
-    color: #10b981;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .ai-topbar-dot {
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: #10b981;
-    display: inline-block;
-  }
-  .ai-nav-btn {
-    background: var(--bg-input, rgba(255,255,255,0.06));
-    border: 1px solid var(--border-color);
+  .gemini-top-btn {
+    background: none;
+    border: none;
     cursor: pointer;
-    color: var(--text-secondary);
+    color: inherit;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 7px;
-    border-radius: 10px;
-    transition: all 0.15s;
+    padding: 6px;
+    border-radius: 50%;
+    transition: background 0.15s, opacity 0.15s;
     -webkit-tap-highlight-color: transparent;
-    font-family: inherit;
+    opacity: 0.85;
   }
-  .ai-nav-btn:hover  { color: var(--text-primary); border-color: var(--accent-blue, #3b82f6); }
-  .ai-nav-btn:active { transform: scale(0.91); }
+  .gemini-top-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    opacity: 1;
+  }
+  .dark-theme .gemini-top-btn:hover,
+  body:not(.light-theme) .gemini-top-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
 
-  /* ── Scroll area ── */
-  .ai-scroll {
+  /* ── Scroll Area ── */
+  .gemini-scroll-area {
     flex: 1 1 0;
     min-height: 0;
     overflow-y: auto;
-    overscroll-behavior: contain;
+    display: flex;
+    flex-direction: column;
     -webkit-overflow-scrolling: touch;
   }
 
-  /* ── Welcome ── */
-  .ai-welcome {
+  /* ── Welcome Stage (Vertical Center) ── */
+  .gemini-welcome-center {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 100%;
-    padding: 20px 20px 28px;
-    gap: 0;
-  }
-  .ai-logo {
-    width: 64px; height: 64px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: ai-glow-pulse 3.2s ease-in-out infinite;
-    margin-bottom: 16px;
-    flex-shrink: 0;
-  }
-  .ai-welcome-title {
-    font-size: clamp(1.28rem, 5vw, 1.6rem);
-    font-weight: 800;
-    margin: 0 0 4px;
+    padding: 20px 24px 40px 24px;
     text-align: center;
+    user-select: none;
+  }
+
+  .gemini-star-wrap {
+    margin-bottom: 24px;
+    animation: gemini-pulse 4s infinite ease-in-out;
+  }
+
+  .gemini-greeting-text {
+    font-size: clamp(1.6rem, 6.5vw, 2.1rem);
+    font-weight: 500;
+    color: #1f1f1f;
     letter-spacing: -0.025em;
-    color: var(--text-primary);
-    font-family: var(--font-display, 'Outfit', sans-serif);
-    line-height: 1.2;
+    margin: 0;
+    line-height: 1.25;
   }
-  .ai-welcome-sub {
-    font-size: 0.84rem;
-    color: var(--text-muted);
-    margin: 0 0 22px;
-    text-align: center;
+  .dark-theme .gemini-greeting-text,
+  body:not(.light-theme) .gemini-greeting-text {
+    color: #f8fafc;
   }
 
-  /* ── Mode pills ── */
-  .ai-mode-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 22px;
-  }
-  .ai-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 7px 16px;
-    border-radius: 999px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    cursor: pointer;
-    font-family: var(--font-display, inherit);
-    border: 1.5px solid transparent;
-    transition: all 0.18s ease;
-    -webkit-tap-highlight-color: transparent;
-    white-space: nowrap;
-  }
-  .ai-pill.on  {
-    background: rgba(59,130,246,0.18);
-    color: #3b82f6;
-    border-color: rgba(59,130,246,0.4);
-    box-shadow: 0 2px 10px rgba(37,99,235,0.18);
-  }
-  .ai-pill.off {
-    background: var(--bg-card);
-    color: var(--text-secondary);
-    border-color: var(--border-color);
-  }
-  .ai-pill.off:hover { border-color: #3b82f6; color: #3b82f6; }
-
-  /* ── Suggestion cards ── */
-  .ai-suggestions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    width: 100%;
-    max-width: 440px;
-    margin-top: 16px;
-  }
-  .ai-sug {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    padding: 10px 12px;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 14px;
-    cursor: pointer;
-    text-align: left;
-    font-family: inherit;
-    transition: all 0.18s ease;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .ai-sug:hover {
-    border-color: rgba(59,130,246,0.5);
-    background: rgba(59,130,246,0.06);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 14px rgba(37,99,235,0.15);
-  }
-  .ai-sug:active { transform: scale(0.97); }
-  .ai-sug-icon  { font-size: 1.05rem; flex-shrink: 0; margin-top: 1px; }
-  .ai-sug-text  { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); line-height: 1.4; }
-
-  /* ── Messages ── */
-  .ai-messages {
-    padding: 12px 0 6px;
-    display: flex;
-    flex-direction: column;
-  }
-  .ai-msg-row {
-    display: flex;
-    flex-direction: column;
-    padding: 0 16px;
-    margin-bottom: 14px;
-  }
-  .ai-bot-header {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    margin-bottom: 6px;
-  }
-  .ai-bot-avatar {
-    width: 22px; height: 22px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
+  /* ── Floating Capsule Input Bar (Gemini Pill) ── */
+  .gemini-input-dock {
+    padding: 8px 18px calc(env(safe-area-inset-bottom, 0px) + 16px) 18px;
     flex-shrink: 0;
-  }
-  .ai-bot-name { font-size: 0.8rem; font-weight: 700; color: var(--text-primary); }
-  .ai-bot-ts   { font-size: 0.68rem; color: var(--text-muted); }
-
-  .ai-bubble {
-    max-width: 84%;
-    padding: 11px 16px;
-    font-size: 0.94rem;
-    line-height: 1.65;
-    word-break: break-word;
-    animation: ai-fade-up 0.2s cubic-bezier(0.16,1,0.3,1) both;
-    white-space: pre-line;
-  }
-  .ai-bubble-user {
-    align-self: flex-end;
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    color: #fff;
-    border-radius: 18px 18px 4px 18px;
-    box-shadow: 0 4px 14px rgba(37,99,235,0.3);
-  }
-  .ai-bubble-bot {
-    align-self: flex-start;
-    background: var(--bg-card);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    border-radius: 4px 18px 18px 18px;
-    box-shadow: var(--shadow-card);
-  }
-  .ai-user-ts {
-    font-size: 0.66rem;
-    color: var(--text-muted);
-    margin-top: 4px;
-    padding: 0 4px;
-    align-self: flex-end;
-  }
-  .ai-copy-btn {
-    align-self: flex-start;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--text-muted);
-    font-size: 0.71rem;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    margin-top: 5px;
-    padding: 2px 4px;
-    border-radius: 6px;
-    font-family: inherit;
-    -webkit-tap-highlight-color: transparent;
-    transition: color 0.14s;
-  }
-  .ai-copy-btn:hover { color: var(--text-primary); }
-
-  /* ── Typing dots ── */
-  .ai-dots span {
-    display: inline-block;
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: #3b82f6;
-    margin: 0 2px;
-    animation: ai-dot-bounce 1.1s ease-in-out infinite;
-  }
-  .ai-dots span:nth-child(2) { animation-delay:.16s; }
-  .ai-dots span:nth-child(3) { animation-delay:.32s; }
-
-  /* ── Input card ── */
-  .ai-card-wrap {
+    background: transparent;
+    z-index: 30;
     width: 100%;
-    max-width: 480px;
+    max-width: 600px;
     margin: 0 auto;
     box-sizing: border-box;
   }
-  .ai-card {
-    background: var(--bg-card);
-    border: 1.5px solid var(--border-color);
-    border-radius: 22px;
-    padding: 12px 14px 10px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-    transition: border-color 0.2s, box-shadow 0.2s;
-    box-sizing: border-box;
-    width: 100%;
-  }
-  .ai-card:focus-within {
-    border-color: rgba(59,130,246,0.6);
-    box-shadow: 0 0 0 3px rgba(59,130,246,0.12), 0 6px 24px rgba(0,0,0,0.16);
-  }
-  .ai-file-tag {
+
+  .gemini-capsule-card {
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 999px;
+    padding: 8px 12px 8px 16px;
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    margin-bottom: 8px;
-    background: rgba(59,130,246,0.12);
-    border: 1px solid rgba(59,130,246,0.3);
-    border-radius: 8px;
-    font-size: 0.77rem;
-    color: #3b82f6;
-    font-weight: 700;
+    gap: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-sizing: border-box;
+    min-height: 52px;
   }
-  .ai-file-x {
+  .gemini-capsule-card.multiline {
+    border-radius: 24px;
+    align-items: flex-end;
+  }
+  .dark-theme .gemini-capsule-card,
+  body:not(.light-theme) .gemini-capsule-card {
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  }
+  .gemini-capsule-card:focus-within {
+    box-shadow: 0 6px 28px rgba(59, 130, 246, 0.18), 0 0 0 2px #3b82f6;
+  }
+
+  /* ── Plus Button on Left ── */
+  .gemini-plus-btn {
     background: none;
     border: none;
+    color: #4b5563;
     cursor: pointer;
-    color: #3b82f6;
-    padding: 0;
     display: flex;
-    margin-left: auto;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 50%;
+    transition: transform 0.15s, color 0.15s;
+    flex-shrink: 0;
     -webkit-tap-highlight-color: transparent;
   }
-  /* CRITICAL: textarea must never be in a nested component */
-  .ai-textarea {
-    width: 100%;
+  .gemini-plus-btn:hover {
+    color: #1f1f1f;
+    background: rgba(0, 0, 0, 0.05);
+  }
+  .dark-theme .gemini-plus-btn,
+  body:not(.light-theme) .gemini-plus-btn {
+    color: #94a3b8;
+  }
+  .dark-theme .gemini-plus-btn:hover,
+  body:not(.light-theme) .gemini-plus-btn:hover {
+    color: #f1f5f9;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  /* ── Auto-Growing Input Box (Stable, Non-Remounting) ── */
+  .gemini-textarea {
+    flex: 1 1 0;
+    min-width: 0;
     border: none;
     outline: none;
     resize: none;
     background: transparent;
-    color: var(--text-primary);
-    font-size: 1rem;
-    line-height: 1.55;
+    color: #1f1f1f;
+    font-size: 1.02rem;
+    line-height: 1.45;
     font-family: inherit;
-    min-height: 38px;
-    max-height: 220px;
-    padding: 0 0 6px;
+    min-height: 26px;
+    max-height: 180px;
+    padding: 3px 0;
     box-sizing: border-box;
     display: block;
     overflow-y: auto;
     -webkit-tap-highlight-color: transparent;
-    /* Prevent scroll jump on mobile */
-    touch-action: manipulation;
   }
-  .ai-textarea::placeholder { color: var(--text-muted); font-size: 0.96rem; }
+  .dark-theme .gemini-textarea,
+  body:not(.light-theme) .gemini-textarea {
+    color: #f8fafc;
+  }
+  .gemini-textarea::placeholder {
+    color: #757575;
+    font-size: 1.02rem;
+  }
+  .dark-theme .gemini-textarea::placeholder,
+  body:not(.light-theme) .gemini-textarea::placeholder {
+    color: #94a3b8;
+  }
 
-  .ai-card-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: 4px;
-    gap: 6px;
-  }
-  .ai-chips { display: flex; align-items: center; gap: 5px; flex-wrap: nowrap; }
-  .ai-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 0.78rem;
-    font-weight: 700;
-    cursor: pointer;
-    font-family: inherit;
-    border: 1px solid var(--border-color);
-    background: var(--bg-input, rgba(255,255,255,0.04));
-    color: var(--text-secondary);
-    transition: all 0.15s;
-    -webkit-tap-highlight-color: transparent;
-    white-space: nowrap;
-    user-select: none;
-  }
-  .ai-chip.on  { background: rgba(59,130,246,0.18); color: #3b82f6; border-color: rgba(59,130,246,0.4); }
-  .ai-chip:hover { border-color: #3b82f6; }
-
-  .ai-card-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-  .ai-attach {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--text-muted);
-    display: flex;
-    align-items: center;
-    padding: 5px;
-    border-radius: 8px;
-    transition: color 0.15s, background 0.15s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .ai-attach:hover { color: var(--text-primary); background: rgba(255,255,255,0.06); }
-  .ai-send {
-    width: 36px; height: 36px;
+  /* ── Right Action (Mic or Send Arrow) ── */
+  .gemini-action-btn {
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     border: none;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     flex-shrink: 0;
     -webkit-tap-highlight-color: transparent;
   }
-  .ai-send.on  {
-    background: #3b82f6;
-    color: #fff;
-    box-shadow: 0 4px 14px rgba(37,99,235,0.45);
+  .gemini-mic-btn {
+    background: none;
+    color: #4b5563;
   }
-  .ai-send.on:hover  { background: #2563eb; transform: scale(1.08); }
-  .ai-send.on:active { transform: scale(0.92); }
-  .ai-send.off {
-    background: rgba(59,130,246,0.15);
-    color: rgba(255,255,255,0.3);
-    cursor: not-allowed;
+  .gemini-mic-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #1f1f1f;
+  }
+  .gemini-mic-btn.listening {
+    background: #ef4444 !important;
+    color: #ffffff !important;
+    animation: gemini-pulse 1.5s infinite;
+  }
+  .dark-theme .gemini-mic-btn,
+  body:not(.light-theme) .gemini-mic-btn {
+    color: #94a3b8;
+  }
+  .dark-theme .gemini-mic-btn:hover,
+  body:not(.light-theme) .gemini-mic-btn:hover {
+    color: #f8fafc;
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .gemini-send-btn {
+    background: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 2px 10px rgba(37, 99, 235, 0.35);
+    transform: scale(1.02);
+  }
+  .gemini-send-btn:hover {
+    background: #1d4ed8;
+    transform: scale(1.08);
+  }
+  .gemini-send-btn:active {
+    transform: scale(0.92);
   }
 
-  /* ── Dock (active chat bottom bar) ── */
-  .ai-dock {
-    flex-shrink: 0;
-    padding: 8px 16px 14px;
-    background: var(--bg-secondary, var(--bg-primary));
-    border-top: 1px solid var(--border-color);
-    z-index: 10;
+  /* ── Chat Messages ── */
+  .gemini-msg-row {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 16px;
+    padding: 0 18px;
+    box-sizing: border-box;
+    animation: gemini-fade-in 0.2s ease-out both;
   }
-  .ai-dock .ai-card-wrap { max-width: 100%; }
+  .gemini-bubble {
+    max-width: 86%;
+    padding: 12px 18px;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    border-radius: 22px;
+    word-break: break-word;
+  }
+  .gemini-bubble-user {
+    align-self: flex-end;
+    background: #2563eb;
+    color: #ffffff;
+    border-bottom-right-radius: 6px;
+    box-shadow: 0 3px 12px rgba(37, 99, 235, 0.25);
+  }
+  .gemini-bubble-bot {
+    align-self: flex-start;
+    background: #ffffff;
+    color: #1f1f1f;
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    border-bottom-left-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+  .dark-theme .gemini-bubble-bot,
+  body:not(.light-theme) .gemini-bubble-bot {
+    background: #1e293b;
+    color: #f8fafc;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
 
-  /* ── Mobile ── */
+  /* ── Responsive Mobile ── */
   @media (max-width: 768px) {
-    .ai-root {
+    .gemini-root {
       height: calc(100dvh - 65px - env(safe-area-inset-bottom, 0px));
       min-height: 0;
-      border-radius: 12px;
     }
-    .ai-topbar { padding: 10px 14px 8px; }
-    .ai-welcome { padding: 10px 14px 18px; }
-    .ai-welcome-title { font-size: 1.25rem; }
-    .ai-suggestions { grid-template-columns: 1fr 1fr; gap: 7px; max-width: 100%; }
-    .ai-card-wrap { max-width: 100%; }
-    .ai-card { border-radius: 20px; padding: 10px 12px 9px; }
-    .ai-textarea { font-size: 16px; /* prevent iOS zoom */ }
-    .ai-dock {
-      padding: 8px 12px calc(env(safe-area-inset-bottom, 0px) + 8px);
+    .gemini-top-bar {
+      padding: 10px 14px 4px 14px;
     }
-    .ai-msg-row { padding: 0 12px; }
-    .ai-bubble { max-width: 90%; font-size: 0.92rem; }
-    .ai-chip { font-size: 0.74rem; padding: 4px 9px; }
+    .gemini-greeting-text {
+      font-size: 1.75rem;
+    }
+    .gemini-input-dock {
+      padding: 6px 12px calc(env(safe-area-inset-bottom, 0px) + 12px) 12px;
+    }
+    .gemini-capsule-card {
+      min-height: 48px;
+      padding: 6px 10px 6px 14px;
+    }
+    .gemini-textarea {
+      font-size: 16px; /* Prevents auto-zoom on iOS */
+    }
   }
 `;
 
-/* ── Modes ── */
-const MODES = [
-  { id: 'instant', label: 'Instant',  Icon: Zap  },
-  { id: 'expert',  label: 'Expert',   Icon: Gem  },
-  { id: 'vision',  label: 'Vision',   Icon: Globe },
-];
-
-/* ── Suggestions ── */
-const SUGS = [
-  { icon: '🔴', text: 'Scan a phishing link',           q: 'Scan paypal-secure-login.xyz'                                       },
-  { icon: '🛡️', text: 'How phishing attacks work',      q: 'How do phishing attacks work and how can I protect myself?'         },
-  { icon: '🐍', text: 'Python ML feature code',         q: 'Show Python code for URL feature extraction for phishing detection' },
-  { icon: '🎓', text: 'About APDS & authors',           q: 'Tell me about APDS project, authors, and University of Sargodha'    },
-];
+/* ── Exact Multi-Color Google Gemini 4-Pointed Star SVG ── */
+function GeminiSparkleStar({ size = 46 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M50 0C50 27.614 27.614 50 0 50C27.614 50 50 72.386 50 100C50 72.386 72.386 50 100 50C72.386 50 50 27.614 50 0Z"
+        fill="url(#gemini_multi_grad)"
+      />
+      <defs>
+        <linearGradient id="gemini_multi_grad" x1="10" y1="0" x2="90" y2="100" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#f43f5e" />
+          <stop offset="25%" stopColor="#fb923c" />
+          <stop offset="50%" stopColor="#22c55e" />
+          <stop offset="75%" stopColor="#3b82f6" />
+          <stop offset="100%" stopColor="#8b5cf6" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
 
 /* ─────────────────────────────────────────────────────────────────
    MAIN COMPONENT
-   NOTE: InputCard is NOT a nested component — it's rendered inline.
-   This is the fix for the keyboard-close bug on mobile.
 ───────────────────────────────────────────────────────────────── */
-export default function AiChatbot({ t, language = 'English', onMenuToggle }) {
-  const [messages,     setMessages]     = useState([]);
-  const [inputText,    setInputText]    = useState('');
-  const [activeMode,   setActiveMode]   = useState('instant');
-  const [isTyping,     setIsTyping]     = useState(false);
-  const [copiedId,     setCopiedId]     = useState(null);
+export default function AiChatbot({ t, language = 'English', currentUser, onMenuToggle }) {
+  const [messages, setMessages] = useState([]);
+  const [inputText, setInputText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [copiedId, setCopiedId] = useState(null);
   const [attachedFile, setAttachedFile] = useState(null);
-  const [deepThink,    setDeepThink]    = useState(false);
-  const [searchOn,     setSearchOn]     = useState(false);
+  const [isListening, setIsListening] = useState(false);
 
-  // Single stable textarea ref — NEVER inside a nested component
+  const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
-  const fileRef     = useRef(null);
-  const endRef      = useRef(null);
+  const fileInputRef = useRef(null);
+  const recognitionRef = useRef(null);
 
   const hasMessages = messages.length > 0;
-  const canSend     = (inputText.trim().length > 0 || !!attachedFile) && !isTyping;
+  const canSend = (inputText.trim().length > 0 || !!attachedFile) && !isTyping;
 
-  // Auto-scroll
+  // Derive User Display Name (e.g. "ahmad", "Ahmad", or fallback)
+  const getUserName = () => {
+    if (currentUser?.name) {
+      return currentUser.name.split(' ')[0].toLowerCase();
+    }
+    if (currentUser?.username) {
+      return currentUser.username.toLowerCase();
+    }
+    return 'ahmad';
+  };
+
+  // Auto-scroll to bottom
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  // Auto-resize textarea height
-  const resize = useCallback(() => {
+  // Dynamic height for textarea without remounting
+  const autoResize = useCallback(() => {
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = 'auto';
-    const min = 38;
-    const max = window.innerWidth <= 768 ? 180 : 220;
-    el.style.height = Math.min(Math.max(el.scrollHeight, min), max) + 'px';
+    const minH = 26;
+    const maxH = window.innerWidth <= 768 ? 160 : 180;
+    const targetH = Math.min(Math.max(el.scrollHeight, minH), maxH);
+    el.style.height = `${targetH}px`;
   }, []);
 
-  useEffect(() => { resize(); }, [inputText, resize]);
+  useEffect(() => {
+    autoResize();
+  }, [inputText, autoResize]);
 
-  /* ── Send message ── */
-  const send = useCallback(async (override) => {
-    const base  = typeof override === 'string' ? override.trim() : inputText.trim();
-    const extra = attachedFile ? `\n\n[File: ${attachedFile.name}]\n${attachedFile.content}` : '';
-    const query = (base + extra).trim();
+  // Voice speech-to-text recognition
+  const toggleVoiceInput = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert('Speech recognition is not supported in this browser.');
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = language === 'Urdu' ? 'ur-PK' : 'en-US';
+
+      recognition.onstart = () => setIsListening(true);
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setInputText(prev => (prev ? `${prev} ${transcript}` : transcript));
+        setIsListening(false);
+      };
+      recognition.onerror = () => setIsListening(false);
+      recognition.onend = () => setIsListening(false);
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch {
+      setIsListening(false);
+    }
+  };
+
+  /* ── Send Message ── */
+  const handleSend = async (overrideText) => {
+    const baseText = typeof overrideText === 'string' ? overrideText.trim() : inputText.trim();
+    const fileNote = attachedFile
+      ? `\n\n[Attached: ${attachedFile.name}]\n${attachedFile.content}`
+      : '';
+    const query = (baseText + fileNote).trim();
     if (!query || isTyping) return;
 
-    const ts  = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const uid = Date.now();
-    const userMsg = { id: uid, sender: 'user', text: base, fileInfo: attachedFile?.name, time: ts() };
+    const ts = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const userMsg = {
+      id: Date.now(),
+      sender: 'user',
+      text: baseText,
+      fileInfo: attachedFile ? attachedFile.name : null,
+      time: ts
+    };
 
-    setMessages(p => [...p, userMsg]);
+    setMessages(prev => [...prev, userMsg]);
     setInputText('');
     setAttachedFile(null);
-    if (textareaRef.current) textareaRef.current.style.height = 'auto';
+
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
+
     setIsTyping(true);
 
     try {
       const res = await generateChatbotResponse(query, [...messages, userMsg], language);
       setIsTyping(false);
-      setMessages(p => [...p, { id: uid + 1, sender: 'bot', text: res.text, time: ts() }]);
+      const tsBot = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      setMessages(prev => [...prev, {
+        id: Date.now() + 1,
+        sender: 'bot',
+        text: res.text,
+        time: tsBot
+      }]);
     } catch {
       setIsTyping(false);
-      setMessages(p => [...p, { id: uid + 1, sender: 'bot', text: '⚠️ Connection error — please try again.', time: ts() }]);
+      const tsBot = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      setMessages(prev => [...prev, {
+        id: Date.now() + 1,
+        sender: 'bot',
+        text: '⚠️ Connection notice. Please try again.',
+        time: tsBot
+      }]);
     }
-  }, [inputText, attachedFile, isTyping, messages, language]);
+  };
 
-  /* ── File attach ── */
-  const handleFile = (e) => {
+  /* ── File Attach ── */
+  const handleFileAttach = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = ev => setAttachedFile({ name: file.name, content: ev.target.result?.toString().slice(0, 4000) ?? '' });
+    reader.onload = (ev) => {
+      setAttachedFile({
+        name: file.name,
+        content: ev.target.result?.toString().slice(0, 4000) || ''
+      });
+    };
     reader.readAsText(file);
     e.target.value = '';
   };
 
-  /* ── Copy ── */
+  /* ── Copy to Clipboard ── */
   const handleCopy = (text, id) => {
     navigator.clipboard.writeText(text).catch(() => {});
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 1800);
   };
 
-  /* ── New chat ── */
-  const newChat = () => {
+  /* ── Reset Chat ── */
+  const handleNewChat = () => {
     setMessages([]);
     setInputText('');
     setAttachedFile(null);
   };
 
-  /* ── Keyboard handler — no Enter-to-send on mobile ── */
+  /* ── Keydown (no mobile submit on enter) ── */
   const handleKeyDown = (e) => {
-    const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    if (e.key === 'Enter' && !e.shiftKey && !isMobile) {
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    if (e.key === 'Enter' && !e.shiftKey && !isTouch) {
       e.preventDefault();
-      send();
+      handleSend();
     }
   };
 
-  const modeName = MODES.find(m => m.id === activeMode)?.label ?? 'Instant';
+  const isMultiLine = inputText.includes('\n') || (textareaRef.current?.scrollHeight || 0) > 36;
 
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     INPUT CARD JSX — rendered INLINE (not as a sub-component)
-     This prevents React from unmounting the textarea on re-renders,
-     which was causing the keyboard to close on mobile.
+     INLINE FLOATING CAPSULE INPUT BAR (GEMINI PILL)
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-  const inputCardJSX = (
-    <div className="ai-card-wrap">
-      <div className="ai-card">
-        {/* File badge */}
-        {attachedFile && (
-          <div className="ai-file-tag">
-            <FileText size={13} />
-            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {attachedFile.name}
-            </span>
-            <button className="ai-file-x" onClick={() => setAttachedFile(null)}><X size={13} /></button>
-          </div>
-        )}
+  const InputCapsuleJSX = (
+    <div className="gemini-input-dock">
+      {/* File preview if attached */}
+      {attachedFile && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          padding: '6px 14px',
+          marginBottom: '8px',
+          background: 'rgba(59, 130, 246, 0.12)',
+          border: '1px solid rgba(59, 130, 246, 0.3)',
+          borderRadius: '999px',
+          fontSize: '0.78rem',
+          color: '#2563eb',
+          fontWeight: 700
+        }}>
+          <FileText size={13} />
+          <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {attachedFile.name}
+          </span>
+          <button
+            onClick={() => setAttachedFile(null)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#2563eb', padding: 0 }}
+          >
+            <X size={13} />
+          </button>
+        </div>
+      )}
 
-        {/* Textarea — stable ref, never remounted */}
+      <div className={`gemini-capsule-card ${isMultiLine ? 'multiline' : ''}`}>
+        {/* Left Plus Attachment Button */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".txt,.eml,.csv,.json,.py,.md,.log"
+          onChange={handleFileAttach}
+          style={{ display: 'none' }}
+        />
+        <button
+          type="button"
+          className="gemini-plus-btn"
+          onMouseDown={e => e.preventDefault()}
+          onClick={() => fileInputRef.current?.click()}
+          title="Add files or scan"
+        >
+          <Plus size={20} strokeWidth={2.4} />
+        </button>
+
+        {/* Stable Textarea Input */}
         <textarea
           ref={textareaRef}
-          className="ai-textarea"
+          className="gemini-textarea"
           value={inputText}
-          onInput={resize}
+          onInput={autoResize}
           onChange={e => setInputText(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Message APDS AI..."
+          placeholder="Ask Gemini"
           rows={1}
           autoComplete="off"
           autoCorrect="off"
@@ -629,201 +595,150 @@ export default function AiChatbot({ t, language = 'English', onMenuToggle }) {
           spellCheck={false}
         />
 
-        {/* Bottom action row */}
-        <div className="ai-card-row">
-          <div className="ai-chips">
-            <button
-              type="button"
-              className={`ai-chip ${deepThink ? 'on' : ''}`}
-              onMouseDown={e => e.preventDefault()} /* prevent blur on click */
-              onClick={() => setDeepThink(v => !v)}
-            >
-              <Atom size={12} /> DeepThink
-            </button>
-            <button
-              type="button"
-              className={`ai-chip ${searchOn ? 'on' : ''}`}
-              onMouseDown={e => e.preventDefault()}
-              onClick={() => setSearchOn(v => !v)}
-            >
-              <Globe size={12} /> Search
-            </button>
-          </div>
-
-          <div className="ai-card-actions">
-            <input ref={fileRef} type="file" accept=".txt,.eml,.csv,.json,.py,.md,.log" onChange={handleFile} style={{ display: 'none' }} />
-            <button
-              type="button"
-              className="ai-attach"
-              onMouseDown={e => e.preventDefault()}
-              onClick={() => fileRef.current?.click()}
-              title="Attach file"
-            >
-              <Paperclip size={19} style={{ color: attachedFile ? '#3b82f6' : undefined }} />
-            </button>
-
-            <button
-              type="button"
-              className={`ai-send ${canSend ? 'on' : 'off'}`}
-              onMouseDown={e => e.preventDefault()}
-              onClick={() => send()}
-              disabled={!canSend}
-              aria-label="Send"
-            >
-              <ArrowUp size={18} strokeWidth={2.8} />
-            </button>
-          </div>
-        </div>
+        {/* Right Action Button: Mic or Elevated Send Arrow */}
+        {inputText.trim().length > 0 || attachedFile ? (
+          <button
+            type="button"
+            className="gemini-action-btn gemini-send-btn"
+            onMouseDown={e => e.preventDefault()}
+            onClick={() => handleSend()}
+            disabled={!canSend}
+            title="Send prompt"
+            aria-label="Send prompt"
+          >
+            <ArrowUp size={18} strokeWidth={2.8} />
+          </button>
+        ) : (
+          <button
+            type="button"
+            className={`gemini-action-btn gemini-mic-btn ${isListening ? 'listening' : ''}`}
+            onMouseDown={e => e.preventDefault()}
+            onClick={toggleVoiceInput}
+            title={isListening ? 'Listening...' : 'Voice input'}
+            aria-label="Voice input"
+          >
+            <Mic size={20} strokeWidth={2} />
+          </button>
+        )}
       </div>
     </div>
   );
 
   return (
     <>
-      <style>{CSS}</style>
-      <div className="ai-root">
+      <style>{GEMINI_CSS}</style>
+      <div className="gemini-root">
 
-        {/* ── Top bar ── */}
-        <div className="ai-topbar">
-          <div className="ai-topbar-brand">
-            <div className="ai-topbar-icon">
-              <Shield size={15} />
-            </div>
-            <div className="ai-topbar-info">
-              <div className="ai-topbar-name">APDS Defense AI</div>
-              <div className="ai-topbar-status">
-                <span className="ai-topbar-dot" />
-                ML Active · 94.6% accuracy
-              </div>
-            </div>
-          </div>
+        {/* ── Top Bar (Minimal Icons) ── */}
+        <div className="gemini-top-bar">
+          <button
+            className="gemini-top-btn"
+            title="Menu"
+            onClick={() => {
+              if (onMenuToggle) onMenuToggle();
+              else {
+                const menuBtn = document.querySelector('.hamburger-btn');
+                if (menuBtn) menuBtn.click();
+              }
+            }}
+          >
+            <Menu size={22} strokeWidth={2} />
+          </button>
 
-          <div style={{ display: 'flex', gap: 6 }}>
-            {hasMessages && (
-              <button className="ai-nav-btn" onClick={newChat} title="New chat" style={{ fontSize: '0.75rem', gap: 5, padding: '6px 12px', borderRadius: 10 }}>
-                <PlusCircle size={14} />
-                <span style={{ fontWeight: 700 }}>New</span>
-              </button>
-            )}
+          {hasMessages && (
             <button
-              className="ai-nav-btn"
-              onClick={() => onMenuToggle?.() ?? document.querySelector('.hamburger-btn')?.click()}
-              title="Menu"
+              className="gemini-top-btn"
+              title="New Chat"
+              onClick={handleNewChat}
             >
-              <Menu size={20} strokeWidth={2} />
+              <Plus size={22} strokeWidth={2} />
             </button>
-          </div>
+          )}
         </div>
 
-        {/* ── Scrollable area ── */}
-        <div className="ai-scroll">
+        {/* ── Scrollable Area ── */}
+        <div className="gemini-scroll-area">
           {!hasMessages ? (
-            /* ── Welcome screen ── */
-            <div className="ai-welcome">
-              {/* Logo */}
-              <div className="ai-logo">
-                <svg width={34} height={34} viewBox="0 0 48 48" fill="none">
-                  <path d="M24 5C13.5 5 5 13.5 5 24s8.5 19 19 19 19-8.5 19-19S34.5 5 24 5z" fill="white" fillOpacity="0.92"/>
-                  <path d="M14 26c1.5-5.5 7-8.5 13-7.5 4 .7 6.5 3.8 5.7 7-.8 3.2-5 5.8-10 5.8s-7.8-2.6-8.7-5.3z" fill="#1d4ed8"/>
-                  <path d="M27 18.5c.9-3.3 3.5-5.5 7-5.5-1.3 2.5-.4 4.3 2 5.2-2.6.6-5.6.7-9 .3z" fill="#1d4ed8"/>
-                  <circle cx="20.5" cy="24" r="2" fill="white"/>
-                </svg>
+            /* ── Gemini Welcome Center Stage (Exact Match) ── */
+            <div className="gemini-welcome-center">
+              {/* Iconic Multi-Color 4-Pointed Sparkle Star */}
+              <div className="gemini-star-wrap">
+                <GeminiSparkleStar size={48} />
               </div>
 
-              <h1 className="ai-welcome-title">Start chatting with {modeName}</h1>
-              <p className="ai-welcome-sub">Powered by APDS Neural ML Engine</p>
-
-              {/* Mode pills */}
-              <div className="ai-mode-row">
-                {MODES.map(({ id, label, Icon }) => (
-                  <button
-                    key={id}
-                    className={`ai-pill ${activeMode === id ? 'on' : 'off'}`}
-                    onMouseDown={e => e.preventDefault()}
-                    onClick={() => setActiveMode(id)}
-                  >
-                    <Icon size={13} strokeWidth={activeMode === id ? 2.5 : 2} />
-                    {label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Input card — rendered inline, not a sub-component */}
-              {inputCardJSX}
-
-              {/* Suggestion cards */}
-              <div className="ai-suggestions">
-                {SUGS.map((s, i) => (
-                  <button
-                    key={i}
-                    className="ai-sug"
-                    onMouseDown={e => e.preventDefault()}
-                    onClick={() => send(s.q)}
-                  >
-                    <span className="ai-sug-icon">{s.icon}</span>
-                    <span className="ai-sug-text">{s.text}</span>
-                  </button>
-                ))}
-              </div>
+              {/* Greeting */}
+              <h1 className="gemini-greeting-text">
+                Your move, {getUserName()}!
+              </h1>
             </div>
           ) : (
-            /* ── Active messages stream ── */
-            <div className="ai-messages">
+            /* ── Active Conversation Stream ── */
+            <div style={{ padding: '10px 0', display: 'flex', flexDirection: 'column' }}>
               {messages.map(msg => (
-                <div key={msg.id} className="ai-msg-row">
-                  {msg.sender === 'bot' && (
-                    <div className="ai-bot-header">
-                      <div className="ai-bot-avatar"><Shield size={11} /></div>
-                      <span className="ai-bot-name">APDS Defense AI</span>
-                      <span className="ai-bot-ts">{msg.time}</span>
-                    </div>
-                  )}
-
-                  <div className={`ai-bubble ${msg.sender === 'user' ? 'ai-bubble-user' : 'ai-bubble-bot'}`}>
+                <div key={msg.id} className="gemini-msg-row">
+                  <div className={`gemini-bubble ${msg.sender === 'user' ? 'gemini-bubble-user' : 'gemini-bubble-bot'}`}>
                     {msg.fileInfo && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 5, fontSize: '0.75rem', opacity: 0.85, fontWeight: 700 }}>
-                        <FileText size={12} /> {msg.fileInfo}
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        marginBottom: '6px',
+                        fontSize: '0.78rem',
+                        opacity: 0.9,
+                        fontWeight: 700
+                      }}>
+                        <FileText size={13} /> {msg.fileInfo}
                       </div>
                     )}
-                    {msg.text}
+                    <div style={{ whiteSpace: 'pre-line' }}>{msg.text}</div>
+                    {msg.sender === 'bot' && (
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '6px' }}>
+                        <button
+                          onClick={() => handleCopy(msg.text, msg.id)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: 'inherit',
+                            opacity: 0.7,
+                            fontSize: '0.74rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                        >
+                          {copiedId === msg.id ? <><Check size={12} color="#10b981" /> Copied</> : <><Copy size={12} /> Copy</>}
+                        </button>
+                      </div>
+                    )}
                   </div>
-
-                  {msg.sender === 'bot' ? (
-                    <button className="ai-copy-btn" onClick={() => handleCopy(msg.text, msg.id)}>
-                      {copiedId === msg.id
-                        ? <><Check size={12} color="#10b981" /> Copied</>
-                        : <><Copy size={12} /> Copy response</>
-                      }
-                    </button>
-                  ) : (
-                    <span className="ai-user-ts">{msg.time}</span>
-                  )}
+                  <span style={{
+                    fontSize: '0.68rem',
+                    opacity: 0.6,
+                    marginTop: '3px',
+                    alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
+                    padding: '0 4px'
+                  }}>
+                    {msg.time}
+                  </span>
                 </div>
               ))}
 
-              {/* Typing indicator */}
               {isTyping && (
-                <div className="ai-msg-row">
-                  <div className="ai-bot-header">
-                    <div className="ai-bot-avatar"><Shield size={11} /></div>
-                    <span className="ai-bot-name">APDS Defense AI</span>
-                  </div>
-                  <div className="ai-bubble ai-bubble-bot">
-                    <div className="ai-dots"><span /><span /><span /></div>
+                <div className="gemini-msg-row">
+                  <div className="gemini-bubble gemini-bubble-bot" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <GeminiSparkleStar size={16} />
+                    <span style={{ fontSize: '0.85rem', opacity: 0.8 }}>Thinking...</span>
                   </div>
                 </div>
               )}
-              <div ref={endRef} />
+              <div ref={messagesEndRef} />
             </div>
           )}
         </div>
 
-        {/* ── Bottom dock (active chat only) ── */}
-        {hasMessages && (
-          <div className="ai-dock">
-            {inputCardJSX}
-          </div>
-        )}
+        {/* ── Bottom Floating Capsule Input Dock ── */}
+        {InputCapsuleJSX}
 
       </div>
     </>
