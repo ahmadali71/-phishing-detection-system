@@ -1,275 +1,98 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
-  Shield, Plus, Mic, ArrowUp, Copy, Check,
-  X, FileText, Sparkles, ArrowRight, Search, Lock, Code2
+  Shield, Plus, ArrowUp, Copy, Check, X, FileText
 } from 'lucide-react';
 import { generateChatbotResponse } from '../utils/chatbotEngine';
 
-/* ─────────────────────────────────────────────────────────────────
-   APDS AI ASSISTANT — ChatGPT-style centered square input layout
-───────────────────────────────────────────────────────────────── */
 const CSS = `
   @keyframes ai-breathe {
-    0%,100% { box-shadow: 0 0 28px rgba(59,130,246,0.5), 0 0 55px rgba(99,102,241,0.25); transform:scale(1); }
-    50%     { box-shadow: 0 0 44px rgba(59,130,246,0.75), 0 0 80px rgba(168,85,247,0.45); transform:scale(1.04); }
+    0%,100% { box-shadow:0 0 28px rgba(59,130,246,0.5),0 0 55px rgba(99,102,241,0.25);transform:scale(1); }
+    50%     { box-shadow:0 0 44px rgba(59,130,246,0.75),0 0 80px rgba(168,85,247,0.45);transform:scale(1.04); }
   }
   @keyframes ai-orbit {
     from { transform:rotate(0deg); }
     to   { transform:rotate(360deg); }
   }
   @keyframes ai-fadein {
-    from { opacity:0; transform:translateY(10px); }
-    to   { opacity:1; transform:translateY(0); }
+    from { opacity:0;transform:translateY(8px); }
+    to   { opacity:1;transform:translateY(0); }
   }
 
-  /* ── Root Canvas ── */
   .ai-canvas {
-    display:flex;
-    flex-direction:column;
-    height:100%;
-    width:100%;
-    background:var(--bg-primary,#080c16);
-    color:var(--text-primary,#f8fafc);
+    display:flex;flex-direction:column;height:100%;width:100%;
+    background:var(--bg-primary,#080c16);color:var(--text-primary,#f8fafc);
     font-family:var(--font-sans,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif);
-    box-sizing:border-box;
-    overflow:hidden;
-    flex:1 1 0;
-    min-height:0;
-    position:relative;
+    box-sizing:border-box;overflow:hidden;flex:1 1 0;min-height:0;position:relative;
   }
 
   /* ── Scroll area ── */
   .ai-scroll {
-    flex:1 1 0;
-    min-height:0;
-    overflow-y:auto;
-    display:flex;
-    flex-direction:column;
+    flex:1 1 0;min-height:0;overflow-y:auto;
+    display:flex;flex-direction:column;
     -webkit-overflow-scrolling:touch;
   }
 
-  /* ── WELCOME: centered column ── */
-  .ai-welcome {
-    flex:1 1 auto;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    padding:24px 20px 24px 20px;
-    text-align:center;
-    width:100%;
-    max-width:600px;
-    margin:0 auto;
-    box-sizing:border-box;
+  /* ── Welcome Hero (in scroll, above input) ── */
+  .ai-hero {
+    flex:1 1 auto;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    padding:32px 20px 20px 20px;text-align:center;
     animation:ai-fadein 0.35s ease-out both;
   }
-
-  /* ── Shield Logo ── */
   .ai-logo-wrap {
-    position:relative;
-    width:90px;
-    height:90px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    margin-bottom:18px;
-    flex-shrink:0;
+    position:relative;width:88px;height:88px;
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:16px;flex-shrink:0;
   }
   .ai-logo-ring {
-    position:absolute;
-    inset:-8px;
-    border-radius:50%;
+    position:absolute;inset:-8px;border-radius:50%;
     border:1.5px dashed rgba(99,102,241,0.45);
     animation:ai-orbit 14s linear infinite;
   }
   .ai-logo-core {
-    width:74px;
-    height:74px;
-    border-radius:22px;
+    width:72px;height:72px;border-radius:22px;
     background:linear-gradient(135deg,#2563eb 0%,#4f46e5 55%,#7c3aed 100%);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#fff;
+    display:flex;align-items:center;justify-content:center;color:#fff;
     animation:ai-breathe 4s ease-in-out infinite;
   }
-
-  /* ── Brand ── */
   .ai-brand-name {
-    font-size:1.15rem;
-    font-weight:800;
+    font-size:1.1rem;font-weight:800;
     font-family:var(--font-display,'Outfit',sans-serif);
     background:linear-gradient(135deg,#60a5fa 0%,#a78bfa 100%);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-    background-clip:text;
-    margin:0 0 6px;
-    letter-spacing:-0.01em;
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    margin:0 0 5px;letter-spacing:-0.01em;
   }
   .ai-online-badge {
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-    padding:3px 12px;
-    border-radius:9999px;
-    background:rgba(16,185,129,0.12);
-    border:1px solid rgba(16,185,129,0.28);
-    font-size:0.72rem;
-    font-weight:700;
-    color:#10b981;
-    margin-bottom:20px;
+    display:inline-flex;align-items:center;gap:6px;
+    padding:3px 12px;border-radius:9999px;
+    background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.28);
+    font-size:0.72rem;font-weight:700;color:#10b981;margin-bottom:18px;
   }
-  .ai-dot {
+  .ai-badge-dot {
     width:6px;height:6px;border-radius:50%;
     background:#10b981;box-shadow:0 0 6px #10b981;
   }
-
-  /* ── Greeting ── */
   .ai-greeting {
-    font-size:clamp(1.45rem,5.5vw,2rem);
-    font-weight:800;
+    font-size:clamp(1.4rem,5.5vw,1.9rem);font-weight:800;
     font-family:var(--font-display,'Outfit',sans-serif);
     color:var(--text-primary,#f8fafc);
-    letter-spacing:-0.02em;
-    margin:0 0 6px;
-    line-height:1.25;
+    letter-spacing:-0.02em;margin:0 0 5px;line-height:1.25;
   }
-  .ai-greeting-name {
+  .ai-greeting span {
     background:linear-gradient(135deg,#60a5fa,#a78bfa);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-    background-clip:text;
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   }
   .ai-greeting-sub {
-    font-size:0.9rem;
-    color:var(--text-muted,#8493a8);
-    margin:0 0 28px;
+    font-size:0.88rem;color:var(--text-muted,#8493a8);margin:0;
   }
 
-  /* ── CENTERED SQUARE INPUT BOX (the main change) ── */
-  .ai-center-box {
-    width:100%;
-    background:var(--bg-card,#141f36);
-    border:1.5px solid var(--border-color,rgba(255,255,255,0.12));
-    border-radius:18px;
-    padding:16px 16px 12px 16px;
-    box-sizing:border-box;
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-    box-shadow:0 8px 32px rgba(0,0,0,0.3);
-    transition:border-color 0.2s,box-shadow 0.2s;
-  }
-  .ai-center-box:focus-within {
-    border-color:#3b82f6;
-    box-shadow:0 0 32px rgba(59,130,246,0.3), 0 8px 32px rgba(0,0,0,0.35);
-  }
-
-  .ai-center-textarea {
-    width:100%;
-    min-height:80px;
-    max-height:220px;
-    border:none;
-    outline:none;
-    resize:none;
-    background:transparent;
-    color:var(--text-primary,#f8fafc);
-    font-size:1rem;
-    line-height:1.6;
-    font-family:inherit;
-    box-sizing:border-box;
-    overflow-y:auto;
-    -webkit-tap-highlight-color:transparent;
-  }
-  .ai-center-textarea::placeholder {
-    color:var(--text-muted,#8493a8);
-    font-size:0.97rem;
-  }
-
-  .ai-center-footer {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:8px;
-  }
-  .ai-center-left {
-    display:flex;
-    align-items:center;
-    gap:8px;
-  }
-  .ai-icon-btn {
-    width:34px;height:34px;border-radius:9px;
-    border:1px solid var(--border-color,rgba(255,255,255,0.1));
-    background:var(--bg-input,rgba(255,255,255,0.05));
-    color:var(--text-muted,#8493a8);
-    display:flex;align-items:center;justify-content:center;
-    cursor:pointer;transition:all 0.15s ease;
-    -webkit-tap-highlight-color:transparent;
-    flex-shrink:0;
-  }
-  .ai-icon-btn:hover { color:#3b82f6; border-color:#3b82f6; }
-
-  .ai-send-btn {
-    height:38px;
-    padding:0 18px;
-    border-radius:10px;
-    border:none;
-    background:linear-gradient(135deg,#2563eb 0%,#7c3aed 100%);
-    color:#fff;
-    font-size:0.85rem;
-    font-weight:700;
-    font-family:inherit;
-    display:flex;align-items:center;gap:7px;
-    cursor:pointer;
-    box-shadow:0 4px 16px rgba(37,99,235,0.4);
-    transition:transform 0.18s,box-shadow 0.18s;
-    flex-shrink:0;
-    -webkit-tap-highlight-color:transparent;
-  }
-  .ai-send-btn:hover {
-    transform:translateY(-1px);
-    box-shadow:0 6px 22px rgba(37,99,235,0.55);
-  }
-  .ai-send-btn:active { transform:scale(0.95); }
-  .ai-send-btn:disabled { opacity:0.45; cursor:not-allowed; transform:none; }
-
-  /* mic-only circular variant */
-  .ai-send-btn-mic {
-    width:38px;height:38px;padding:0;border-radius:10px;
-    background:linear-gradient(135deg,#2563eb 0%,#7c3aed 100%);
-    border:none;color:#fff;display:flex;align-items:center;justify-content:center;
-    cursor:pointer;box-shadow:0 4px 16px rgba(37,99,235,0.4);
-    transition:transform 0.18s;flex-shrink:0;
-    -webkit-tap-highlight-color:transparent;
-  }
-  .ai-send-btn-mic:hover { transform:scale(1.08); }
-  .ai-send-btn-mic:active { transform:scale(0.92); }
-
-  /* ── File badge ── */
-  .ai-file-badge {
-    display:flex;align-items:center;gap:6px;
-    padding:4px 12px;border-radius:9999px;
-    background:rgba(59,130,246,0.15);
-    border:1px solid rgba(59,130,246,0.3);
-    font-size:0.76rem;color:#60a5fa;font-weight:600;
-    width:100%;box-sizing:border-box;margin-bottom:4px;
-  }
-  .ai-file-badge span { flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-  .ai-file-badge button {
-    background:none;border:none;cursor:pointer;color:#60a5fa;padding:0;
-    display:flex;align-items:center;
-  }
-
-  /* ── Chat Stream ── */
+  /* ── Chat stream ── */
   .ai-chat-stream {
-    padding:14px 0;
-    display:flex;
-    flex-direction:column;
+    padding:12px 0;display:flex;flex-direction:column;
   }
   .ai-msg-row {
-    display:flex;flex-direction:column;
-    width:100%;margin-bottom:14px;
-    padding:0 16px;box-sizing:border-box;
+    display:flex;flex-direction:column;width:100%;
+    margin-bottom:12px;padding:0 16px;box-sizing:border-box;
     animation:ai-fadein 0.2s ease-out both;
   }
   .ai-bubble {
@@ -285,96 +108,116 @@ const CSS = `
   }
   .ai-bubble-bot {
     align-self:flex-start;
-    background:var(--bg-card,#141f36);
-    color:var(--text-primary,#f8fafc);
+    background:var(--bg-card,#141f36);color:var(--text-primary,#f8fafc);
     border:1px solid var(--border-color,rgba(255,255,255,0.08));
-    border-bottom-left-radius:4px;
-    box-shadow:0 4px 14px rgba(0,0,0,0.15);
+    border-bottom-left-radius:4px;box-shadow:0 4px 14px rgba(0,0,0,0.15);
   }
   .ai-msg-time {
-    font-size:0.68rem;color:var(--text-muted,#8493a8);
-    margin-top:3px;padding:0 4px;
+    font-size:0.68rem;color:var(--text-muted,#8493a8);margin-top:3px;padding:0 4px;
   }
   .ai-copy-btn {
-    background:none;border:none;cursor:pointer;
-    color:var(--text-muted,#8493a8);
-    font-size:0.74rem;
-    display:flex;align-items:center;gap:4px;
-    margin-top:6px;
+    background:none;border:none;cursor:pointer;color:var(--text-muted,#8493a8);
+    font-size:0.74rem;display:flex;align-items:center;gap:4px;margin-top:6px;
   }
-
-  /* ── Bottom dock input (chat mode) ── */
-  .ai-dock {
-    flex-shrink:0;
-    padding:6px 14px calc(env(safe-area-inset-bottom,0px) + 8px) 14px;
-    z-index:30;width:100%;max-width:600px;
-    margin:0 auto;box-sizing:border-box;
-  }
-  .ai-dock-box {
-    background:var(--bg-card,#141f36);
-    border:1.5px solid var(--border-color,rgba(255,255,255,0.12));
-    border-radius:18px;
-    padding:10px 12px 10px 16px;
-    display:flex;align-items:flex-end;gap:10px;
-    box-shadow:0 6px 24px rgba(0,0,0,0.25);
-    box-sizing:border-box;min-height:52px;
-    transition:border-color 0.2s,box-shadow 0.2s;
-  }
-  .ai-dock-box:focus-within {
-    border-color:#3b82f6;
-    box-shadow:0 0 28px rgba(59,130,246,0.35);
-  }
-  .ai-dock-textarea {
-    flex:1 1 0;min-width:0;border:none;outline:none;resize:none;
-    background:transparent;color:var(--text-primary,#f8fafc);
-    font-size:1rem;line-height:1.45;font-family:inherit;
-    min-height:26px;max-height:150px;padding:3px 0;
-    box-sizing:border-box;overflow-y:auto;
-    -webkit-tap-highlight-color:transparent;
-  }
-  .ai-dock-textarea::placeholder { color:var(--text-muted,#8493a8); }
-  .ai-dock-actions { display:flex;align-items:center;gap:8px;flex-shrink:0; }
-
-  /* ── New Chat button ── */
   .ai-new-chat-btn {
     background:var(--bg-card,#141f36);
     border:1px solid var(--border-color,rgba(255,255,255,0.12));
-    border-radius:9999px;
-    color:var(--text-muted,#8493a8);
+    border-radius:9999px;color:var(--text-muted,#8493a8);
     padding:4px 14px;font-size:0.74rem;font-weight:700;
     cursor:pointer;font-family:inherit;
     transition:border-color 0.15s,color 0.15s;
   }
   .ai-new-chat-btn:hover { border-color:#3b82f6;color:#3b82f6; }
 
-  /* ── Responsive ── */
+  /* ── THE ONE INPUT BOX — always same style, always at bottom ── */
+  .ai-input-dock {
+    flex-shrink:0;
+    padding:10px 16px calc(env(safe-area-inset-bottom,0px) + 12px) 16px;
+    width:100%;max-width:600px;margin:0 auto;box-sizing:border-box;
+  }
+  .ai-input-box {
+    width:100%;
+    background:var(--bg-card,#141f36);
+    border:1.5px solid var(--border-color,rgba(255,255,255,0.12));
+    border-radius:18px;
+    padding:14px 14px 10px 16px;
+    box-sizing:border-box;
+    display:flex;flex-direction:column;gap:10px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.3);
+    transition:border-color 0.2s,box-shadow 0.2s;
+  }
+  .ai-input-box:focus-within {
+    border-color:#3b82f6;
+    box-shadow:0 0 28px rgba(59,130,246,0.3),0 8px 32px rgba(0,0,0,0.35);
+  }
+  .ai-input-textarea {
+    width:100%;min-height:52px;max-height:180px;
+    border:none;outline:none;resize:none;
+    background:transparent;color:var(--text-primary,#f8fafc);
+    font-size:1rem;line-height:1.55;font-family:inherit;
+    box-sizing:border-box;overflow-y:auto;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .ai-input-textarea::placeholder { color:var(--text-muted,#8493a8);font-size:0.96rem; }
+  .ai-input-footer {
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+  }
+  .ai-attach-btn {
+    width:32px;height:32px;border-radius:8px;
+    border:1px solid var(--border-color,rgba(255,255,255,0.1));
+    background:var(--bg-input,rgba(255,255,255,0.04));
+    color:var(--text-muted,#8493a8);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;transition:all 0.15s ease;
+    -webkit-tap-highlight-color:transparent;flex-shrink:0;
+  }
+  .ai-attach-btn:hover { color:#3b82f6;border-color:#3b82f6; }
+  .ai-send-btn {
+    height:36px;padding:0 18px;border-radius:9px;border:none;
+    background:linear-gradient(135deg,#2563eb 0%,#7c3aed 100%);
+    color:#fff;font-size:0.84rem;font-weight:700;font-family:inherit;
+    display:flex;align-items:center;gap:6px;cursor:pointer;
+    box-shadow:0 4px 14px rgba(37,99,235,0.4);
+    transition:transform 0.18s,box-shadow 0.18s;flex-shrink:0;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .ai-send-btn:hover { transform:translateY(-1px);box-shadow:0 6px 20px rgba(37,99,235,0.55); }
+  .ai-send-btn:active { transform:scale(0.95); }
+  .ai-send-btn:disabled { opacity:0.4;cursor:not-allowed;transform:none; }
+
+  /* file badge */
+  .ai-file-badge {
+    display:flex;align-items:center;gap:6px;padding:4px 12px;
+    border-radius:9999px;background:rgba(59,130,246,0.15);
+    border:1px solid rgba(59,130,246,0.3);
+    font-size:0.76rem;color:#60a5fa;font-weight:600;
+    width:100%;box-sizing:border-box;margin-bottom:4px;
+  }
+  .ai-file-badge span { flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+  .ai-file-badge button {
+    background:none;border:none;cursor:pointer;color:#60a5fa;padding:0;
+    display:flex;align-items:center;
+  }
+
   @media (max-width:768px) {
     .ai-canvas { height:100%;border-radius:0;border:none; }
-    .ai-welcome { padding:16px 14px 16px 14px; }
-    .ai-greeting { font-size:1.55rem; }
-    .ai-center-textarea { font-size:16px; }
-    .ai-dock-textarea  { font-size:16px; }
+    .ai-hero { padding:20px 14px 12px 14px; }
+    .ai-greeting { font-size:1.45rem; }
+    .ai-input-dock { padding:8px 12px calc(env(safe-area-inset-bottom,0px) + 8px) 12px; }
+    .ai-input-textarea { font-size:16px;min-height:44px; }
   }
 `;
 
-/* ─────────────────────────────────────────────────────────────────
-   MAIN COMPONENT
-───────────────────────────────────────────────────────────────── */
 export default function AiChatbot({ t, language = 'English', currentUser }) {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages]   = useState([]);
   const [inputText, setInputText] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [copiedId, setCopiedId] = useState(null);
+  const [isTyping, setIsTyping]   = useState(false);
+  const [copiedId, setCopiedId]   = useState(null);
   const [attachedFile, setAttachedFile] = useState(null);
-  const [isListening, setIsListening] = useState(false);
-  const [voiceError, setVoiceError] = useState('');
-  const [interimText, setInterimText] = useState('');
 
   const messagesEndRef = useRef(null);
-  const centerTextareaRef = useRef(null);
-  const dockTextareaRef   = useRef(null);
-  const fileInputRef      = useRef(null);
-  const recognitionRef    = useRef(null);
+  const textareaRef    = useRef(null);   // single stable ref — never remounts
+  const fileInputRef   = useRef(null);
 
   const hasMessages = messages.length > 0;
   const canSend = (inputText.trim().length > 0 || !!attachedFile) && !isTyping;
@@ -388,229 +231,109 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
     return 'Ahmad';
   };
 
-  // Auto-scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  // Auto-resize — works on whichever textarea is active
-  const autoResize = useCallback((ref) => {
-    const el = ref?.current;
+  const autoResize = useCallback(() => {
+    const el = textareaRef.current;
     if (!el) return;
     el.style.height = 'auto';
-    const maxH = window.innerWidth <= 768 ? 140 : 220;
+    const maxH = window.innerWidth <= 768 ? 140 : 180;
     el.style.height = `${Math.min(el.scrollHeight, maxH)}px`;
   }, []);
 
-  // Voice Recognition — fixed with proper permission request & error handling
-  const toggleVoice = async () => {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) {
-      setVoiceError('Speech recognition is not supported in this browser. Try Chrome or Edge.');
-      setTimeout(() => setVoiceError(''), 4000);
-      return;
-    }
+  useEffect(() => { autoResize(); }, [inputText, autoResize]);
 
-    // Stop if already listening
-    if (isListening) {
-      recognitionRef.current?.stop();
-      setIsListening(false);
-      setInterimText('');
-      return;
-    }
-
-    // Explicitly request microphone permission first (shows browser prompt on mobile)
-    try {
-      await navigator.mediaDevices.getUserMedia({ audio: true });
-    } catch (permErr) {
-      setVoiceError('Microphone permission denied. Please allow mic access in browser settings.');
-      setTimeout(() => setVoiceError(''), 5000);
-      return;
-    }
-
-    setVoiceError('');
-    let gotResult = false;
-
-    try {
-      const r = new SR();
-      r.lang = language === 'Urdu' ? 'ur-PK' : 'en-US';
-      r.continuous = false;
-      r.interimResults = true; // show live preview while speaking
-
-      r.onstart = () => { setIsListening(true); setInterimText(''); };
-
-      r.onresult = (e) => {
-        let interim = '';
-        let final = '';
-        for (let i = e.resultIndex; i < e.results.length; i++) {
-          if (e.results[i].isFinal) {
-            final += e.results[i][0].transcript;
-            gotResult = true;
-          } else {
-            interim += e.results[i][0].transcript;
-          }
-        }
-        if (interim) setInterimText(interim);
-        if (final) {
-          setInputText(p => p ? `${p} ${final.trim()}` : final.trim());
-          setInterimText('');
-        }
-      };
-
-      r.onerror = (e) => {
-        setIsListening(false);
-        setInterimText('');
-        const msgs = {
-          'not-allowed': 'Mic access denied. Enable microphone permission in your browser.',
-          'no-speech':   'No speech detected. Please try speaking again.',
-          'network':     'Network error during voice recognition. Check your connection.',
-          'aborted':     '',
-          'audio-capture': 'No microphone found. Please connect a microphone.',
-        };
-        const msg = msgs[e.error] || `Voice error: ${e.error}`;
-        if (msg) { setVoiceError(msg); setTimeout(() => setVoiceError(''), 5000); }
-      };
-
-      r.onend = () => {
-        setIsListening(false);
-        setInterimText('');
-        if (!gotResult) {
-          setVoiceError('No speech detected. Tap the mic and speak clearly.');
-          setTimeout(() => setVoiceError(''), 3500);
-        }
-      };
-
-      recognitionRef.current = r;
-      r.start();
-    } catch (err) {
-      setIsListening(false);
-      setVoiceError('Could not start voice recognition. Please try again.');
-      setTimeout(() => setVoiceError(''), 4000);
-    }
-  };
-
-  // Send
   const handleSend = async (override) => {
     const base = typeof override === 'string' ? override.trim() : inputText.trim();
     const fileNote = attachedFile ? `\n\n[Attached: ${attachedFile.name}]\n${attachedFile.content}` : '';
     const query = (base + fileNote).trim();
     if (!query || isTyping) return;
 
-    const ts = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const userMsg = { id: Date.now(), sender: 'user', text: base, fileInfo: attachedFile?.name || null, time: ts };
+    const ts = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    const userMsg = { id: Date.now(), sender:'user', text:base, fileInfo:attachedFile?.name||null, time:ts };
 
     setMessages(p => [...p, userMsg]);
     setInputText('');
     setAttachedFile(null);
-    if (centerTextareaRef.current) centerTextareaRef.current.style.height = 'auto';
-    if (dockTextareaRef.current)   dockTextareaRef.current.style.height   = 'auto';
+    if (textareaRef.current) textareaRef.current.style.height = 'auto';
     setIsTyping(true);
 
     try {
       const res = await generateChatbotResponse(query, [...messages, userMsg], language);
       setIsTyping(false);
-      const tb = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      setMessages(p => [...p, { id: Date.now()+1, sender:'bot', text:res.text, time:tb }]);
+      const tb = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+      setMessages(p => [...p, { id:Date.now()+1, sender:'bot', text:res.text, time:tb }]);
     } catch {
       setIsTyping(false);
-      const tb = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      setMessages(p => [...p, { id: Date.now()+1, sender:'bot', text:'⚠️ Connection error. Please try again.', time:tb }]);
+      const tb = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+      setMessages(p => [...p, { id:Date.now()+1, sender:'bot', text:'⚠️ Connection error. Please try again.', time:tb }]);
     }
   };
 
   const handleFileAttach = e => {
     const file = e.target.files?.[0]; if (!file) return;
     const reader = new FileReader();
-    reader.onload = ev => setAttachedFile({ name: file.name, content: ev.target.result?.toString().slice(0,4000) || '' });
+    reader.onload = ev => setAttachedFile({ name:file.name, content:ev.target.result?.toString().slice(0,4000)||'' });
     reader.readAsText(file); e.target.value = '';
   };
 
   const handleCopy = (text, id) => {
-    navigator.clipboard.writeText(text).catch(() => {});
-    setCopiedId(id); setTimeout(() => setCopiedId(null), 1800);
+    navigator.clipboard.writeText(text).catch(()=>{});
+    setCopiedId(id); setTimeout(()=>setCopiedId(null), 1800);
   };
 
   const handleNewChat = () => { setMessages([]); setInputText(''); setAttachedFile(null); };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = e => {
     const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     if (e.key === 'Enter' && !e.shiftKey && !isTouch) { e.preventDefault(); handleSend(); }
   };
 
-  /* ── Hidden file input (shared) ── */
-  const FileInputEl = (
-    <input
-      ref={fileInputRef}
-      type="file"
-      accept=".txt,.eml,.csv,.json,.py,.md,.log,.msg"
-      onChange={handleFileAttach}
-      style={{ display: 'none' }}
-    />
-  );
-
-  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     CENTERED SQUARE INPUT BOX (welcome screen)
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-  const CenterInputJSX = (
-    <div className="ai-center-box">
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     THE ONE INPUT BOX — renders once, never changes
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+  const InputBoxJSX = (
+    <div className="ai-input-dock">
       {attachedFile && (
         <div className="ai-file-badge">
-          <FileText size={13} />
+          <FileText size={13}/>
           <span>{attachedFile.name}</span>
-          <button onMouseDown={e=>e.preventDefault()} onClick={()=>setAttachedFile(null)}><X size={13}/></button>
+          <button onMouseDown={e=>e.preventDefault()} onClick={()=>setAttachedFile(null)}>
+            <X size={13}/>
+          </button>
         </div>
       )}
 
-      {/* Textarea — inline so it never remounts */}
-      <textarea
-        ref={centerTextareaRef}
-        className="ai-center-textarea"
-        value={inputText}
-        onInput={() => autoResize(centerTextareaRef)}
-        onChange={e => setInputText(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder="Ask APDS AI anything, or paste a suspicious URL..."
-        rows={3}
-        autoComplete="off"
-        autoCorrect="off"
-        autoCapitalize="sentences"
-        spellCheck={false}
-      />
+      <div className="ai-input-box">
+        {/* SINGLE stable textarea — inline JSX, never a sub-component */}
+        <textarea
+          ref={textareaRef}
+          className="ai-input-textarea"
+          value={inputText}
+          onInput={autoResize}
+          onChange={e => setInputText(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Ask APDS AI anything, or paste a suspicious URL..."
+          rows={2}
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="sentences"
+          spellCheck={false}
+        />
 
-      {/* Interim voice preview */}
-      {isListening && interimText && (
-        <div style={{
-          fontSize:'0.92rem', color:'var(--text-muted,#8493a8)',
-          fontStyle:'italic', padding:'2px 0 4px 0', lineHeight:1.45
-        }}>
-          🎙️ {interimText}...
-        </div>
-      )}
-
-      <div className="ai-center-footer">
-        <div className="ai-center-left">
+        <div className="ai-input-footer">
           <button
             type="button"
-            className="ai-icon-btn"
+            className="ai-attach-btn"
             onMouseDown={e=>e.preventDefault()}
             onClick={()=>fileInputRef.current?.click()}
             title="Attach file"
           >
-            <Plus size={18} strokeWidth={2.4}/>
+            <Plus size={17} strokeWidth={2.4}/>
           </button>
-          <button
-            type="button"
-            className="ai-icon-btn"
-            onMouseDown={e=>e.preventDefault()}
-            onClick={toggleVoice}
-            title={isListening ? 'Stop listening' : 'Voice input'}
-            style={isListening ? { color:'#f43f5e', borderColor:'#f43f5e', background:'rgba(244,63,94,0.1)' } : {}}
-          >
-            <Mic size={17} strokeWidth={2.2}/>
-          </button>
-        </div>
 
-        {inputText.trim().length > 0 || attachedFile ? (
           <button
             type="button"
             className="ai-send-btn"
@@ -618,64 +341,8 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
             onClick={()=>handleSend()}
             disabled={!canSend}
           >
-            <ArrowUp size={16} strokeWidth={2.8}/> Send
+            <ArrowUp size={15} strokeWidth={2.8}/> Send
           </button>
-        ) : (
-          <button
-            type="button"
-            className="ai-send-btn-mic"
-            onMouseDown={e=>e.preventDefault()}
-            onClick={toggleVoice}
-            title="Voice"
-            style={isListening ? { background:'#f43f5e' } : {}}
-          >
-            <Mic size={18} strokeWidth={2.2}/>
-          </button>
-        )}
-      </div>
-    </div>
-  );
-
-  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     BOTTOM DOCK INPUT (chat screen)
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-  const DockInputJSX = (
-    <div className="ai-dock">
-      {attachedFile && (
-        <div className="ai-file-badge" style={{ marginBottom:'6px' }}>
-          <FileText size={13}/>
-          <span>{attachedFile.name}</span>
-          <button onMouseDown={e=>e.preventDefault()} onClick={()=>setAttachedFile(null)}><X size={13}/></button>
-        </div>
-      )}
-      <div className="ai-dock-box">
-        <textarea
-          ref={dockTextareaRef}
-          className="ai-dock-textarea"
-          value={inputText}
-          onInput={() => autoResize(dockTextareaRef)}
-          onChange={e => setInputText(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Message APDS AI..."
-          rows={1}
-          autoComplete="off"
-          autoCorrect="off"
-          autoCapitalize="sentences"
-          spellCheck={false}
-        />
-        <div className="ai-dock-actions">
-          <button type="button" className="ai-icon-btn" onMouseDown={e=>e.preventDefault()} onClick={()=>fileInputRef.current?.click()} title="Attach file">
-            <Plus size={17} strokeWidth={2.4}/>
-          </button>
-          {inputText.trim().length > 0 || attachedFile ? (
-            <button type="button" className="ai-send-btn-mic" onMouseDown={e=>e.preventDefault()} onClick={()=>handleSend()} disabled={!canSend}>
-              <ArrowUp size={18} strokeWidth={2.8}/>
-            </button>
-          ) : (
-            <button type="button" className="ai-send-btn-mic" onMouseDown={e=>e.preventDefault()} onClick={toggleVoice}>
-              <Mic size={17} strokeWidth={2.2}/>
-            </button>
-          )}
         </div>
       </div>
     </div>
@@ -684,67 +351,42 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
   return (
     <>
       <style>{CSS}</style>
-      <div className="ai-canvas">
-        {FileInputEl}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".txt,.eml,.csv,.json,.py,.md,.log,.msg"
+        onChange={handleFileAttach}
+        style={{ display:'none' }}
+      />
 
+      <div className="ai-canvas">
+
+        {/* ── Scroll area: hero OR chat stream ── */}
         <div className="ai-scroll">
+
           {!hasMessages ? (
-            /* ── WELCOME: Logo + Title + Centered Square Input ── */
-            <div className="ai-welcome">
-              {/* Shield Logo */}
+            /* Welcome hero — logo + greeting only, no input here */
+            <div className="ai-hero">
               <div className="ai-logo-wrap">
                 <div className="ai-logo-ring"/>
                 <div className="ai-logo-core">
-                  <Shield size={38} strokeWidth={2.2}/>
+                  <Shield size={36} strokeWidth={2.2}/>
                 </div>
               </div>
 
-              {/* Brand */}
               <div className="ai-brand-name">APDS Sentinel AI</div>
               <div className="ai-online-badge">
-                <span className="ai-dot"/>
+                <span className="ai-badge-dot"/>
                 <span>Neural ML Online · 94.6% Accuracy</span>
               </div>
 
-              {/* Greeting */}
               <h1 className="ai-greeting">
-                Hi, <span className="ai-greeting-name">{getUserName()}!</span> 👋
+                Hi, <span>{getUserName()}!</span> 👋
               </h1>
               <p className="ai-greeting-sub">How can I help protect your security today?</p>
-
-              {/* ── Centered Square Input Box ── */}
-              {CenterInputJSX}
-
-              {/* Voice listening indicator */}
-              {isListening && (
-                <div style={{
-                  marginTop:'10px', display:'flex', alignItems:'center', gap:'8px',
-                  padding:'8px 14px', borderRadius:'12px',
-                  background:'rgba(244,63,94,0.12)', border:'1px solid rgba(244,63,94,0.3)',
-                  fontSize:'0.82rem', color:'#f43f5e', fontWeight:700, width:'100%',
-                  boxSizing:'border-box'
-                }}>
-                  <span style={{ display:'inline-block', width:8, height:8, borderRadius:'50%',
-                    background:'#f43f5e', boxShadow:'0 0 8px #f43f5e',
-                    animation:'ai-breathe 1s infinite ease-in-out' }}/>
-                  🎙️ Listening... Speak now and pause when done.
-                </div>
-              )}
-
-              {/* Voice error toast */}
-              {voiceError && (
-                <div style={{
-                  marginTop:'8px', padding:'8px 14px', borderRadius:'12px',
-                  background:'rgba(245,158,11,0.12)', border:'1px solid rgba(245,158,11,0.3)',
-                  fontSize:'0.82rem', color:'#f59e0b', fontWeight:600, width:'100%',
-                  boxSizing:'border-box'
-                }}>
-                  ⚠️ {voiceError}
-                </div>
-              )}
             </div>
           ) : (
-            /* ── Active Chat Messages ── */
+            /* Chat messages stream */
             <div className="ai-chat-stream">
               <div style={{ display:'flex', justifyContent:'flex-end', padding:'0 16px 8px 16px' }}>
                 <button className="ai-new-chat-btn" onMouseDown={e=>e.preventDefault()} onClick={handleNewChat}>
@@ -767,7 +409,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                       </button>
                     )}
                   </div>
-                  <span className="ai-msg-time" style={{ alignSelf: msg.sender==='user' ? 'flex-end' : 'flex-start' }}>
+                  <span className="ai-msg-time" style={{ alignSelf: msg.sender==='user'?'flex-end':'flex-start' }}>
                     {msg.time}
                   </span>
                 </div>
@@ -786,36 +428,9 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
           )}
         </div>
 
-        {/* ── Bottom dock (only in chat mode) ── */}
-        {hasMessages && (
-          <>
-            {isListening && (
-              <div style={{
-                display:'flex', alignItems:'center', gap:'8px',
-                padding:'5px 14px', margin:'0 14px 4px',
-                borderRadius:'12px', background:'rgba(244,63,94,0.12)',
-                border:'1px solid rgba(244,63,94,0.3)',
-                fontSize:'0.78rem', color:'#f43f5e', fontWeight:700
-              }}>
-                <span style={{ width:7,height:7,borderRadius:'50%',background:'#f43f5e',
-                  boxShadow:'0 0 6px #f43f5e', display:'inline-block',
-                  animation:'ai-breathe 1s infinite' }}/>
-                🎙️ Listening... speak now.
-              </div>
-            )}
-            {voiceError && (
-              <div style={{
-                padding:'5px 14px', margin:'0 14px 4px',
-                borderRadius:'12px', background:'rgba(245,158,11,0.12)',
-                border:'1px solid rgba(245,158,11,0.3)',
-                fontSize:'0.78rem', color:'#f59e0b', fontWeight:600
-              }}>
-                ⚠️ {voiceError}
-              </div>
-            )}
-            {DockInputJSX}
-          </>
-        )}
+        {/* ── THE ONE INPUT BOX — always at bottom, never changes ── */}
+        {InputBoxJSX}
+
       </div>
     </>
   );
