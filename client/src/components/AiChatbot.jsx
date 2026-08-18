@@ -1,85 +1,54 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
-  Plus, Mic, ArrowUp, Copy, Check, X, FileText, PlusCircle
+  Shield, Sparkles, Plus, Mic, ArrowUp, Copy, Check,
+  X, FileText, Lock, Globe, Terminal, RefreshCw,
+  Search, MessageSquare, Code2, AlertTriangle, ArrowRight
 } from 'lucide-react';
 import { generateChatbotResponse } from '../utils/chatbotEngine';
 
 /* ─────────────────────────────────────────────────────────────────
-   EXACT 1:1 REPLICA OF THE USER'S MINIMALIST SCREENSHOT
+   APDS AI ASSISTANT — SEAMLESS DESIGN SYSTEM (100% MATCH WITH SITE)
 ───────────────────────────────────────────────────────────────── */
-const MINIMAL_CSS = `
-  @keyframes ribbon-pulse {
+const APDS_AI_CSS = `
+  @keyframes apds-shield-glow {
     0%, 100% {
+      box-shadow: 0 0 25px rgba(59, 130, 246, 0.4), 0 0 50px rgba(139, 92, 246, 0.25);
       transform: scale(1);
-      filter: drop-shadow(0 0 25px rgba(99, 102, 241, 0.4)) drop-shadow(0 0 50px rgba(56, 189, 248, 0.25));
     }
     50% {
+      box-shadow: 0 0 38px rgba(59, 130, 246, 0.65), 0 0 70px rgba(139, 92, 246, 0.45);
       transform: scale(1.04);
-      filter: drop-shadow(0 0 38px rgba(168, 85, 247, 0.65)) drop-shadow(0 0 75px rgba(56, 189, 248, 0.45));
     }
   }
 
-  @keyframes twinkle-sparkle {
-    0%, 100% { opacity: 0.25; transform: scale(0.75); }
-    50%      { opacity: 1; transform: scale(1.3); }
+  @keyframes apds-sparkle-twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50%      { opacity: 1; transform: scale(1.2); }
   }
 
-  @keyframes chat-fade-in {
+  @keyframes apds-fade-up {
     from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* ── Canvas Background: Deep Pure Midnight/Black ── */
-  .minimal-ai-canvas {
+  /* ── Canvas Container (Inherits Website Theme Colors) ── */
+  .apds-chat-canvas {
     display: flex;
     flex-direction: column;
     height: 100%;
     width: 100%;
-    background: #03050c;
-    color: #ffffff;
+    background: var(--bg-primary, #080c16);
+    color: var(--text-primary, #f8fafc);
     position: relative;
     box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
     overflow: hidden;
     flex: 1 1 0;
     min-height: 0;
   }
-  .light-theme .minimal-ai-canvas {
-    background: #0a0e1c;
-    color: #ffffff;
-  }
 
-  /* ── Top Bar (Minimal Top Right + Button) ── */
-  .minimal-ai-topbar {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding: 14px 18px 4px 18px;
-    background: transparent;
-    flex-shrink: 0;
-    z-index: 20;
-  }
-  .minimal-ai-btn-top-plus {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #0d1222;
-    border: 1.5px solid #8b5cf6;
-    box-shadow: 0 0 16px rgba(139, 92, 246, 0.45);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ffffff;
-    cursor: pointer;
-    transition: transform 0.18s, box-shadow 0.18s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .minimal-ai-btn-top-plus:active {
-    transform: scale(0.92);
-  }
-
-  /* ── Scroll Area ── */
-  .minimal-ai-scroll {
+  /* ── Scrollable Viewport ── */
+  .apds-chat-scroll {
     flex: 1 1 0;
     min-height: 0;
     overflow-y: auto;
@@ -88,36 +57,180 @@ const MINIMAL_CSS = `
     -webkit-overflow-scrolling: touch;
   }
 
-  /* ── Welcome Stage (Centered Glowing Ribbon Loop) ── */
-  .minimal-ai-center {
-    flex: 1;
+  /* ── Welcome Stage ── */
+  .apds-welcome-container {
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 20px 20px 40px 20px;
+    padding: 16px 16px 10px 16px;
     text-align: center;
-    user-select: none;
+    max-width: 480px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
   }
 
-  .minimal-ai-ribbon-wrap {
+  /* ── Signature Glowing APDS Shield Logo ── */
+  .apds-shield-logo-wrap {
     position: relative;
-    width: 140px;
-    height: 140px;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
   }
-
-  .minimal-ai-sparkle {
+  .apds-shield-logo-core {
+    width: 70px;
+    height: 70px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    animation: apds-shield-glow 3.6s infinite ease-in-out;
+    position: relative;
+  }
+  .apds-shield-sparkle {
     position: absolute;
     color: #60a5fa;
-    animation: twinkle-sparkle 2.5s infinite ease-in-out;
+    animation: apds-sparkle-twinkle 2.4s infinite ease-in-out;
   }
 
-  /* ── Floating Glowing Capsule Input Dock ── */
-  .minimal-ai-dock {
-    padding: 8px 16px calc(env(safe-area-inset-bottom, 0px) + 14px) 16px;
+  /* ── Brand Title & Status ── */
+  .apds-brand-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    font-family: var(--font-display, 'Outfit', sans-serif);
+    background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 3px 0;
+    letter-spacing: -0.01em;
+  }
+  .apds-brand-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #10b981;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 10px;
+    border-radius: 9999px;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    margin-bottom: 12px;
+  }
+  .apds-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 6px #10b981;
+  }
+
+  /* ── Headlines ── */
+  .apds-welcome-greeting {
+    font-size: clamp(1.45rem, 5.2vw, 1.8rem);
+    font-weight: 800;
+    font-family: var(--font-display, 'Outfit', sans-serif);
+    color: var(--text-primary, #f8fafc);
+    margin: 0 0 2px 0;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .apds-user-name {
+    color: #3b82f6;
+  }
+  .apds-welcome-question {
+    font-size: clamp(1rem, 3.8vw, 1.25rem);
+    font-weight: 700;
+    color: var(--text-secondary, #cbd5e1);
+    margin: 0 0 16px 0;
+    letter-spacing: -0.01em;
+  }
+
+  /* ── 2x2 Quick Action Prompt Cards (Theme Matched) ── */
+  .apds-prompt-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+  }
+  .apds-prompt-card {
+    background: var(--bg-card, #141f36);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    border-radius: 14px;
+    padding: 9px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.16s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-tap-highlight-color: transparent;
+    color: var(--text-secondary, #cbd5e1);
+  }
+  .apds-prompt-card:hover {
+    border-color: #3b82f6;
+    background: var(--bg-card-hover, #1c2b4a);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+  .apds-prompt-card:active {
+    transform: scale(0.97);
+  }
+  .apds-card-icon-box {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .apds-card-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-primary, #f8fafc);
+    line-height: 1.2;
+    margin-bottom: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .apds-card-desc {
+    font-size: 0.68rem;
+    color: var(--text-muted, #8493a8);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .apds-card-arrow {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--bg-input, rgba(255, 255, 255, 0.05));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted, #8493a8);
+    flex-shrink: 0;
+  }
+
+  /* ── Floating Glowing Input Capsule (Website Theme Matched) ── */
+  .apds-input-dock {
+    padding: 6px 14px calc(env(safe-area-inset-bottom, 0px) + 8px) 14px;
     flex-shrink: 0;
     background: transparent;
     z-index: 30;
@@ -126,71 +239,68 @@ const MINIMAL_CSS = `
     margin: 0 auto;
     box-sizing: border-box;
   }
-
-  .minimal-ai-capsule {
-    background: #080d1c;
-    border: 1.5px solid transparent;
+  .apds-input-capsule {
+    background: var(--bg-card, #141f36);
+    border: 1.5px solid var(--border-color, rgba(255, 255, 255, 0.12));
     border-radius: 9999px;
-    background-image: linear-gradient(#080d1c, #080d1c), linear-gradient(135deg, #38bdf8 0%, #6366f1 50%, #a855f7 100%);
-    background-origin: border-box;
-    background-clip: padding-box, border-box;
     padding: 6px 10px 6px 18px;
     display: flex;
     align-items: center;
     gap: 10px;
-    box-shadow: 0 0 24px rgba(99, 102, 241, 0.28), 0 8px 30px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     box-sizing: border-box;
-    min-height: 52px;
+    min-height: 50px;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .minimal-ai-capsule.multiline {
-    border-radius: 26px;
+  .apds-input-capsule.multiline {
+    border-radius: 24px;
     align-items: flex-end;
     padding-bottom: 8px;
   }
-  .minimal-ai-capsule:focus-within {
-    box-shadow: 0 0 35px rgba(99, 102, 241, 0.45), 0 8px 32px rgba(0, 0, 0, 0.7);
+  .apds-input-capsule:focus-within {
+    border-color: #3b82f6;
+    box-shadow: 0 0 24px rgba(59, 130, 246, 0.35);
   }
 
-  /* ── Auto-Growing Textarea (Never remounts) ── */
-  .minimal-ai-textarea {
+  /* ── Textarea ── */
+  .apds-input-textarea {
     flex: 1 1 0;
     min-width: 0;
     border: none;
     outline: none;
     resize: none;
     background: transparent;
-    color: #ffffff;
-    font-size: 1rem;
+    color: var(--text-primary, #f8fafc);
+    font-size: 0.98rem;
     line-height: 1.45;
     font-family: inherit;
     min-height: 26px;
-    max-height: 160px;
+    max-height: 150px;
     padding: 3px 0;
     box-sizing: border-box;
     display: block;
     overflow-y: auto;
     -webkit-tap-highlight-color: transparent;
   }
-  .minimal-ai-textarea::placeholder {
-    color: #64748b;
-    font-size: 0.98rem;
+  .apds-input-textarea::placeholder {
+    color: var(--text-muted, #8493a8);
+    font-size: 0.94rem;
   }
 
-  /* ── Right Action Buttons (Plus & Mic/Send) ── */
-  .minimal-ai-actions {
+  /* ── Actions ── */
+  .apds-input-actions {
     display: flex;
     align-items: center;
     gap: 8px;
     flex-shrink: 0;
   }
-  .minimal-ai-btn-plus {
+  .apds-btn-attach {
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    background: transparent;
-    color: #94a3b8;
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+    background: var(--bg-input, rgba(255, 255, 255, 0.05));
+    color: var(--text-muted, #8493a8);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -198,144 +308,140 @@ const MINIMAL_CSS = `
     transition: all 0.15s ease;
     -webkit-tap-highlight-color: transparent;
   }
-  .minimal-ai-btn-plus:hover {
-    color: #ffffff;
-    border-color: #6366f1;
+  .apds-btn-attach:hover {
+    color: #3b82f6;
+    border-color: #3b82f6;
   }
-  .minimal-ai-btn-mic {
-    width: 38px;
-    height: 38px;
+  .apds-btn-send {
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     border: none;
-    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
     color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 0 16px rgba(124, 58, 237, 0.5);
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
     transition: transform 0.18s, box-shadow 0.18s;
     flex-shrink: 0;
     -webkit-tap-highlight-color: transparent;
   }
-  .minimal-ai-btn-mic:hover {
+  .apds-btn-send:hover {
     transform: scale(1.08);
-    box-shadow: 0 0 22px rgba(124, 58, 237, 0.75);
+    background: linear-gradient(135deg, #1d4ed8 0%, #4338ca 100%);
   }
-  .minimal-ai-btn-mic:active {
+  .apds-btn-send:active {
     transform: scale(0.92);
   }
 
-  /* ── Chat Messages Stream ── */
-  .minimal-ai-msg-row {
+  /* ── Chat Messages ── */
+  .apds-chat-msg {
     display: flex;
     flex-direction: column;
     width: 100%;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     padding: 0 16px;
     box-sizing: border-box;
-    animation: chat-fade-in 0.2s ease-out both;
+    animation: apds-fade-up 0.2s ease-out both;
   }
-  .minimal-ai-bubble {
+  .apds-chat-bubble {
     max-width: 86%;
-    padding: 12px 18px;
-    font-size: 0.96rem;
-    line-height: 1.6;
-    border-radius: 22px;
+    padding: 12px 16px;
+    font-size: 0.94rem;
+    line-height: 1.55;
+    border-radius: 20px;
     word-break: break-word;
   }
-  .minimal-ai-bubble-user {
+  .apds-chat-bubble-user {
     align-self: flex-end;
-    background: linear-gradient(135deg, #2563eb 0%, #6366f1 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
     color: #ffffff;
     border-bottom-right-radius: 4px;
-    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
   }
-  .minimal-ai-bubble-bot {
+  .apds-chat-bubble-bot {
     align-self: flex-start;
-    background: #0d1322;
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--bg-card, #141f36);
+    color: var(--text-primary, #f8fafc);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
     border-bottom-left-radius: 4px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
   }
 
   /* ── Responsive Mobile ── */
   @media (max-width: 768px) {
-    .minimal-ai-canvas {
+    .apds-chat-canvas {
       height: 100%;
       border-radius: 0;
       border: none;
     }
-    .minimal-ai-dock {
-      padding: 6px 12px calc(env(safe-area-inset-bottom, 0px) + 8px) 12px;
+    .apds-welcome-container {
+      padding: 10px 12px 6px 12px;
     }
-    .minimal-ai-capsule {
-      min-height: 48px;
-      padding: 5px 8px 5px 14px;
+    .apds-welcome-greeting {
+      font-size: 1.55rem;
     }
-    .minimal-ai-textarea {
+    .apds-welcome-question {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+    }
+    .apds-prompt-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+    .apds-prompt-card {
+      padding: 8px 10px;
+    }
+    .apds-input-dock {
+      padding: 4px 10px calc(env(safe-area-inset-bottom, 0px) + 6px) 10px;
+    }
+    .apds-input-textarea {
       font-size: 16px; /* Prevents auto-zoom on iOS */
-    }
-    .minimal-ai-bubble {
-      max-width: 90%;
-      font-size: 0.94rem;
     }
   }
 `;
 
-/* ── Exact 3D Glowing Ribbon Loop SVG Emblem ── */
-function GlowingRibbonEmblem({ size = 120 }) {
-  return (
-    <div style={{ position: 'relative', animation: 'ribbon-pulse 3.8s infinite ease-in-out' }}>
-      <svg width={size} height={size} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="ribbon_flow_1" x1="20" y1="20" x2="180" y2="180" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#38bdf8" />
-            <stop offset="35%" stopColor="#60a5fa" />
-            <stop offset="70%" stopColor="#818cf8" />
-            <stop offset="100%" stopColor="#c084fc" />
-          </linearGradient>
-          <linearGradient id="ribbon_flow_2" x1="180" y1="20" x2="20" y2="180" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#ec4899" />
-            <stop offset="40%" stopColor="#a855f7" />
-            <stop offset="75%" stopColor="#6366f1" />
-            <stop offset="100%" stopColor="#38bdf8" />
-          </linearGradient>
-          <filter id="ribbon_aura" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="6" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-
-        {/* Ambient Ring */}
-        <circle cx="100" cy="100" r="76" stroke="rgba(99, 102, 241, 0.25)" strokeWidth="1.5" />
-
-        {/* Outer 3-Lobed Ribbon Knot */}
-        <path
-          d="M100 42 C120 42 145 60 152 85 C158 110 142 135 120 148 C98 160 68 152 50 130 C32 108 40 76 65 55 C78 44 90 42 100 42 Z"
-          stroke="url(#ribbon_flow_1)"
-          strokeWidth="14"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          filter="url(#ribbon_aura)"
-        />
-
-        {/* Inner Counter-Loop Knot */}
-        <path
-          d="M100 52 C75 52 56 75 62 105 C68 135 105 145 130 128 C155 110 145 75 122 58 C112 52 105 52 100 52 Z"
-          stroke="url(#ribbon_flow_2)"
-          strokeWidth="10"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </div>
-  );
-}
+/* ── 4 Quick Actions (APDS Security Themed) ── */
+const SECURITY_ACTIONS = [
+  {
+    id: 'scan',
+    title: 'Scan Suspicious URL',
+    desc: 'Deep ML & Lexical Audit',
+    icon: Shield,
+    iconBg: 'rgba(239, 68, 68, 0.15)',
+    iconColor: '#f43f5e',
+    query: 'Scan paypal-security-verification.xyz'
+  },
+  {
+    id: 'email',
+    title: 'Analyze Phishing Email',
+    desc: 'Header & NLP Inspection',
+    icon: Lock,
+    iconBg: 'rgba(59, 130, 246, 0.15)',
+    iconColor: '#3b82f6',
+    query: 'How do I detect phishing in an urgent account suspension email?'
+  },
+  {
+    id: 'code',
+    title: 'ML Feature Pipeline',
+    desc: 'Python Extraction Script',
+    icon: Code2,
+    iconBg: 'rgba(16, 185, 129, 0.15)',
+    iconColor: '#10b981',
+    query: 'Show Python code for URL feature extraction and Random Forest classifier'
+  },
+  {
+    id: 'project',
+    title: 'APDS Architecture',
+    desc: 'Authors, Supervisor & Stats',
+    icon: Sparkles,
+    iconBg: 'rgba(168, 85, 247, 0.15)',
+    iconColor: '#a855f7',
+    query: 'Tell me about the APDS project authors, supervisor, and University of Sargodha'
+  }
+];
 
 /* ─────────────────────────────────────────────────────────────────
    MAIN COMPONENT
@@ -355,6 +461,16 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
 
   const hasMessages = messages.length > 0;
   const canSend = (inputText.trim().length > 0 || !!attachedFile) && !isTyping;
+
+  // Clean User Display Name
+  const getUserName = () => {
+    const raw = currentUser?.name || currentUser?.username;
+    if (raw && !raw.toLowerCase().includes('system') && !raw.toLowerCase().includes('admin')) {
+      const first = raw.split(' ')[0];
+      return first.charAt(0).toUpperCase() + first.slice(1);
+    }
+    return 'Ahmad';
+  };
 
   // Auto-scroll
   useEffect(() => {
@@ -503,10 +619,10 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
   const isMultiLine = inputText.includes('\n') || (textareaRef.current?.scrollHeight || 0) > 34;
 
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     INLINE FLOATING CAPSULE (EXACT MATCH TO SCREENSHOT)
+     INLINE FLOATING CAPSULE (SEAMLESS SITE MATCH)
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-  const CapsuleInputJSX = (
-    <div className="minimal-ai-dock">
+  const InputCapsuleJSX = (
+    <div className="apds-input-dock">
       {/* File preview badge */}
       {attachedFile && (
         <div style={{
@@ -515,11 +631,11 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
           gap: '6px',
           padding: '4px 12px',
           marginBottom: '6px',
-          background: 'rgba(99, 102, 241, 0.2)',
-          border: '1px solid rgba(99, 102, 241, 0.35)',
+          background: 'rgba(59, 130, 246, 0.15)',
+          border: '1px solid rgba(59, 130, 246, 0.3)',
           borderRadius: '9999px',
           fontSize: '0.76rem',
-          color: '#93c5fd',
+          color: '#3b82f6',
           fontWeight: 600
         }}>
           <FileText size={13} />
@@ -529,23 +645,23 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
           <button
             onMouseDown={e => e.preventDefault()}
             onClick={() => setAttachedFile(null)}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#93c5fd', padding: 0 }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#3b82f6', padding: 0 }}
           >
             <X size={13} />
           </button>
         </div>
       )}
 
-      <div className={`minimal-ai-capsule ${isMultiLine ? 'multiline' : ''}`}>
-        {/* Stable Textarea Input — NEVER remounted */}
+      <div className={`apds-input-capsule ${isMultiLine ? 'multiline' : ''}`}>
+        {/* Stable Textarea Input */}
         <textarea
           ref={textareaRef}
-          className="minimal-ai-textarea"
+          className="apds-input-textarea"
           value={inputText}
           onInput={autoResize}
           onChange={e => setInputText(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Type a message or hold to speak"
+          placeholder="Ask APDS AI or scan a threat..."
           rows={1}
           autoComplete="off"
           autoCorrect="off"
@@ -553,8 +669,8 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
           spellCheck={false}
         />
 
-        {/* Right Actions: Plus & Mic/Send */}
-        <div className="minimal-ai-actions">
+        {/* Right Actions: Plus & Send/Mic */}
+        <div className="apds-input-actions">
           <input
             ref={fileInputRef}
             type="file"
@@ -564,7 +680,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
           />
           <button
             type="button"
-            className="minimal-ai-btn-plus"
+            className="apds-btn-attach"
             onMouseDown={e => e.preventDefault()}
             onClick={() => fileInputRef.current?.click()}
             title="Attach file"
@@ -572,11 +688,10 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
             <Plus size={18} strokeWidth={2.4} />
           </button>
 
-          {/* Glowing Circular Blue/Purple Action Button */}
           {inputText.trim().length > 0 || attachedFile ? (
             <button
               type="button"
-              className="minimal-ai-btn-mic"
+              className="apds-btn-send"
               onMouseDown={e => e.preventDefault()}
               onClick={() => handleSend()}
               disabled={!canSend}
@@ -588,13 +703,13 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
           ) : (
             <button
               type="button"
-              className="minimal-ai-btn-mic"
+              className="apds-btn-send"
               onMouseDown={e => e.preventDefault()}
               onClick={toggleVoiceInput}
               title={isListening ? 'Listening...' : 'Voice message'}
               aria-label="Voice message"
             >
-              <Mic size={19} strokeWidth={2.2} />
+              <Mic size={18} strokeWidth={2.2} />
             </button>
           )}
         </div>
@@ -604,43 +719,92 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
 
   return (
     <>
-      <style>{MINIMAL_CSS}</style>
-      <div className="minimal-ai-canvas">
+      <style>{APDS_AI_CSS}</style>
+      <div className="apds-chat-canvas">
 
-        {/* ── Top Bar: Minimal Purple Glowing Plus Circle on Right ── */}
-        <div className="minimal-ai-topbar">
-          <button
-            className="minimal-ai-btn-top-plus"
-            title="New Chat"
-            onMouseDown={e => e.preventDefault()}
-            onClick={handleNewChat}
-          >
-            <Plus size={22} strokeWidth={2.4} />
-          </button>
-        </div>
-
-        {/* ── Scroll Area: Centered Glowing Ribbon Knot or Active Messages ── */}
-        <div className="minimal-ai-scroll">
+        {/* ── Scroll Area: Logo + Title + Quick Actions or Chat Stream ── */}
+        <div className="apds-chat-scroll">
           {!hasMessages ? (
-            /* ── Pure Minimalist Center (Exact Match to Screenshot) ── */
-            <div className="minimal-ai-center">
-              <div className="minimal-ai-ribbon-wrap">
-                {/* Floating sparkles around ribbon */}
-                <span className="minimal-ai-sparkle" style={{ top: '8%', left: '0%', fontSize: '11px' }}>✦</span>
-                <span className="minimal-ai-sparkle" style={{ top: '15%', right: '4%', fontSize: '13px', animationDelay: '0.8s' }}>✦</span>
-                <span className="minimal-ai-sparkle" style={{ bottom: '15%', left: '4%', fontSize: '12px', animationDelay: '1.4s' }}>✦</span>
-                <span className="minimal-ai-sparkle" style={{ bottom: '10%', right: '0%', fontSize: '10px', animationDelay: '1.9s' }}>✦</span>
+            /* ── Welcome Stage (Glowing APDS Logo + Title) ── */
+            <div className="apds-welcome-container">
+              {/* Glowing APDS Shield Logo */}
+              <div className="apds-shield-logo-wrap">
+                <span className="apds-shield-sparkle" style={{ top: '4%', left: '0%', fontSize: '11px' }}>✦</span>
+                <span className="apds-shield-sparkle" style={{ top: '10%', right: '2%', fontSize: '13px', animationDelay: '0.8s' }}>✦</span>
+                <span className="apds-shield-sparkle" style={{ bottom: '8%', left: '4%', fontSize: '12px', animationDelay: '1.4s' }}>✦</span>
+                <span className="apds-shield-sparkle" style={{ bottom: '4%', right: '0%', fontSize: '10px', animationDelay: '1.9s' }}>✦</span>
 
-                {/* 3D Glowing Ribbon Emblem */}
-                <GlowingRibbonEmblem size={120} />
+                <div className="apds-shield-logo-core">
+                  <Shield size={36} strokeWidth={2.2} />
+                </div>
+              </div>
+
+              {/* Title & Status Badge */}
+              <div className="apds-brand-title">APDS Sentinel AI</div>
+              <div className="apds-brand-badge">
+                <span className="apds-status-dot" />
+                <span>Neural Defense Active · 94.6% Acc</span>
+              </div>
+
+              {/* Greeting & Headline */}
+              <h1 className="apds-welcome-greeting">
+                Hi, <span className="apds-user-name">{getUserName()}!</span> 👋
+              </h1>
+              <h2 className="apds-welcome-question">
+                How can I protect your security today?
+              </h2>
+
+              {/* 2x2 Action Cards */}
+              <div className="apds-prompt-grid">
+                {SECURITY_ACTIONS.map(card => {
+                  const Icon = card.icon;
+                  return (
+                    <div
+                      key={card.id}
+                      className="apds-prompt-card"
+                      onMouseDown={e => e.preventDefault()}
+                      onClick={() => handleSend(card.query)}
+                    >
+                      <div className="apds-card-icon-box" style={{ background: card.iconBg, color: card.iconColor }}>
+                        <Icon size={16} strokeWidth={2.2} />
+                      </div>
+                      <div style={{ flex: 1, overflow: 'hidden' }}>
+                        <div className="apds-card-title">{card.title}</div>
+                        <div className="apds-card-desc">{card.desc}</div>
+                      </div>
+                      <div className="apds-card-arrow">
+                        <ArrowRight size={11} strokeWidth={2.5} />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ) : (
             /* ── Active Chat Messages Stream ── */
             <div style={{ padding: '12px 0', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '0 16px 6px 16px' }}>
+                <button
+                  onMouseDown={e => e.preventDefault()}
+                  onClick={handleNewChat}
+                  style={{
+                    background: 'var(--bg-card, #141f36)',
+                    border: '1px solid var(--border-color, rgba(255, 255, 255, 0.12))',
+                    borderRadius: '9999px',
+                    color: 'var(--text-muted, #8493a8)',
+                    padding: '4px 12px',
+                    fontSize: '0.74rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  + New Chat
+                </button>
+              </div>
+
               {messages.map(msg => (
-                <div key={msg.id} className="minimal-ai-msg-row">
-                  <div className={`minimal-ai-bubble ${msg.sender === 'user' ? 'minimal-ai-bubble-user' : 'minimal-ai-bubble-bot'}`}>
+                <div key={msg.id} className="apds-chat-msg">
+                  <div className={`apds-chat-bubble ${msg.sender === 'user' ? 'apds-chat-bubble-user' : 'apds-chat-bubble-bot'}`}>
                     {msg.fileInfo && (
                       <div style={{
                         display: 'flex',
@@ -664,7 +828,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                             background: 'none',
                             border: 'none',
                             cursor: 'pointer',
-                            color: '#94a3b8',
+                            color: 'var(--text-muted, #8493a8)',
                             fontSize: '0.74rem',
                             display: 'flex',
                             alignItems: 'center',
@@ -678,7 +842,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                   </div>
                   <span style={{
                     fontSize: '0.68rem',
-                    color: '#64748b',
+                    color: 'var(--text-muted, #8493a8)',
                     marginTop: '3px',
                     alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
                     padding: '0 4px'
@@ -689,10 +853,10 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
               ))}
 
               {isTyping && (
-                <div className="minimal-ai-msg-row">
-                  <div className="minimal-ai-bubble minimal-ai-bubble-bot" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#818cf8', animation: 'twinkle-sparkle 1s infinite' }} />
-                    <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Thinking...</span>
+                <div className="apds-chat-msg">
+                  <div className="apds-chat-bubble apds-chat-bubble-bot" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Shield size={15} color="#3b82f6" />
+                    <span style={{ fontSize: '0.84rem', color: 'var(--text-muted, #8493a8)' }}>Analyzing threat...</span>
                   </div>
                 </div>
               )}
@@ -701,8 +865,8 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
           )}
         </div>
 
-        {/* ── Floating Capsule Pill Dock at Bottom (Always 100% Visible) ── */}
-        {CapsuleInputJSX}
+        {/* ── Floating Input Dock at Bottom ── */}
+        {InputCapsuleJSX}
 
       </div>
     </>
