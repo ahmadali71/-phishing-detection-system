@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   User, Lock, Bell, ChevronRight, Smartphone, Check,
   Shield, Palette, Edit2, Key, Download, Trash2, Eye,
@@ -71,12 +71,23 @@ export default function ProfileSettings({
   const [department, setDepartment] = useState('Department of Information Technology');
   const [university, setUniversity] = useState('University of Sargodha');
 
-  // Security states
-  const [twoFA, setTwoFA] = useState(currentUser?.twoFactorAuth !== false);
+  // Security states — default 2FA to FALSE for newly registered / entered users unless explicitly enabled
+  const [twoFA, setTwoFA] = useState(currentUser?.twoFactorAuth === true);
   const [show2FASetup, setShow2FASetup] = useState(false);
   const [authCode, setAuthCode] = useState('');
-  const [twoFAVerified, setTwoFAVerified] = useState(true);
+  const [twoFAVerified, setTwoFAVerified] = useState(currentUser?.twoFactorAuth === true);
   const [loginAlerts, setLoginAlerts] = useState(currentUser?.loginAlerts !== false);
+
+  // Sync if currentUser updates
+  useEffect(() => {
+    if (currentUser) {
+      if (currentUser.name) setFullName(currentUser.name);
+      if (currentUser.email) setEmail(currentUser.email);
+      if (currentUser.role) setRole(currentUser.role);
+      setTwoFA(currentUser.twoFactorAuth === true);
+      setTwoFAVerified(currentUser.twoFactorAuth === true);
+    }
+  }, [currentUser]);
 
   // Password fields
   const [showPwSection, setShowPwSection] = useState(false);
@@ -138,12 +149,30 @@ export default function ProfileSettings({
     showToast('Password updated securely!');
   };
 
+  const handleToggle2FA = (checked) => {
+    setTwoFA(checked);
+    if (checked) {
+      setShow2FASetup(true);
+      showToast('2FA Enabled! Complete authenticator app setup below.');
+    } else {
+      setShow2FASetup(false);
+      setTwoFAVerified(false);
+      if (onUpdateProfile) {
+        onUpdateProfile({ twoFactorAuth: false });
+      }
+      showToast('Two-Factor Authentication disabled.', 'error');
+    }
+  };
+
   const handleVerify2FACode = () => {
     if (authCode.length === 6) {
       setTwoFAVerified(true);
       setTwoFA(true);
       setShow2FASetup(false);
       setAuthCode('');
+      if (onUpdateProfile) {
+        onUpdateProfile({ twoFactorAuth: true });
+      }
       showToast('Two-Factor Authentication activated and verified!');
     } else {
       showToast('Please enter a valid 6-digit authenticator code.', 'error');
@@ -173,17 +202,17 @@ export default function ProfileSettings({
 
   const tabs = [
     { id: 'All', label: 'All Settings', icon: Settings },
-    { id: 'Profile', label: t.profileTab || 'Profile', icon: User },
-    { id: 'Change Password', label: t.changePasswordTab || 'Change Password', icon: Lock },
-    { id: 'Two Factor Auth', label: t.twoFactorTab || 'Two Factor Auth', icon: Smartphone },
-    { id: 'Notifications', label: t.notificationsTab || 'Notifications', icon: Bell },
-    { id: 'Privacy Settings', label: t.privacyTab || 'Privacy Settings', icon: Shield },
-    { id: 'Theme Settings', label: t.themeTab || 'Theme Settings', icon: Palette },
+    { id: 'Profile', label: t?.profileTab || 'Profile', icon: User },
+    { id: 'Change Password', label: t?.changePasswordTab || 'Change Password', icon: Lock },
+    { id: 'Two Factor Auth', label: t?.twoFactorTab || 'Two Factor Auth', icon: Smartphone },
+    { id: 'Notifications', label: t?.notificationsTab || 'Notifications', icon: Bell },
+    { id: 'Privacy Settings', label: t?.privacyTab || 'Privacy Settings', icon: Shield },
+    { id: 'Theme Settings', label: t?.themeTab || 'Theme Settings', icon: Palette },
   ];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '1120px', margin: '0 auto' }}>
-      {/* ── Desktop Top Badge & Title (Exact Match to PDF Page 64 Screen 9) ── */}
+      {/* ── Desktop Top Badge & Title ── */}
       <div className="desktop-header-wrap">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
           <div style={{
@@ -209,7 +238,7 @@ export default function ProfileSettings({
             fontFamily: 'var(--font-display)',
             textTransform: 'uppercase'
           }}>
-            {t.profileSettings || 'PROFILE & SETTINGS'}
+            {t?.profileSettings || 'PROFILE & SETTINGS'}
           </span>
         </div>
 
@@ -223,7 +252,7 @@ export default function ProfileSettings({
         </div>
       </div>
 
-      {/* ── Mobile Vibrant Hero Banner (ONLY ON MOBILE) ── */}
+      {/* ── Mobile Vibrant Hero Banner ── */}
       <div className="mobile-vibrant-hero">
         <div className="mobile-vibrant-hero-content">
           <h2 className="mobile-vibrant-hero-title">Profile &amp; Security Settings</h2>
@@ -274,7 +303,7 @@ export default function ProfileSettings({
       {/* ── 3-Column / Tabbed Grid Layout ── */}
       <div className="responsive-grid-3-col" style={{ display: 'grid', gap: '20px', alignItems: 'start' }}>
 
-        {/* ── COLUMN 1: LEFT TAB NAVIGATION (Interactive Filter) ── */}
+        {/* ── COLUMN 1: LEFT TAB NAVIGATION ── */}
         <div className="glass-panel profile-tabs-sidebar" style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
           <div style={{ fontSize: '0.72rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '6px 10px', marginBottom: '2px' }}>
             Navigation Categories
@@ -288,7 +317,6 @@ export default function ProfileSettings({
                 onClick={() => {
                   setActiveTab(tab.id);
                   if (tab.id === 'Change Password') setShowPwSection(true);
-                  if (tab.id === 'Two Factor Auth' && !twoFA) setShow2FASetup(true);
                 }}
                 style={{
                   display: 'flex',
@@ -326,7 +354,7 @@ export default function ProfileSettings({
           {(activeTab === 'All' || activeTab === 'Profile') && (
             <div className="glass-panel" style={{ padding: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
-                <h3 style={{ fontSize: '1.05rem', fontWeight: '800' }}>{t.personalInfo || 'Profile Information'}</h3>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: '800' }}>{t?.personalInfo || 'Profile Information'}</h3>
                 <button
                   onClick={() => setIsEditing(!isEditing)}
                   className="btn-secondary"
@@ -413,7 +441,7 @@ export default function ProfileSettings({
           {/* Section 2: Security & Authentication Controls */}
           {(activeTab === 'All' || activeTab === 'Change Password' || activeTab === 'Two Factor Auth') && (
             <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <h3 style={{ fontSize: '1.05rem', fontWeight: '800' }}>{t.securityControls || 'Security & Authentication'}</h3>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: '800' }}>{t?.securityControls || 'Security & Authentication'}</h3>
 
               {/* Item 1: Change Password Interactive Card */}
               <div
@@ -435,8 +463,8 @@ export default function ProfileSettings({
                     <Lock size={18} color="#3b82f6" />
                   </div>
                   <div>
-                    <div style={{ fontWeight: '700', fontSize: '0.88rem' }}>{t.changePassword || 'Change Password'}</div>
-                    <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>{t.changePasswordDesc || 'Update and encrypt account credentials'}</div>
+                    <div style={{ fontWeight: '700', fontSize: '0.88rem' }}>{t?.changePassword || 'Change Password'}</div>
+                    <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>{t?.changePasswordDesc || 'Update and encrypt account credentials'}</div>
                   </div>
                 </div>
                 <ChevronRight size={18} color="var(--text-muted)" style={{ transform: showPwSection ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
@@ -515,7 +543,7 @@ export default function ProfileSettings({
                     <Smartphone size={18} color="#635fec" />
                   </div>
                   <div>
-                    <div style={{ fontWeight: '700', fontSize: '0.88rem' }}>{t.twoFactor || 'Two-Factor Authentication (2FA)'}</div>
+                    <div style={{ fontWeight: '700', fontSize: '0.88rem' }}>{t?.twoFactor || 'Two-Factor Authentication (2FA)'}</div>
                     <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
                       {twoFA ? '● Active — Authenticator App & OTP Protected' : '○ Inactive — Enable for higher protection'}
                     </div>
@@ -536,21 +564,11 @@ export default function ProfileSettings({
                       cursor: 'pointer'
                     }}
                   >
-                    {show2FASetup ? 'Hide Setup' : 'Configure'}
+                    {show2FASetup ? 'Hide Setup' : (twoFA ? 'Reconfigure' : 'Configure')}
                   </button>
                   <Toggle
                     checked={twoFA}
-                    onChange={() => {
-                      const next = !twoFA;
-                      setTwoFA(next);
-                      if (next) {
-                        setShow2FASetup(true);
-                        showToast('2FA Enabled! Complete authenticator app pairing below.');
-                      } else {
-                        setShow2FASetup(false);
-                        showToast('Two-Factor Authentication disabled.', 'error');
-                      }
-                    }}
+                    onChange={() => handleToggle2FA(!twoFA)}
                   />
                 </div>
               </div>
@@ -614,7 +632,7 @@ export default function ProfileSettings({
                     <label style={{ fontSize: '0.76rem', fontWeight: '700', color: 'var(--text-secondary)' }}>
                       Enter 6-Digit Code from Authenticator App:
                     </label>
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '6px', flexWrap: 'wrap' }}>
                       <input
                         type="text"
                         maxLength={6}
@@ -639,6 +657,14 @@ export default function ProfileSettings({
                       >
                         Verify &amp; Activate
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => setShow2FASetup(false)}
+                        className="btn-secondary"
+                        style={{ padding: '8px 14px', fontSize: '0.84rem' }}
+                      >
+                        Close
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -659,13 +685,15 @@ export default function ProfileSettings({
                     <Bell size={18} color="#f59e0b" />
                   </div>
                   <div>
-                    <div style={{ fontWeight: '700', fontSize: '0.88rem' }}>{t.loginAlerts || 'Suspicious Login Alerts'}</div>
-                    <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>{t.loginAlertsDesc || 'Instant push alerts for unrecognized IP sign-ins'}</div>
+                    <div style={{ fontWeight: '700', fontSize: '0.88rem' }}>{t?.loginAlerts || 'Suspicious Login Alerts'}</div>
+                    <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>{t?.loginAlertsDesc || 'Instant push alerts for unrecognized IP sign-ins'}</div>
                   </div>
                 </div>
                 <Toggle checked={loginAlerts} onChange={() => {
-                  setLoginAlerts(!loginAlerts);
-                  showToast(!loginAlerts ? 'Login Alerts enabled.' : 'Login Alerts disabled.');
+                  const next = !loginAlerts;
+                  setLoginAlerts(next);
+                  if (onUpdateProfile) onUpdateProfile({ loginAlerts: next });
+                  showToast(next ? 'Login Alerts enabled.' : 'Login Alerts disabled.');
                 }} />
               </div>
             </div>
@@ -743,10 +771,10 @@ export default function ProfileSettings({
           {/* Card 1: Theme & Interface Settings */}
           {(activeTab === 'All' || activeTab === 'Theme Settings') && (
             <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <h3 style={{ fontSize: '1.05rem', fontWeight: '800' }}>{t.systemPrefs || 'Theme & Language'}</h3>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: '800' }}>{t?.systemPrefs || 'Theme & Language'}</h3>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.86rem', fontWeight: '700' }}>{t.darkTheme || 'Dark Theme'}</span>
+                <span style={{ fontSize: '0.86rem', fontWeight: '700' }}>{t?.darkTheme || 'Dark Theme'}</span>
                 <Toggle checked={theme === 'dark'} onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
               </div>
 
@@ -756,12 +784,12 @@ export default function ProfileSettings({
                 </label>
                 <div className="theme-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
                   {[
-                    { id: 'light', label: t.lightTheme || 'Light', color: '#f8fafc', dot: '#3b82f6' },
-                    { id: 'dark', label: t.darkThemeLabel || 'Dark', color: '#0f172a', dot: '#f8fafc' },
-                    { id: 'ocean', label: t.oceanTheme || 'Ocean', color: '#0f2140', dot: '#38bdf8' },
-                    { id: 'purple', label: t.purpleTheme || 'Indigo', color: '#1a102d', dot: '#635fec' },
-                    { id: 'emerald', label: t.emeraldTheme || 'Emerald', color: '#0a1f12', dot: '#34d399' },
-                    { id: 'royal', label: t.royalTheme || 'Royal', color: '#0f1530', dot: '#818cf8' },
+                    { id: 'light', label: t?.lightTheme || 'Light', color: '#f8fafc', dot: '#3b82f6' },
+                    { id: 'dark', label: t?.darkThemeLabel || 'Dark', color: '#0f172a', dot: '#f8fafc' },
+                    { id: 'ocean', label: t?.oceanTheme || 'Ocean', color: '#0f2140', dot: '#38bdf8' },
+                    { id: 'purple', label: t?.purpleTheme || 'Indigo', color: '#1a102d', dot: '#635fec' },
+                    { id: 'emerald', label: t?.emeraldTheme || 'Emerald', color: '#0a1f12', dot: '#34d399' },
+                    { id: 'royal', label: t?.royalTheme || 'Royal', color: '#0f1530', dot: '#818cf8' },
                   ].map(opt => {
                     const active = theme === opt.id;
                     return (
@@ -802,7 +830,7 @@ export default function ProfileSettings({
 
               <div>
                 <label style={{ fontSize: '0.72rem', fontWeight: '800', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', letterSpacing: '0.06em' }}>
-                  {t.languageLabel || 'SYSTEM LANGUAGE'}
+                  {t?.languageLabel || 'SYSTEM LANGUAGE'}
                 </label>
                 <select
                   value={language || 'English'}
@@ -822,7 +850,7 @@ export default function ProfileSettings({
           {/* Card 2: Account Security Health Status */}
           <div className="glass-panel" style={{ padding: '24px 20px', textAlign: 'center' }}>
             <div style={{ fontSize: '0.78rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '14px', letterSpacing: '0.06em' }}>
-              {t.accountStatus || 'Security Health Audit'}
+              {t?.accountStatus || 'Security Health Audit'}
             </div>
 
             <div style={{
@@ -842,7 +870,7 @@ export default function ProfileSettings({
             </div>
 
             <div style={{ fontSize: '1rem', fontWeight: '800', color: twoFA ? '#10b981' : '#f59e0b' }}>
-              {twoFA ? (t.accountSecure || 'Account Fully Protected') : 'Two-Factor Auth Recommended'}
+              {twoFA ? (t?.accountSecure || 'Account Fully Protected') : 'Two-Factor Auth Recommended'}
             </div>
             <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '4px' }}>
               {twoFA ? '256-bit Token Encryption & 2FA Active' : 'Enable 2FA to achieve 100% security score'}

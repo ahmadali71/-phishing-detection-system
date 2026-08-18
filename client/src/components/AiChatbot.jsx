@@ -15,7 +15,7 @@ const APDS_CHAT_STYLES = `
     40%           { transform: scale(1.05); opacity: 1;    }
   }
   @keyframes apds-fadein {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0);   }
   }
   @keyframes apds-pulse-ring {
@@ -27,8 +27,9 @@ const APDS_CHAT_STYLES = `
   .apds-chat-container {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 120px);
-    min-height: 540px;
+    height: calc(100vh - 140px);
+    max-height: 840px;
+    min-height: 480px;
     background: var(--bg-primary);
     border-radius: 20px;
     overflow: hidden;
@@ -41,28 +42,41 @@ const APDS_CHAT_STYLES = `
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 18px;
+    padding: 10px 16px;
     background: var(--bg-card);
     border-bottom: 1px solid var(--border-color);
     flex-shrink: 0;
     z-index: 10;
   }
 
-  .apds-chat-messages-area {
+  .apds-chat-scroll-area {
     flex: 1 1 0;
+    min-height: 0;
     overflow-y: auto;
-    padding: 16px 16px 8px;
+    padding: 14px 14px 6px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
   }
 
   .apds-msg-row {
-    animation: apds-fadein 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: apds-fadein 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
     display: flex;
     flex-direction: column;
+    width: 100%;
+  }
+
+  /* ── Bottom Input Dock ── */
+  .apds-input-dock {
+    flex-shrink: 0;
+    margin-top: auto;
+    padding: 8px 14px 12px;
+    background: var(--bg-primary);
+    border-top: 1px solid var(--border-color);
+    z-index: 30;
+    box-sizing: border-box;
     width: 100%;
   }
 
@@ -70,69 +84,69 @@ const APDS_CHAT_STYLES = `
   .apds-input-card {
     background: var(--bg-card);
     border: 1.5px solid var(--border-color);
-    border-radius: 20px;
+    border-radius: 18px;
     overflow: hidden;
-    transition: border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
-                box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-                height 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
     position: relative;
+    max-width: 760px;
+    margin: 0 auto;
   }
   .apds-input-card:focus-within {
     border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18), 0 8px 24px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18), 0 6px 20px rgba(0, 0, 0, 0.1);
   }
 
-  /* Textarea auto-expanding with scroll when full */
+  /* Textarea auto-expanding with smooth scaling */
   .apds-dynamic-textarea {
     width: 100%;
     border: none;
     outline: none;
     resize: none;
-    padding: 14px 16px 8px;
-    font-size: 0.96rem;
-    line-height: 1.55;
+    padding: 12px 14px 4px;
+    font-size: 0.95rem;
+    line-height: 1.5;
     background: transparent;
     color: var(--text-primary);
     font-family: inherit;
-    min-height: 48px;
-    max-height: 280px;
+    min-height: 42px;
+    max-height: 260px;
     box-sizing: border-box;
     display: block;
     overflow-y: auto;
-    transition: height 0.15s ease-out;
+    transition: height 0.12s ease-out;
     -webkit-tap-highlight-color: transparent;
   }
   .apds-dynamic-textarea.expanded {
-    max-height: 420px;
-    min-height: 180px;
+    max-height: 380px;
+    min-height: 160px;
   }
   .apds-dynamic-textarea::placeholder {
     color: var(--text-muted);
-    font-size: 0.92rem;
+    font-size: 0.9rem;
   }
 
   /* Scrollbar styling for textarea */
   .apds-dynamic-textarea::-webkit-scrollbar {
-    width: 6px;
+    width: 5px;
   }
   .apds-dynamic-textarea::-webkit-scrollbar-thumb {
     background: rgba(99, 102, 241, 0.3);
     border-radius: 3px;
   }
 
-  /* Mode selection tabs */
+  /* Mode selection pills */
   .apds-mode-pill {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 7px 16px;
+    gap: 5px;
+    padding: 6px 14px;
     border-radius: 999px;
     cursor: pointer;
     font-family: inherit;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 600;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s ease;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
   }
@@ -140,8 +154,7 @@ const APDS_CHAT_STYLES = `
     background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     color: #ffffff !important;
     border: 1.5px solid transparent;
-    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
-    transform: scale(1.02);
+    box-shadow: 0 3px 10px rgba(99, 102, 241, 0.35);
   }
   .apds-mode-pill.inactive {
     background: var(--bg-card);
@@ -158,13 +171,13 @@ const APDS_CHAT_STYLES = `
   .apds-suggestion-btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
+    gap: 8px;
+    padding: 8px 12px;
     border-radius: 12px;
     border: 1.5px solid var(--border-color);
     background: var(--bg-card);
     color: var(--text-secondary);
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
     font-family: inherit;
@@ -175,34 +188,34 @@ const APDS_CHAT_STYLES = `
   .apds-suggestion-btn:hover {
     border-color: #6366f1;
     color: #6366f1;
-    background: rgba(99, 102, 241, 0.08);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+    background: rgba(99, 102, 241, 0.06);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(99, 102, 241, 0.12);
   }
   .apds-suggestion-btn:active {
-    transform: scale(0.97);
+    transform: scale(0.98);
   }
 
-  /* File attachment badge */
+  /* File attachment chip */
   .apds-file-chip {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 12px;
-    margin: 8px 12px 2px;
+    padding: 5px 10px;
+    margin: 6px 10px 2px;
     background: rgba(99, 102, 241, 0.12);
     border: 1px solid rgba(99, 102, 241, 0.3);
-    border-radius: 10px;
-    font-size: 0.8rem;
+    border-radius: 8px;
+    font-size: 0.78rem;
     color: #6366f1;
     font-weight: 700;
-    max-width: calc(100% - 24px);
+    max-width: calc(100% - 20px);
   }
 
-  /* Send button */
+  /* Send circle button */
   .apds-send-circle-btn {
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     border: none;
     display: flex;
@@ -217,45 +230,47 @@ const APDS_CHAT_STYLES = `
     background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     color: #ffffff;
     box-shadow: 0 4px 14px rgba(99, 102, 241, 0.45);
-    transform: scale(1.04);
   }
   .apds-send-circle-btn.ready:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 18px rgba(99, 102, 241, 0.6);
+    transform: scale(1.08);
   }
   .apds-send-circle-btn.ready:active {
-    transform: scale(0.94);
+    transform: scale(0.92);
   }
   .apds-send-circle-btn.disabled {
     background: var(--bg-input);
     color: var(--text-muted);
     cursor: not-allowed;
-    opacity: 0.7;
+    opacity: 0.65;
   }
 
-  /* Mobile specific fine-tuning */
+  /* ── MOBILE VIEWPORT OPTIMIZATIONS ── */
   @media (max-width: 768px) {
     .apds-chat-container {
-      height: calc(100vh - 84px);
-      min-height: 0;
-      border-radius: 16px;
-      margin: 0 -4px;
+      height: calc(100dvh - 165px);
+      max-height: none;
+      min-height: 340px;
+      border-radius: 14px;
+      margin: 0;
     }
     .apds-chat-header {
-      padding: 10px 14px;
+      padding: 8px 12px;
     }
-    .apds-chat-messages-area {
-      padding: 12px 10px 6px;
-      gap: 10px;
+    .apds-chat-scroll-area {
+      padding: 10px 10px 4px;
+      gap: 8px;
     }
     .apds-dynamic-textarea {
-      font-size: 0.94rem;
-      padding: 12px 14px 6px;
-      min-height: 44px;
-      max-height: 240px;
+      font-size: 0.92rem;
+      padding: 10px 12px 4px;
+      min-height: 40px;
+      max-height: 200px;
     }
     .apds-input-dock {
-      padding: 8px 10px calc(env(safe-area-inset-bottom, 0px) + 8px) 10px !important;
+      padding: 6px 8px calc(env(safe-area-inset-bottom, 0px) + 6px) 8px !important;
+    }
+    .hide-mobile-text {
+      display: none !important;
     }
   }
 `;
@@ -265,7 +280,7 @@ const APDS_CHAT_STYLES = `
 ───────────────────────────────────────────────────────────────── */
 function TypingDots() {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '4px 2px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '3px 2px' }}>
       {[0, 1, 2].map(i => (
         <span key={i} style={{
           width: '7px', height: '7px', borderRadius: '50%',
@@ -292,34 +307,34 @@ function MsgContent({ text, msgId, onCopy, copiedId }) {
           const key = `${msgId}-${idx}`;
           return (
             <div key={idx} style={{
-              margin: '10px 0', borderRadius: '12px', overflow: 'hidden',
+              margin: '8px 0', borderRadius: '10px', overflow: 'hidden',
               border: '1px solid var(--border-color)',
               background: 'var(--bg-input)'
             }}>
               <div style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                padding: '6px 14px', background: 'var(--bg-secondary)',
+                padding: '5px 12px', background: 'var(--bg-secondary)',
                 borderBottom: '1px solid var(--border-color)',
-                fontSize: '0.74rem', color: 'var(--text-muted)'
+                fontSize: '0.73rem', color: 'var(--text-muted)'
               }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontFamily: 'monospace', fontWeight: 700 }}>
-                  <Terminal size={14} color="#6366f1" /> {lang}
+                <span style={{ display: 'flex', alignItems: 'center', gap: '5px', fontFamily: 'monospace', fontWeight: 700 }}>
+                  <Terminal size={13} color="#6366f1" /> {lang}
                 </span>
                 <button
                   onClick={() => onCopy(code, key)}
                   style={{
                     background: 'none', border: 'none', cursor: 'pointer',
                     color: 'var(--text-muted)', fontSize: '0.72rem',
-                    display: 'flex', alignItems: 'center', gap: '4px',
+                    display: 'flex', alignItems: 'center', gap: '3px',
                     fontWeight: 600
                   }}
                 >
-                  {copiedId === key ? <><Check size={12} color="#10b981" /> Copied</> : <><Copy size={12} /> Copy Code</>}
+                  {copiedId === key ? <><Check size={12} color="#10b981" /> Copied</> : <><Copy size={12} /> Copy</>}
                 </button>
               </div>
               <pre style={{
-                margin: 0, padding: '12px 14px', fontFamily: 'var(--font-mono, monospace)',
-                fontSize: '0.82rem', color: '#818cf8', overflowX: 'auto', lineHeight: 1.55
+                margin: 0, padding: '10px 12px', fontFamily: 'var(--font-mono, monospace)',
+                fontSize: '0.8rem', color: '#818cf8', overflowX: 'auto', lineHeight: 1.5
               }}>
                 <code>{code}</code>
               </pre>
@@ -344,9 +359,9 @@ function MsgContent({ text, msgId, onCopy, copiedId }) {
 /* ─────────────────────────────────────────────────────────────────
    ANIMATED LOGO
 ───────────────────────────────────────────────────────────────── */
-function Logo({ size = 56 }) {
+function Logo({ size = 52 }) {
   return (
-    <div style={{ position: 'relative', width: size, height: size, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ position: 'relative', width: size, height: size, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
       <div style={{
         position: 'absolute', inset: 0, borderRadius: '50%',
         background: 'rgba(99, 102, 241, 0.25)',
@@ -357,9 +372,9 @@ function Logo({ size = 56 }) {
         background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 60%, #3730a3 100%)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         position: 'relative', zIndex: 2,
-        boxShadow: '0 4px 20px rgba(99, 102, 241, 0.45)'
+        boxShadow: '0 4px 16px rgba(99, 102, 241, 0.4)'
       }}>
-        <Shield size={size * 0.48} color="white" strokeWidth={2.2} />
+        <Shield size={size * 0.46} color="white" strokeWidth={2.2} />
       </div>
     </div>
   );
@@ -369,9 +384,9 @@ function Logo({ size = 56 }) {
    MODES & PRESETS
 ───────────────────────────────────────────────────────────────── */
 const MODES = [
-  { id: 'instant', label: 'Instant', icon: Zap, desc: 'Fast heuristic response' },
-  { id: 'expert',  label: 'Expert AI', icon: Shield, desc: 'Deep cybersecurity reasoning' },
-  { id: 'scan',    label: 'Live Scan', icon: Search, desc: 'Direct URL/Email forensic audit' },
+  { id: 'instant', label: 'Instant', icon: Zap },
+  { id: 'expert',  label: 'Expert', icon: Shield },
+  { id: 'scan',    label: 'Scan', icon: Search },
 ];
 
 const SUGGESTIONS = [
@@ -408,11 +423,10 @@ export default function AiChatbot({ t, language = 'English' }) {
   const adjustTextareaHeight = useCallback(() => {
     const el = textareaRef.current;
     if (!el) return;
-    // Reset to single-line calculation
     el.style.height = 'auto';
-    const isMobile = window.innerWidth <= 768;
-    const minH = isMobile ? 44 : 48;
-    const maxH = isExpandedInput ? 420 : (isMobile ? 240 : 280);
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+    const minH = isMobile ? 40 : 44;
+    const maxH = isExpandedInput ? 380 : (isMobile ? 200 : 260);
     const targetH = Math.min(Math.max(el.scrollHeight, minH), maxH);
     el.style.height = `${targetH}px`;
   }, [isExpandedInput]);
@@ -505,27 +519,26 @@ export default function AiChatbot({ t, language = 'English' }) {
 
   /* ── Welcome Screen (Empty State) ── */
   const WelcomeScreen = () => (
-    <div style={{
-      flex: 1,
+    <div className="apds-chat-scroll-area" style={{
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '16px 16px 20px',
-      gap: '16px',
+      padding: '12px 14px',
+      gap: '12px',
       maxWidth: '680px',
       margin: '0 auto',
       width: '100%',
       boxSizing: 'border-box'
     }}>
-      <Logo size={60} />
+      <Logo size={48} />
 
       <div style={{ textAlign: 'center' }}>
         <h2 style={{
-          fontSize: 'clamp(1.25rem, 4.5vw, 1.65rem)',
+          fontSize: 'clamp(1.15rem, 4vw, 1.5rem)',
           fontWeight: '800',
           color: 'var(--text-primary)',
-          margin: '0 0 6px 0',
+          margin: '0 0 4px 0',
           fontFamily: 'var(--font-display)',
           letterSpacing: '-0.02em'
         }}>
@@ -538,13 +551,13 @@ export default function AiChatbot({ t, language = 'English' }) {
             APDS AI
           </span>
         </h2>
-        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
-          Autonomous Cyber Defense Assistant • 94.6% ML Accuracy
+        <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.35 }}>
+          Cybersecurity Assistant • 94.6% ML Accuracy
         </p>
       </div>
 
       {/* Mode Selection Pills */}
-      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'center' }}>
         {MODES.map(m => {
           const Icon = m.icon;
           const active = mode === m.id;
@@ -554,7 +567,7 @@ export default function AiChatbot({ t, language = 'English' }) {
               onClick={() => setMode(m.id)}
               className={`apds-mode-pill ${active ? 'active' : 'inactive'}`}
             >
-              <Icon size={14} strokeWidth={active ? 2.5 : 2} />
+              <Icon size={13} strokeWidth={active ? 2.5 : 2} />
               {m.label}
             </button>
           );
@@ -564,10 +577,10 @@ export default function AiChatbot({ t, language = 'English' }) {
       {/* Preset Suggestion Cards */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-        gap: '8px',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+        gap: '6px',
         width: '100%',
-        marginTop: '6px'
+        marginTop: '4px'
       }}>
         {SUGGESTIONS.map((s, i) => (
           <button
@@ -575,10 +588,10 @@ export default function AiChatbot({ t, language = 'English' }) {
             className="apds-suggestion-btn"
             onClick={() => handleSend(s.query)}
           >
-            <span style={{ fontSize: '1.1rem' }}>{s.icon}</span>
+            <span style={{ fontSize: '1rem' }}>{s.icon}</span>
             <div style={{ overflow: 'hidden' }}>
-              <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-primary)' }}>{s.title}</div>
-              <div style={{ fontSize: '0.73rem', color: 'var(--text-muted)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{s.query}</div>
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>{s.title}</div>
+              <div style={{ fontSize: '0.71rem', color: 'var(--text-muted)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{s.query}</div>
             </div>
           </button>
         ))}
@@ -588,7 +601,7 @@ export default function AiChatbot({ t, language = 'English' }) {
 
   /* ── Chat Messages View ── */
   const ChatView = () => (
-    <div className="apds-chat-messages-area">
+    <div className="apds-chat-scroll-area">
       {messages.map(msg => (
         <div
           key={msg.id}
@@ -599,43 +612,43 @@ export default function AiChatbot({ t, language = 'English' }) {
         >
           {/* Bot avatar & model tag */}
           {msg.sender === 'bot' && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
               <div style={{
-                width: '24px', height: '24px', borderRadius: '50%',
+                width: '22px', height: '22px', borderRadius: '50%',
                 background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 2px 8px rgba(99, 102, 241, 0.3)'
+                boxShadow: '0 2px 6px rgba(99, 102, 241, 0.3)'
               }}>
-                <Shield size={13} color="white" />
+                <Shield size={12} color="white" />
               </div>
-              <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>APDS Defense AI</span>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{msg.time}</span>
+              <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-primary)' }}>APDS Defense AI</span>
+              <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{msg.time}</span>
             </div>
           )}
 
           {/* Bubble body */}
           <div style={{
             maxWidth: msg.sender === 'user' ? '82%' : '92%',
-            padding: msg.sender === 'user' ? '12px 16px' : '14px 18px',
+            padding: msg.sender === 'user' ? '10px 14px' : '12px 16px',
             borderRadius: msg.sender === 'user' ? '18px 18px 4px 18px' : '4px 18px 18px 18px',
             background: msg.sender === 'user'
               ? 'linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)'
               : 'var(--bg-card)',
             color: msg.sender === 'user' ? '#ffffff' : 'var(--text-primary)',
-            fontSize: '0.92rem',
-            lineHeight: '1.6',
+            fontSize: '0.9rem',
+            lineHeight: '1.55',
             boxShadow: msg.sender === 'user'
-              ? '0 4px 16px rgba(79, 70, 229, 0.3)'
+              ? '0 4px 14px rgba(79, 70, 229, 0.3)'
               : '0 2px 8px rgba(0, 0, 0, 0.06)',
             border: msg.sender === 'bot' ? '1px solid var(--border-color)' : 'none'
           }}>
             {msg.fileInfo && (
               <div style={{
-                display: 'flex', alignItems: 'center', gap: '6px',
-                marginBottom: '6px', fontSize: '0.78rem',
+                display: 'flex', alignItems: 'center', gap: '5px',
+                marginBottom: '5px', fontSize: '0.76rem',
                 color: 'rgba(255, 255, 255, 0.85)', fontWeight: 700
               }}>
-                <FileText size={14} /> {msg.fileInfo}
+                <FileText size={13} /> {msg.fileInfo}
               </div>
             )}
             {msg.sender === 'bot'
@@ -646,7 +659,7 @@ export default function AiChatbot({ t, language = 'English' }) {
 
           {/* User message time */}
           {msg.sender === 'user' && (
-            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '3px', paddingRight: '4px' }}>
+            <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '2px', paddingRight: '4px' }}>
               {msg.time}
             </span>
           )}
@@ -656,18 +669,18 @@ export default function AiChatbot({ t, language = 'English' }) {
       {/* Typing indicator */}
       {isTyping && (
         <div className="apds-msg-row" style={{ alignItems: 'flex-start' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
             <div style={{
-              width: '24px', height: '24px', borderRadius: '50%',
+              width: '22px', height: '22px', borderRadius: '50%',
               background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
               display: 'flex', alignItems: 'center', justifyContent: 'center'
             }}>
-              <Shield size={13} color="white" />
+              <Shield size={12} color="white" />
             </div>
-            <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>APDS Defense AI</span>
+            <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-primary)' }}>APDS Defense AI</span>
           </div>
           <div style={{
-            padding: '12px 18px',
+            padding: '10px 16px',
             borderRadius: '4px 18px 18px 18px',
             background: 'var(--bg-card)',
             border: '1px solid var(--border-color)',
@@ -681,32 +694,24 @@ export default function AiChatbot({ t, language = 'English' }) {
     </div>
   );
 
-  /* ── Auto-Expanding Bottom Input Panel ── */
+  /* ── Auto-Expanding Bottom Input Dock ── */
   const InputPanel = () => {
     const canSend = (inputText.trim().length > 0 || attachedFile) && !isTyping;
 
     return (
-      <div
-        className="apds-input-dock"
-        style={{
-          padding: '8px 16px 14px',
-          maxWidth: '740px',
-          width: '100%',
-          margin: '0 auto',
-          boxSizing: 'border-box',
-          flexShrink: 0
-        }}
-      >
-        {/* Chat view header controls (mini mode tabs + new chat) */}
+      <div className="apds-input-dock">
+        {/* Chat view mini controls */}
         {hasMessages && (
           <div style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginBottom: '8px',
-            gap: '6px'
+            marginBottom: '6px',
+            gap: '6px',
+            maxWidth: '760px',
+            margin: '0 auto 6px'
           }}>
-            <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '2px' }}>
+            <div style={{ display: 'flex', gap: '5px', overflowX: 'auto', paddingBottom: '1px' }}>
               {MODES.map(m => {
                 const Icon = m.icon;
                 const active = mode === m.id;
@@ -715,9 +720,9 @@ export default function AiChatbot({ t, language = 'English' }) {
                     key={m.id}
                     onClick={() => setMode(m.id)}
                     className={`apds-mode-pill ${active ? 'active' : 'inactive'}`}
-                    style={{ padding: '4px 12px', fontSize: '0.78rem' }}
+                    style={{ padding: '3px 10px', fontSize: '0.75rem' }}
                   >
-                    <Icon size={12} strokeWidth={active ? 2.5 : 2} />
+                    <Icon size={11} strokeWidth={active ? 2.5 : 2} />
                     {m.label}
                   </button>
                 );
@@ -730,12 +735,12 @@ export default function AiChatbot({ t, language = 'English' }) {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '4px',
-                padding: '4px 12px',
+                padding: '3px 10px',
                 borderRadius: '999px',
                 border: '1.5px solid var(--border-color)',
                 background: 'var(--bg-card)',
                 color: 'var(--text-muted)',
-                fontSize: '0.78rem',
+                fontSize: '0.75rem',
                 cursor: 'pointer',
                 fontFamily: 'inherit',
                 fontWeight: 600,
@@ -743,7 +748,7 @@ export default function AiChatbot({ t, language = 'English' }) {
               }}
               title="Reset conversation"
             >
-              <RefreshCw size={12} /> New Chat
+              <RefreshCw size={11} /> New Chat
             </button>
           </div>
         )}
@@ -753,7 +758,7 @@ export default function AiChatbot({ t, language = 'English' }) {
           {/* Attached File Preview Chip */}
           {attachedFile && (
             <div className="apds-file-chip">
-              <FileText size={14} />
+              <FileText size={13} />
               <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {attachedFile.name}
               </span>
@@ -762,7 +767,7 @@ export default function AiChatbot({ t, language = 'English' }) {
                 style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6366f1', display: 'flex', padding: 0 }}
                 title="Remove file"
               >
-                <X size={14} />
+                <X size={13} />
               </button>
             </div>
           )}
@@ -772,10 +777,9 @@ export default function AiChatbot({ t, language = 'English' }) {
             ref={textareaRef}
             className={`apds-dynamic-textarea ${isExpandedInput ? 'expanded' : ''}`}
             value={inputText}
+            onInput={adjustTextareaHeight}
             onChange={e => setInputText(e.target.value)}
             onKeyDown={e => {
-              // Desktop: Enter sends, Shift+Enter new line
-              // Mobile: Enter inserts new line (doesn't trigger send)
               const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
               if (e.key === 'Enter' && !e.shiftKey && !isTouchDevice) {
                 e.preventDefault();
@@ -784,8 +788,8 @@ export default function AiChatbot({ t, language = 'English' }) {
             }}
             placeholder={
               mode === 'scan'
-                ? 'Paste URL or email text for live forensic scan...'
-                : 'Message APDS AI... (Shift+Enter for newline)'
+                ? 'Paste URL or email text to scan...'
+                : 'Message APDS AI...'
             }
             rows={1}
             autoComplete="off"
@@ -798,11 +802,11 @@ export default function AiChatbot({ t, language = 'English' }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '6px 12px 10px',
-            gap: '6px'
+            padding: '4px 10px 8px',
+            gap: '4px'
           }}>
             {/* Left Controls: File Attachment & Quick Mode Toggles */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -816,29 +820,29 @@ export default function AiChatbot({ t, language = 'English' }) {
                 onClick={() => fileInputRef.current?.click()}
                 title="Attach log/email/script file (.txt, .eml, .py, .json)"
                 style={{
-                  width: '32px', height: '32px', borderRadius: '50%',
+                  width: '30px', height: '30px', borderRadius: '50%',
                   border: 'none', background: 'none',
                   color: attachedFile ? '#6366f1' : 'var(--text-muted)',
                   cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
                   transition: 'color 0.15s'
                 }}
               >
-                <Paperclip size={17} />
+                <Paperclip size={16} />
               </button>
 
               <button
                 type="button"
                 onClick={() => setMode(mode === 'instant' ? 'expert' : 'instant')}
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '4px',
-                  padding: '4px 10px', borderRadius: '999px', border: 'none',
+                  display: 'inline-flex', alignItems: 'center', gap: '3px',
+                  padding: '3px 8px', borderRadius: '999px', border: 'none',
                   background: mode === 'instant' ? 'rgba(99, 102, 241, 0.14)' : 'var(--bg-input)',
                   color: mode === 'instant' ? '#6366f1' : 'var(--text-muted)',
-                  fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer',
+                  fontSize: '0.74rem', fontWeight: 700, cursor: 'pointer',
                   fontFamily: 'inherit'
                 }}
               >
-                <Zap size={12} strokeWidth={mode === 'instant' ? 2.5 : 2} />
+                <Zap size={11} strokeWidth={mode === 'instant' ? 2.5 : 2} />
                 Instant
               </button>
 
@@ -846,32 +850,32 @@ export default function AiChatbot({ t, language = 'English' }) {
                 type="button"
                 onClick={() => setMode(mode === 'scan' ? 'instant' : 'scan')}
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '4px',
-                  padding: '4px 10px', borderRadius: '999px', border: 'none',
+                  display: 'inline-flex', alignItems: 'center', gap: '3px',
+                  padding: '3px 8px', borderRadius: '999px', border: 'none',
                   background: mode === 'scan' ? 'rgba(99, 102, 241, 0.14)' : 'var(--bg-input)',
                   color: mode === 'scan' ? '#6366f1' : 'var(--text-muted)',
-                  fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer',
+                  fontSize: '0.74rem', fontWeight: 700, cursor: 'pointer',
                   fontFamily: 'inherit'
                 }}
               >
-                <Search size={12} strokeWidth={mode === 'scan' ? 2.5 : 2} />
+                <Search size={11} strokeWidth={mode === 'scan' ? 2.5 : 2} />
                 Scan
               </button>
             </div>
 
             {/* Right Controls: Expand/Collapse, Line/Char Badge, Clear & Send Button */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               {/* Dynamic Size Indicator for Large Prompts */}
               {isLargePrompt && (
                 <span style={{
-                  fontSize: '0.7rem',
+                  fontSize: '0.68rem',
                   color: 'var(--text-muted)',
                   fontWeight: 600,
-                  padding: '2px 6px',
-                  borderRadius: '6px',
+                  padding: '2px 5px',
+                  borderRadius: '5px',
                   background: 'var(--bg-input)'
                 }}>
-                  {lineCount > 1 ? `${lineCount} lines • ` : ''}{inputText.length}c
+                  {lineCount > 1 ? `${lineCount}L • ` : ''}{inputText.length}c
                 </span>
               )}
 
@@ -882,13 +886,13 @@ export default function AiChatbot({ t, language = 'English' }) {
                   onClick={() => setIsExpandedInput(v => !v)}
                   title={isExpandedInput ? 'Collapse input' : 'Expand input to full view'}
                   style={{
-                    width: '28px', height: '28px', borderRadius: '6px',
+                    width: '26px', height: '26px', borderRadius: '6px',
                     border: 'none', background: 'var(--bg-input)',
                     color: isExpandedInput ? '#6366f1' : 'var(--text-muted)',
                     cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
                   }}
                 >
-                  {isExpandedInput ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+                  {isExpandedInput ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
                 </button>
               )}
 
@@ -904,13 +908,13 @@ export default function AiChatbot({ t, language = 'English' }) {
                   }}
                   title="Clear input"
                   style={{
-                    width: '28px', height: '28px', borderRadius: '50%',
+                    width: '26px', height: '26px', borderRadius: '50%',
                     border: '1px solid var(--border-color)',
                     background: 'var(--bg-input)', color: 'var(--text-muted)',
                     cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
                   }}
                 >
-                  <X size={13} />
+                  <X size={12} />
                 </button>
               )}
 
@@ -923,7 +927,7 @@ export default function AiChatbot({ t, language = 'English' }) {
                 title="Send query"
                 aria-label="Send message"
               >
-                <ArrowUp size={18} strokeWidth={2.5} />
+                <ArrowUp size={16} strokeWidth={2.5} />
               </button>
             </div>
           </div>
@@ -932,12 +936,12 @@ export default function AiChatbot({ t, language = 'English' }) {
         {/* Academic Project Footnote */}
         <p style={{
           textAlign: 'center',
-          fontSize: '0.69rem',
+          fontSize: '0.66rem',
           color: 'var(--text-muted)',
-          margin: '6px 0 0',
-          lineHeight: 1.3
+          margin: '4px 0 0',
+          lineHeight: 1.2
         }}>
-          APDS Cyber AI • 94.6% Accuracy • Dept of CS &amp; IT, Univ of Sargodha
+          APDS Cyber AI • 94.6% Accuracy • Univ of Sargodha
         </p>
       </div>
     );
@@ -949,45 +953,45 @@ export default function AiChatbot({ t, language = 'English' }) {
       <div className="apds-chat-container">
         {/* Top Header Identity Bar */}
         <div className="apds-chat-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div style={{
-              width: '32px', height: '32px', borderRadius: '10px',
+              width: '28px', height: '28px', borderRadius: '8px',
               background: 'linear-gradient(135deg, #6366f1, #3b82f6)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'white', fontWeight: 900, fontSize: '0.85rem',
-              boxShadow: '0 2px 8px rgba(99, 102, 241, 0.35)'
+              color: 'white', fontWeight: 900, fontSize: '0.8rem',
+              boxShadow: '0 2px 6px rgba(99, 102, 241, 0.35)'
             }}>
               AI
             </div>
             <div>
-              <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.2 }}>
+              <div style={{ fontSize: '0.86rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.2 }}>
                 APDS Cyber Defense Assistant
               </div>
-              <div style={{ fontSize: '0.7rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
-                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 6px #10b981' }} />
-                Neural ML Pipeline Online (94.6%)
+              <div style={{ fontSize: '0.68rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
+                <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 5px #10b981' }} />
+                Neural ML Pipeline Online
               </div>
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
             <button
               onClick={() => handleSend('Scan paypal-secure-login.com')}
               className="apds-mode-pill inactive"
-              style={{ padding: '5px 10px', fontSize: '0.75rem' }}
+              style={{ padding: '4px 8px', fontSize: '0.72rem' }}
               title="Test real-time scan"
             >
-              <Zap size={12} color="#f59e0b" />
-              <span className="hide-mobile">Test Scan</span>
+              <Zap size={11} color="#f59e0b" />
+              <span className="hide-mobile-text">Test Scan</span>
             </button>
             {hasMessages && (
               <button
                 onClick={handleNewChat}
                 className="apds-mode-pill inactive"
-                style={{ padding: '5px 10px', fontSize: '0.75rem' }}
+                style={{ padding: '4px 8px', fontSize: '0.72rem' }}
                 title="Start new conversation"
               >
-                <RefreshCw size={12} />
+                <RefreshCw size={11} />
               </button>
             )}
           </div>
