@@ -367,6 +367,8 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
   const [copiedId, setCopiedId] = useState(null);
   const [attachedFile, setAttachedFile] = useState(null);
   const [isListening, setIsListening] = useState(false);
+  const [voiceError, setVoiceError] = useState('');
+  const [interimText, setInterimText] = useState('');
 
   const messagesEndRef = useRef(null);
   const centerTextareaRef = useRef(null);
@@ -400,19 +402,91 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
     el.style.height = `${Math.min(el.scrollHeight, maxH)}px`;
   }, []);
 
-  // Voice
-  const toggleVoice = () => {
+  // Voice Recognition — fixed with proper permission request & error handling
+  const toggleVoice = async () => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) return alert('Speech recognition not supported.');
-    if (isListening) { recognitionRef.current?.stop(); setIsListening(false); return; }
+    if (!SR) {
+      setVoiceError('Speech recognition is not supported in this browser. Try Chrome or Edge.');
+      setTimeout(() => setVoiceError(''), 4000);
+      return;
+    }
+
+    // Stop if already listening
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      setInterimText('');
+      return;
+    }
+
+    // Explicitly request microphone permission first (shows browser prompt on mobile)
+    try {
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (permErr) {
+      setVoiceError('Microphone permission denied. Please allow mic access in browser settings.');
+      setTimeout(() => setVoiceError(''), 5000);
+      return;
+    }
+
+    setVoiceError('');
+    let gotResult = false;
+
     try {
       const r = new SR();
       r.lang = language === 'Urdu' ? 'ur-PK' : 'en-US';
-      r.onstart = () => setIsListening(true);
-      r.onresult = e => { setInputText(p => p ? `${p} ${e.results[0][0].transcript}` : e.results[0][0].transcript); setIsListening(false); };
-      r.onerror = r.onend = () => setIsListening(false);
-      recognitionRef.current = r; r.start();
-    } catch { setIsListening(false); }
+      r.continuous = false;
+      r.interimResults = true; // show live preview while speaking
+
+      r.onstart = () => { setIsListening(true); setInterimText(''); };
+
+      r.onresult = (e) => {
+        let interim = '';
+        let final = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          if (e.results[i].isFinal) {
+            final += e.results[i][0].transcript;
+            gotResult = true;
+          } else {
+            interim += e.results[i][0].transcript;
+          }
+        }
+        if (interim) setInterimText(interim);
+        if (final) {
+          setInputText(p => p ? `${p} ${final.trim()}` : final.trim());
+          setInterimText('');
+        }
+      };
+
+      r.onerror = (e) => {
+        setIsListening(false);
+        setInterimText('');
+        const msgs = {
+          'not-allowed': 'Mic access denied. Enable microphone permission in your browser.',
+          'no-speech':   'No speech detected. Please try speaking again.',
+          'network':     'Network error during voice recognition. Check your connection.',
+          'aborted':     '',
+          'audio-capture': 'No microphone found. Please connect a microphone.',
+        };
+        const msg = msgs[e.error] || `Voice error: ${e.error}`;
+        if (msg) { setVoiceError(msg); setTimeout(() => setVoiceError(''), 5000); }
+      };
+
+      r.onend = () => {
+        setIsListening(false);
+        setInterimText('');
+        if (!gotResult) {
+          setVoiceError('No speech detected. Tap the mic and speak clearly.');
+          setTimeout(() => setVoiceError(''), 3500);
+        }
+      };
+
+      recognitionRef.current = r;
+      r.start();
+    } catch (err) {
+      setIsListening(false);
+      setVoiceError('Could not start voice recognition. Please try again.');
+      setTimeout(() => setVoiceError(''), 4000);
+    }
   };
 
   // Send
@@ -503,9 +577,18 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
         spellCheck={false}
       />
 
+      {/* Interim voice preview */}
+      {isListening && interimText && (
+        <div style={{
+          fontSize:'0.92rem', color:'var(--text-muted,#8493a8)',
+          fontStyle:'italic', padding:'2px 0 4px 0', lineHeight:1.45
+        }}>
+          🎙️ {interimText}...
+        </div>
+      )}
+
       <div className="ai-center-footer">
         <div className="ai-center-left">
-          {FileInputEl}
           <button
             type="button"
             className="ai-icon-btn"
@@ -520,8 +603,8 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
             className="ai-icon-btn"
             onMouseDown={e=>e.preventDefault()}
             onClick={toggleVoice}
-            title={isListening ? 'Listening...' : 'Voice'}
-            style={isListening ? { color:'#f43f5e', borderColor:'#f43f5e' } : {}}
+            title={isListening ? 'Stop listening' : 'Voice input'}
+            style={isListening ? { color:'#f43f5e', borderColor:'#f43f5e', background:'rgba(244,63,94,0.1)' } : {}}
           >
             <Mic size={17} strokeWidth={2.2}/>
           </button>
@@ -631,6 +714,34 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
 
               {/* ── Centered Square Input Box ── */}
               {CenterInputJSX}
+
+              {/* Voice listening indicator */}
+              {isListening && (
+                <div style={{
+                  marginTop:'10px', display:'flex', alignItems:'center', gap:'8px',
+                  padding:'8px 14px', borderRadius:'12px',
+                  background:'rgba(244,63,94,0.12)', border:'1px solid rgba(244,63,94,0.3)',
+                  fontSize:'0.82rem', color:'#f43f5e', fontWeight:700, width:'100%',
+                  boxSizing:'border-box'
+                }}>
+                  <span style={{ display:'inline-block', width:8, height:8, borderRadius:'50%',
+                    background:'#f43f5e', boxShadow:'0 0 8px #f43f5e',
+                    animation:'ai-breathe 1s infinite ease-in-out' }}/>
+                  🎙️ Listening... Speak now and pause when done.
+                </div>
+              )}
+
+              {/* Voice error toast */}
+              {voiceError && (
+                <div style={{
+                  marginTop:'8px', padding:'8px 14px', borderRadius:'12px',
+                  background:'rgba(245,158,11,0.12)', border:'1px solid rgba(245,158,11,0.3)',
+                  fontSize:'0.82rem', color:'#f59e0b', fontWeight:600, width:'100%',
+                  boxSizing:'border-box'
+                }}>
+                  ⚠️ {voiceError}
+                </div>
+              )}
             </div>
           ) : (
             /* ── Active Chat Messages ── */
@@ -676,7 +787,35 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
         </div>
 
         {/* ── Bottom dock (only in chat mode) ── */}
-        {hasMessages && DockInputJSX}
+        {hasMessages && (
+          <>
+            {isListening && (
+              <div style={{
+                display:'flex', alignItems:'center', gap:'8px',
+                padding:'5px 14px', margin:'0 14px 4px',
+                borderRadius:'12px', background:'rgba(244,63,94,0.12)',
+                border:'1px solid rgba(244,63,94,0.3)',
+                fontSize:'0.78rem', color:'#f43f5e', fontWeight:700
+              }}>
+                <span style={{ width:7,height:7,borderRadius:'50%',background:'#f43f5e',
+                  boxShadow:'0 0 6px #f43f5e', display:'inline-block',
+                  animation:'ai-breathe 1s infinite' }}/>
+                🎙️ Listening... speak now.
+              </div>
+            )}
+            {voiceError && (
+              <div style={{
+                padding:'5px 14px', margin:'0 14px 4px',
+                borderRadius:'12px', background:'rgba(245,158,11,0.12)',
+                border:'1px solid rgba(245,158,11,0.3)',
+                fontSize:'0.78rem', color:'#f59e0b', fontWeight:600
+              }}>
+                ⚠️ {voiceError}
+              </div>
+            )}
+            {DockInputJSX}
+          </>
+        )}
       </div>
     </>
   );
