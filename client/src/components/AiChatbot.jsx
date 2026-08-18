@@ -1,429 +1,361 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
-  Shield, Sparkles, Plus, Mic, ArrowUp, Copy, Check,
-  X, FileText, Lock, Globe, Terminal, RefreshCw,
-  Search, MessageSquare, Code2, Volume2, VolumeX,
-  ThumbsUp, ThumbsDown, ArrowRight, Wand2
+  Shield, Plus, Mic, ArrowUp, Copy, Check,
+  X, FileText, Sparkles, ArrowRight, Search, Lock, Code2
 } from 'lucide-react';
 import { generateChatbotResponse } from '../utils/chatbotEngine';
 
 /* ─────────────────────────────────────────────────────────────────
-   MODERN & CLEAN DESIGN SYSTEM (CLAUDE & CHATGPT MOBILE AESTHETIC)
+   APDS AI ASSISTANT — ChatGPT-style centered square input layout
 ───────────────────────────────────────────────────────────────── */
-const CHATBOT_CSS = `
-  @keyframes apds-breathe {
-    0%, 100% {
-      box-shadow: 0 0 25px rgba(59, 130, 246, 0.4), 0 0 50px rgba(99, 102, 241, 0.2);
-      transform: scale(1);
-    }
-    50% {
-      box-shadow: 0 0 40px rgba(59, 130, 246, 0.65), 0 0 75px rgba(168, 85, 247, 0.4);
-      transform: scale(1.03);
-    }
+const CSS = `
+  @keyframes ai-breathe {
+    0%,100% { box-shadow: 0 0 28px rgba(59,130,246,0.5), 0 0 55px rgba(99,102,241,0.25); transform:scale(1); }
+    50%     { box-shadow: 0 0 44px rgba(59,130,246,0.75), 0 0 80px rgba(168,85,247,0.45); transform:scale(1.04); }
+  }
+  @keyframes ai-orbit {
+    from { transform:rotate(0deg); }
+    to   { transform:rotate(360deg); }
+  }
+  @keyframes ai-fadein {
+    from { opacity:0; transform:translateY(10px); }
+    to   { opacity:1; transform:translateY(0); }
   }
 
-  @keyframes apds-orbit-spin {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
+  /* ── Root Canvas ── */
+  .ai-canvas {
+    display:flex;
+    flex-direction:column;
+    height:100%;
+    width:100%;
+    background:var(--bg-primary,#080c16);
+    color:var(--text-primary,#f8fafc);
+    font-family:var(--font-sans,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif);
+    box-sizing:border-box;
+    overflow:hidden;
+    flex:1 1 0;
+    min-height:0;
+    position:relative;
   }
 
-  @keyframes apds-fade-up {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
+  /* ── Scroll area ── */
+  .ai-scroll {
+    flex:1 1 0;
+    min-height:0;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    -webkit-overflow-scrolling:touch;
   }
 
-  @keyframes apds-dot-pulse {
-    0%, 80%, 100% { transform: translateY(0); opacity: 0.35; }
-    40%           { transform: translateY(-5px); opacity: 1; }
+  /* ── WELCOME: centered column ── */
+  .ai-welcome {
+    flex:1 1 auto;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:24px 20px 24px 20px;
+    text-align:center;
+    width:100%;
+    max-width:600px;
+    margin:0 auto;
+    box-sizing:border-box;
+    animation:ai-fadein 0.35s ease-out both;
   }
 
-  /* ── Canvas Container ── */
-  .apds-ai-canvas {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
-    background: var(--bg-primary, #080c16);
-    background-image: radial-gradient(circle at 50% 25%, rgba(59, 130, 246, 0.08) 0%, transparent 60%);
-    color: var(--text-primary, #f8fafc);
-    position: relative;
-    box-sizing: border-box;
-    font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
-    overflow: hidden;
-    flex: 1 1 0;
-    min-height: 0;
+  /* ── Shield Logo ── */
+  .ai-logo-wrap {
+    position:relative;
+    width:90px;
+    height:90px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-bottom:18px;
+    flex-shrink:0;
   }
-  .light-theme .apds-ai-canvas {
-    background-image: radial-gradient(circle at 50% 25%, rgba(59, 130, 246, 0.06) 0%, transparent 60%);
+  .ai-logo-ring {
+    position:absolute;
+    inset:-8px;
+    border-radius:50%;
+    border:1.5px dashed rgba(99,102,241,0.45);
+    animation:ai-orbit 14s linear infinite;
   }
-
-  /* ── Scrollable Viewport ── */
-  .apds-ai-scroll {
-    flex: 1 1 0;
-    min-height: 0;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* ── Welcome Stage ── */
-  .apds-ai-welcome {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px 18px 12px 18px;
-    text-align: center;
-    max-width: 520px;
-    margin: 0 auto;
-    width: 100%;
-    box-sizing: border-box;
+  .ai-logo-core {
+    width:74px;
+    height:74px;
+    border-radius:22px;
+    background:linear-gradient(135deg,#2563eb 0%,#4f46e5 55%,#7c3aed 100%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    animation:ai-breathe 4s ease-in-out infinite;
   }
 
-  /* ── Glowing Emblem ── */
-  .apds-ai-emblem-wrap {
-    position: relative;
-    width: 84px;
-    height: 84px;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+  /* ── Brand ── */
+  .ai-brand-name {
+    font-size:1.15rem;
+    font-weight:800;
+    font-family:var(--font-display,'Outfit',sans-serif);
+    background:linear-gradient(135deg,#60a5fa 0%,#a78bfa 100%);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
+    margin:0 0 6px;
+    letter-spacing:-0.01em;
   }
-  .apds-ai-emblem-orbit {
-    position: absolute;
-    inset: -6px;
-    border-radius: 50%;
-    border: 1.5px dashed rgba(99, 102, 241, 0.4);
-    animation: apds-orbit-spin 14s linear infinite;
+  .ai-online-badge {
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:3px 12px;
+    border-radius:9999px;
+    background:rgba(16,185,129,0.12);
+    border:1px solid rgba(16,185,129,0.28);
+    font-size:0.72rem;
+    font-weight:700;
+    color:#10b981;
+    margin-bottom:20px;
   }
-  .apds-ai-emblem-core {
-    width: 72px;
-    height: 72px;
-    border-radius: 22px;
-    background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ffffff;
-    animation: apds-breathe 3.8s infinite ease-in-out;
-    box-shadow: 0 0 30px rgba(59, 130, 246, 0.45);
-  }
-
-  /* ── Title & Greetings ── */
-  .apds-ai-title {
-    font-size: 1.1rem;
-    font-weight: 800;
-    font-family: var(--font-display, 'Outfit', sans-serif);
-    color: var(--text-primary, #f8fafc);
-    letter-spacing: -0.01em;
-    margin: 0 0 4px 0;
-  }
-  .apds-ai-status-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 3px 10px;
-    border-radius: 9999px;
-    background: rgba(16, 185, 129, 0.12);
-    border: 1px solid rgba(16, 185, 129, 0.25);
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: #10b981;
-    margin-bottom: 16px;
-  }
-  .apds-ai-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #10b981;
-    box-shadow: 0 0 6px #10b981;
+  .ai-dot {
+    width:6px;height:6px;border-radius:50%;
+    background:#10b981;box-shadow:0 0 6px #10b981;
   }
 
-  .apds-ai-greeting {
-    font-size: clamp(1.4rem, 5.5vw, 1.85rem);
-    font-weight: 800;
-    font-family: var(--font-display, 'Outfit', sans-serif);
-    color: var(--text-primary, #f8fafc);
-    letter-spacing: -0.02em;
-    margin: 0 0 4px 0;
-    line-height: 1.25;
+  /* ── Greeting ── */
+  .ai-greeting {
+    font-size:clamp(1.45rem,5.5vw,2rem);
+    font-weight:800;
+    font-family:var(--font-display,'Outfit',sans-serif);
+    color:var(--text-primary,#f8fafc);
+    letter-spacing:-0.02em;
+    margin:0 0 6px;
+    line-height:1.25;
   }
-  .apds-ai-greeting span {
-    background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .ai-greeting-name {
+    background:linear-gradient(135deg,#60a5fa,#a78bfa);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
   }
-  .apds-ai-subtitle {
-    font-size: 0.88rem;
-    color: var(--text-muted, #8493a8);
-    margin: 0 0 20px 0;
-    line-height: 1.45;
-  }
-
-  /* ── Sleek Suggestion Chips ── */
-  .apds-ai-chips-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-    margin-bottom: 8px;
-  }
-  .apds-ai-chip-card {
-    background: var(--bg-card, #141f36);
-    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-    border-radius: 16px;
-    padding: 10px 14px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    cursor: pointer;
-    text-align: left;
-    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
-    -webkit-tap-highlight-color: transparent;
-    color: var(--text-secondary, #cbd5e1);
-  }
-  .apds-ai-chip-card:hover {
-    border-color: #3b82f6;
-    background: var(--bg-card-hover, #1c2b4a);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-  }
-  .apds-ai-chip-card:active {
-    transform: scale(0.98);
-  }
-  .apds-ai-chip-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    overflow: hidden;
-  }
-  .apds-ai-chip-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .apds-ai-chip-text {
-    font-size: 0.84rem;
-    font-weight: 700;
-    color: var(--text-primary, #f8fafc);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .apds-ai-chip-arrow {
-    color: var(--text-muted, #8493a8);
-    flex-shrink: 0;
+  .ai-greeting-sub {
+    font-size:0.9rem;
+    color:var(--text-muted,#8493a8);
+    margin:0 0 28px;
   }
 
-  /* ── Floating Capsule Input Deck (Always Docked & Visible) ── */
-  .apds-ai-dock {
-    padding: 6px 14px calc(env(safe-area-inset-bottom, 0px) + 8px) 14px;
-    flex-shrink: 0;
-    background: transparent;
-    z-index: 30;
-    width: 100%;
-    max-width: 560px;
-    margin: 0 auto;
-    box-sizing: border-box;
+  /* ── CENTERED SQUARE INPUT BOX (the main change) ── */
+  .ai-center-box {
+    width:100%;
+    background:var(--bg-card,#141f36);
+    border:1.5px solid var(--border-color,rgba(255,255,255,0.12));
+    border-radius:18px;
+    padding:16px 16px 12px 16px;
+    box-sizing:border-box;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.3);
+    transition:border-color 0.2s,box-shadow 0.2s;
   }
-  .apds-ai-capsule {
-    background: var(--bg-card, #141f36);
-    border: 1.5px solid var(--border-color, rgba(255, 255, 255, 0.12));
-    border-radius: 24px;
-    padding: 8px 10px 8px 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
-    box-sizing: border-box;
-    min-height: 52px;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .apds-ai-capsule.multiline {
-    border-radius: 22px;
-    align-items: flex-end;
-    padding-bottom: 8px;
-  }
-  .apds-ai-capsule:focus-within {
-    border-color: #3b82f6;
-    box-shadow: 0 0 28px rgba(59, 130, 246, 0.35);
+  .ai-center-box:focus-within {
+    border-color:#3b82f6;
+    box-shadow:0 0 32px rgba(59,130,246,0.3), 0 8px 32px rgba(0,0,0,0.35);
   }
 
-  /* ── Textarea ── */
-  .apds-ai-textarea {
-    flex: 1 1 0;
-    min-width: 0;
-    border: none;
-    outline: none;
-    resize: none;
-    background: transparent;
-    color: var(--text-primary, #f8fafc);
-    font-size: 1rem;
-    line-height: 1.45;
-    font-family: inherit;
-    min-height: 28px;
-    max-height: 160px;
-    padding: 2px 0;
-    box-sizing: border-box;
-    display: block;
-    overflow-y: auto;
-    -webkit-tap-highlight-color: transparent;
+  .ai-center-textarea {
+    width:100%;
+    min-height:80px;
+    max-height:220px;
+    border:none;
+    outline:none;
+    resize:none;
+    background:transparent;
+    color:var(--text-primary,#f8fafc);
+    font-size:1rem;
+    line-height:1.6;
+    font-family:inherit;
+    box-sizing:border-box;
+    overflow-y:auto;
+    -webkit-tap-highlight-color:transparent;
   }
-  .apds-ai-textarea::placeholder {
-    color: var(--text-muted, #8493a8);
-    font-size: 0.96rem;
+  .ai-center-textarea::placeholder {
+    color:var(--text-muted,#8493a8);
+    font-size:0.97rem;
   }
 
-  /* ── Controls Row ── */
-  .apds-ai-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
+  .ai-center-footer {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
   }
-  .apds-ai-btn-attach {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
-    background: var(--bg-input, rgba(255, 255, 255, 0.05));
-    color: var(--text-muted, #8493a8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    -webkit-tap-highlight-color: transparent;
+  .ai-center-left {
+    display:flex;
+    align-items:center;
+    gap:8px;
   }
-  .apds-ai-btn-attach:hover {
-    color: #3b82f6;
-    border-color: #3b82f6;
+  .ai-icon-btn {
+    width:34px;height:34px;border-radius:9px;
+    border:1px solid var(--border-color,rgba(255,255,255,0.1));
+    background:var(--bg-input,rgba(255,255,255,0.05));
+    color:var(--text-muted,#8493a8);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;transition:all 0.15s ease;
+    -webkit-tap-highlight-color:transparent;
+    flex-shrink:0;
   }
-  .apds-ai-btn-send {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    border: none;
-    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
-    transition: transform 0.18s, box-shadow 0.18s;
-    flex-shrink: 0;
-    -webkit-tap-highlight-color: transparent;
+  .ai-icon-btn:hover { color:#3b82f6; border-color:#3b82f6; }
+
+  .ai-send-btn {
+    height:38px;
+    padding:0 18px;
+    border-radius:10px;
+    border:none;
+    background:linear-gradient(135deg,#2563eb 0%,#7c3aed 100%);
+    color:#fff;
+    font-size:0.85rem;
+    font-weight:700;
+    font-family:inherit;
+    display:flex;align-items:center;gap:7px;
+    cursor:pointer;
+    box-shadow:0 4px 16px rgba(37,99,235,0.4);
+    transition:transform 0.18s,box-shadow 0.18s;
+    flex-shrink:0;
+    -webkit-tap-highlight-color:transparent;
   }
-  .apds-ai-btn-send:hover {
-    transform: scale(1.08);
-    box-shadow: 0 4px 22px rgba(37, 99, 235, 0.6);
+  .ai-send-btn:hover {
+    transform:translateY(-1px);
+    box-shadow:0 6px 22px rgba(37,99,235,0.55);
   }
-  .apds-ai-btn-send:active {
-    transform: scale(0.92);
+  .ai-send-btn:active { transform:scale(0.95); }
+  .ai-send-btn:disabled { opacity:0.45; cursor:not-allowed; transform:none; }
+
+  /* mic-only circular variant */
+  .ai-send-btn-mic {
+    width:38px;height:38px;padding:0;border-radius:10px;
+    background:linear-gradient(135deg,#2563eb 0%,#7c3aed 100%);
+    border:none;color:#fff;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;box-shadow:0 4px 16px rgba(37,99,235,0.4);
+    transition:transform 0.18s;flex-shrink:0;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .ai-send-btn-mic:hover { transform:scale(1.08); }
+  .ai-send-btn-mic:active { transform:scale(0.92); }
+
+  /* ── File badge ── */
+  .ai-file-badge {
+    display:flex;align-items:center;gap:6px;
+    padding:4px 12px;border-radius:9999px;
+    background:rgba(59,130,246,0.15);
+    border:1px solid rgba(59,130,246,0.3);
+    font-size:0.76rem;color:#60a5fa;font-weight:600;
+    width:100%;box-sizing:border-box;margin-bottom:4px;
+  }
+  .ai-file-badge span { flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+  .ai-file-badge button {
+    background:none;border:none;cursor:pointer;color:#60a5fa;padding:0;
+    display:flex;align-items:center;
   }
 
-  /* ── Chat Messages ── */
-  .apds-ai-msg-row {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    margin-bottom: 14px;
-    padding: 0 16px;
-    box-sizing: border-box;
-    animation: apds-fade-up 0.2s ease-out both;
+  /* ── Chat Stream ── */
+  .ai-chat-stream {
+    padding:14px 0;
+    display:flex;
+    flex-direction:column;
   }
-  .apds-ai-bubble {
-    max-width: 86%;
-    padding: 12px 16px;
-    font-size: 0.95rem;
-    line-height: 1.6;
-    border-radius: 20px;
-    word-break: break-word;
+  .ai-msg-row {
+    display:flex;flex-direction:column;
+    width:100%;margin-bottom:14px;
+    padding:0 16px;box-sizing:border-box;
+    animation:ai-fadein 0.2s ease-out both;
   }
-  .apds-ai-bubble-user {
-    align-self: flex-end;
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    color: #ffffff;
-    border-bottom-right-radius: 4px;
-    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+  .ai-bubble {
+    max-width:88%;padding:12px 16px;
+    font-size:0.95rem;line-height:1.6;
+    border-radius:20px;word-break:break-word;
   }
-  .apds-ai-bubble-bot {
-    align-self: flex-start;
-    background: var(--bg-card, #141f36);
-    color: var(--text-primary, #f8fafc);
-    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-    border-bottom-left-radius: 4px;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  .ai-bubble-user {
+    align-self:flex-end;
+    background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);
+    color:#fff;border-bottom-right-radius:4px;
+    box-shadow:0 4px 14px rgba(37,99,235,0.3);
+  }
+  .ai-bubble-bot {
+    align-self:flex-start;
+    background:var(--bg-card,#141f36);
+    color:var(--text-primary,#f8fafc);
+    border:1px solid var(--border-color,rgba(255,255,255,0.08));
+    border-bottom-left-radius:4px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.15);
+  }
+  .ai-msg-time {
+    font-size:0.68rem;color:var(--text-muted,#8493a8);
+    margin-top:3px;padding:0 4px;
+  }
+  .ai-copy-btn {
+    background:none;border:none;cursor:pointer;
+    color:var(--text-muted,#8493a8);
+    font-size:0.74rem;
+    display:flex;align-items:center;gap:4px;
+    margin-top:6px;
   }
 
-  /* ── Responsive Mobile ── */
-  @media (max-width: 768px) {
-    .apds-ai-canvas {
-      height: 100%;
-      border-radius: 0;
-      border: none;
-    }
-    .apds-ai-welcome {
-      padding: 12px 14px 8px 14px;
-    }
-    .apds-ai-greeting {
-      font-size: 1.55rem;
-    }
-    .apds-ai-dock {
-      padding: 4px 10px calc(env(safe-area-inset-bottom, 0px) + 6px) 10px;
-    }
-    .apds-ai-textarea {
-      font-size: 16px; /* Prevents auto-zoom on iOS */
-    }
+  /* ── Bottom dock input (chat mode) ── */
+  .ai-dock {
+    flex-shrink:0;
+    padding:6px 14px calc(env(safe-area-inset-bottom,0px) + 8px) 14px;
+    z-index:30;width:100%;max-width:600px;
+    margin:0 auto;box-sizing:border-box;
+  }
+  .ai-dock-box {
+    background:var(--bg-card,#141f36);
+    border:1.5px solid var(--border-color,rgba(255,255,255,0.12));
+    border-radius:18px;
+    padding:10px 12px 10px 16px;
+    display:flex;align-items:flex-end;gap:10px;
+    box-shadow:0 6px 24px rgba(0,0,0,0.25);
+    box-sizing:border-box;min-height:52px;
+    transition:border-color 0.2s,box-shadow 0.2s;
+  }
+  .ai-dock-box:focus-within {
+    border-color:#3b82f6;
+    box-shadow:0 0 28px rgba(59,130,246,0.35);
+  }
+  .ai-dock-textarea {
+    flex:1 1 0;min-width:0;border:none;outline:none;resize:none;
+    background:transparent;color:var(--text-primary,#f8fafc);
+    font-size:1rem;line-height:1.45;font-family:inherit;
+    min-height:26px;max-height:150px;padding:3px 0;
+    box-sizing:border-box;overflow-y:auto;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .ai-dock-textarea::placeholder { color:var(--text-muted,#8493a8); }
+  .ai-dock-actions { display:flex;align-items:center;gap:8px;flex-shrink:0; }
+
+  /* ── New Chat button ── */
+  .ai-new-chat-btn {
+    background:var(--bg-card,#141f36);
+    border:1px solid var(--border-color,rgba(255,255,255,0.12));
+    border-radius:9999px;
+    color:var(--text-muted,#8493a8);
+    padding:4px 14px;font-size:0.74rem;font-weight:700;
+    cursor:pointer;font-family:inherit;
+    transition:border-color 0.15s,color 0.15s;
+  }
+  .ai-new-chat-btn:hover { border-color:#3b82f6;color:#3b82f6; }
+
+  /* ── Responsive ── */
+  @media (max-width:768px) {
+    .ai-canvas { height:100%;border-radius:0;border:none; }
+    .ai-welcome { padding:16px 14px 16px 14px; }
+    .ai-greeting { font-size:1.55rem; }
+    .ai-center-textarea { font-size:16px; }
+    .ai-dock-textarea  { font-size:16px; }
   }
 `;
-
-/* ── Quick Starter Prompts ── */
-const PROMPT_SUGGESTIONS = [
-  {
-    id: 'scan',
-    title: 'Scan a suspicious URL for phishing',
-    icon: Search,
-    iconBg: 'rgba(239, 68, 68, 0.15)',
-    iconColor: '#f43f5e',
-    query: 'Scan paypal-security-verification.xyz'
-  },
-  {
-    id: 'explain',
-    title: 'How do phishing attacks work and how to stay safe?',
-    icon: Lock,
-    iconBg: 'rgba(59, 130, 246, 0.15)',
-    iconColor: '#3b82f6',
-    query: 'How do phishing attacks work and how can I protect myself?'
-  },
-  {
-    id: 'code',
-    title: 'Show Python ML code for URL feature extraction',
-    icon: Code2,
-    iconBg: 'rgba(16, 185, 129, 0.15)',
-    iconColor: '#10b981',
-    query: 'Show Python code for URL feature extraction and Random Forest classifier'
-  },
-  {
-    id: 'project',
-    title: 'APDS Project authors, supervisor & university specs',
-    icon: Sparkles,
-    iconBg: 'rgba(168, 85, 247, 0.15)',
-    iconColor: '#a855f7',
-    query: 'Tell me about the APDS project authors, supervisor, and University of Sargodha'
-  }
-];
 
 /* ─────────────────────────────────────────────────────────────────
    MAIN COMPONENT
@@ -437,16 +369,16 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
   const [isListening, setIsListening] = useState(false);
 
   const messagesEndRef = useRef(null);
-  const textareaRef = useRef(null);
-  const fileInputRef = useRef(null);
-  const recognitionRef = useRef(null);
+  const centerTextareaRef = useRef(null);
+  const dockTextareaRef   = useRef(null);
+  const fileInputRef      = useRef(null);
+  const recognitionRef    = useRef(null);
 
   const hasMessages = messages.length > 0;
   const canSend = (inputText.trim().length > 0 || !!attachedFile) && !isTyping;
 
-  // Clean User Display Name
   const getUserName = () => {
-    const raw = currentUser?.name || currentUser?.username;
+    const raw = currentUser?.name || currentUser?.username || '';
     if (raw && !raw.toLowerCase().includes('system') && !raw.toLowerCase().includes('admin')) {
       const first = raw.split(' ')[0];
       return first.charAt(0).toUpperCase() + first.slice(1);
@@ -459,188 +391,186 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  // Auto-resize textarea height without remounting
-  const autoResize = useCallback(() => {
-    const el = textareaRef.current;
+  // Auto-resize — works on whichever textarea is active
+  const autoResize = useCallback((ref) => {
+    const el = ref?.current;
     if (!el) return;
     el.style.height = 'auto';
-    const minH = 28;
-    const maxH = window.innerWidth <= 768 ? 140 : 160;
-    const targetH = Math.min(Math.max(el.scrollHeight, minH), maxH);
-    el.style.height = `${targetH}px`;
+    const maxH = window.innerWidth <= 768 ? 140 : 220;
+    el.style.height = `${Math.min(el.scrollHeight, maxH)}px`;
   }, []);
 
-  useEffect(() => {
-    autoResize();
-  }, [inputText, autoResize]);
-
-  // Voice speech recognition
-  const toggleVoiceInput = () => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert('Speech recognition is not supported in this browser.');
-      return;
-    }
-
-    if (isListening) {
-      recognitionRef.current?.stop();
-      setIsListening(false);
-      return;
-    }
-
+  // Voice
+  const toggleVoice = () => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return alert('Speech recognition not supported.');
+    if (isListening) { recognitionRef.current?.stop(); setIsListening(false); return; }
     try {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = language === 'Urdu' ? 'ur-PK' : 'en-US';
-
-      recognition.onstart = () => setIsListening(true);
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        setInputText(prev => (prev ? `${prev} ${transcript}` : transcript));
-        setIsListening(false);
-      };
-      recognition.onerror = () => setIsListening(false);
-      recognition.onend = () => setIsListening(false);
-
-      recognitionRef.current = recognition;
-      recognition.start();
-    } catch {
-      setIsListening(false);
-    }
+      const r = new SR();
+      r.lang = language === 'Urdu' ? 'ur-PK' : 'en-US';
+      r.onstart = () => setIsListening(true);
+      r.onresult = e => { setInputText(p => p ? `${p} ${e.results[0][0].transcript}` : e.results[0][0].transcript); setIsListening(false); };
+      r.onerror = r.onend = () => setIsListening(false);
+      recognitionRef.current = r; r.start();
+    } catch { setIsListening(false); }
   };
 
-  /* ── Send Message ── */
-  const handleSend = async (overrideText) => {
-    const baseText = typeof overrideText === 'string' ? overrideText.trim() : inputText.trim();
-    const fileNote = attachedFile
-      ? `\n\n[Attached: ${attachedFile.name}]\n${attachedFile.content}`
-      : '';
-    const query = (baseText + fileNote).trim();
+  // Send
+  const handleSend = async (override) => {
+    const base = typeof override === 'string' ? override.trim() : inputText.trim();
+    const fileNote = attachedFile ? `\n\n[Attached: ${attachedFile.name}]\n${attachedFile.content}` : '';
+    const query = (base + fileNote).trim();
     if (!query || isTyping) return;
 
     const ts = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const userMsg = {
-      id: Date.now(),
-      sender: 'user',
-      text: baseText,
-      fileInfo: attachedFile ? attachedFile.name : null,
-      time: ts
-    };
+    const userMsg = { id: Date.now(), sender: 'user', text: base, fileInfo: attachedFile?.name || null, time: ts };
 
-    setMessages(prev => [...prev, userMsg]);
+    setMessages(p => [...p, userMsg]);
     setInputText('');
     setAttachedFile(null);
-
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-    }
-
+    if (centerTextareaRef.current) centerTextareaRef.current.style.height = 'auto';
+    if (dockTextareaRef.current)   dockTextareaRef.current.style.height   = 'auto';
     setIsTyping(true);
 
     try {
       const res = await generateChatbotResponse(query, [...messages, userMsg], language);
       setIsTyping(false);
-      const tsBot = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      setMessages(prev => [...prev, {
-        id: Date.now() + 1,
-        sender: 'bot',
-        text: res.text,
-        time: tsBot
-      }]);
+      const tb = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      setMessages(p => [...p, { id: Date.now()+1, sender:'bot', text:res.text, time:tb }]);
     } catch {
       setIsTyping(false);
-      const tsBot = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      setMessages(prev => [...prev, {
-        id: Date.now() + 1,
-        sender: 'bot',
-        text: '⚠️ Connection notice. Please try again.',
-        time: tsBot
-      }]);
+      const tb = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      setMessages(p => [...p, { id: Date.now()+1, sender:'bot', text:'⚠️ Connection error. Please try again.', time:tb }]);
     }
   };
 
-  /* ── File Attach ── */
-  const handleFileAttach = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleFileAttach = e => {
+    const file = e.target.files?.[0]; if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => {
-      setAttachedFile({
-        name: file.name,
-        content: ev.target.result?.toString().slice(0, 4000) || ''
-      });
-    };
-    reader.readAsText(file);
-    e.target.value = '';
+    reader.onload = ev => setAttachedFile({ name: file.name, content: ev.target.result?.toString().slice(0,4000) || '' });
+    reader.readAsText(file); e.target.value = '';
   };
 
-  /* ── Copy to Clipboard ── */
   const handleCopy = (text, id) => {
     navigator.clipboard.writeText(text).catch(() => {});
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 1800);
+    setCopiedId(id); setTimeout(() => setCopiedId(null), 1800);
   };
 
-  /* ── Reset Chat ── */
-  const handleNewChat = () => {
-    setMessages([]);
-    setInputText('');
-    setAttachedFile(null);
-  };
+  const handleNewChat = () => { setMessages([]); setInputText(''); setAttachedFile(null); };
 
-  /* ── Keydown (no mobile submit on enter) ── */
   const handleKeyDown = (e) => {
     const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    if (e.key === 'Enter' && !e.shiftKey && !isTouch) {
-      e.preventDefault();
-      handleSend();
-    }
+    if (e.key === 'Enter' && !e.shiftKey && !isTouch) { e.preventDefault(); handleSend(); }
   };
 
-  const isMultiLine = inputText.includes('\n') || (textareaRef.current?.scrollHeight || 0) > 34;
+  /* ── Hidden file input (shared) ── */
+  const FileInputEl = (
+    <input
+      ref={fileInputRef}
+      type="file"
+      accept=".txt,.eml,.csv,.json,.py,.md,.log,.msg"
+      onChange={handleFileAttach}
+      style={{ display: 'none' }}
+    />
+  );
 
-  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     INLINE FLOATING CAPSULE INPUT DECK
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-  const InputCapsuleJSX = (
-    <div className="apds-ai-dock">
-      {/* File preview badge */}
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     CENTERED SQUARE INPUT BOX (welcome screen)
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+  const CenterInputJSX = (
+    <div className="ai-center-box">
       {attachedFile && (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          padding: '4px 12px',
-          marginBottom: '6px',
-          background: 'rgba(59, 130, 246, 0.15)',
-          border: '1px solid rgba(59, 130, 246, 0.3)',
-          borderRadius: '9999px',
-          fontSize: '0.76rem',
-          color: '#3b82f6',
-          fontWeight: 600
-        }}>
+        <div className="ai-file-badge">
           <FileText size={13} />
-          <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {attachedFile.name}
-          </span>
-          <button
-            onMouseDown={e => e.preventDefault()}
-            onClick={() => setAttachedFile(null)}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#3b82f6', padding: 0 }}
-          >
-            <X size={13} />
-          </button>
+          <span>{attachedFile.name}</span>
+          <button onMouseDown={e=>e.preventDefault()} onClick={()=>setAttachedFile(null)}><X size={13}/></button>
         </div>
       )}
 
-      <div className={`apds-ai-capsule ${isMultiLine ? 'multiline' : ''}`}>
-        {/* Stable Textarea Input */}
+      {/* Textarea — inline so it never remounts */}
+      <textarea
+        ref={centerTextareaRef}
+        className="ai-center-textarea"
+        value={inputText}
+        onInput={() => autoResize(centerTextareaRef)}
+        onChange={e => setInputText(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder="Ask APDS AI anything, or paste a suspicious URL..."
+        rows={3}
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="sentences"
+        spellCheck={false}
+      />
+
+      <div className="ai-center-footer">
+        <div className="ai-center-left">
+          {FileInputEl}
+          <button
+            type="button"
+            className="ai-icon-btn"
+            onMouseDown={e=>e.preventDefault()}
+            onClick={()=>fileInputRef.current?.click()}
+            title="Attach file"
+          >
+            <Plus size={18} strokeWidth={2.4}/>
+          </button>
+          <button
+            type="button"
+            className="ai-icon-btn"
+            onMouseDown={e=>e.preventDefault()}
+            onClick={toggleVoice}
+            title={isListening ? 'Listening...' : 'Voice'}
+            style={isListening ? { color:'#f43f5e', borderColor:'#f43f5e' } : {}}
+          >
+            <Mic size={17} strokeWidth={2.2}/>
+          </button>
+        </div>
+
+        {inputText.trim().length > 0 || attachedFile ? (
+          <button
+            type="button"
+            className="ai-send-btn"
+            onMouseDown={e=>e.preventDefault()}
+            onClick={()=>handleSend()}
+            disabled={!canSend}
+          >
+            <ArrowUp size={16} strokeWidth={2.8}/> Send
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="ai-send-btn-mic"
+            onMouseDown={e=>e.preventDefault()}
+            onClick={toggleVoice}
+            title="Voice"
+            style={isListening ? { background:'#f43f5e' } : {}}
+          >
+            <Mic size={18} strokeWidth={2.2}/>
+          </button>
+        )}
+      </div>
+    </div>
+  );
+
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     BOTTOM DOCK INPUT (chat screen)
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+  const DockInputJSX = (
+    <div className="ai-dock">
+      {attachedFile && (
+        <div className="ai-file-badge" style={{ marginBottom:'6px' }}>
+          <FileText size={13}/>
+          <span>{attachedFile.name}</span>
+          <button onMouseDown={e=>e.preventDefault()} onClick={()=>setAttachedFile(null)}><X size={13}/></button>
+        </div>
+      )}
+      <div className="ai-dock-box">
         <textarea
-          ref={textareaRef}
-          className="apds-ai-textarea"
+          ref={dockTextareaRef}
+          className="ai-dock-textarea"
           value={inputText}
-          onInput={autoResize}
+          onInput={() => autoResize(dockTextareaRef)}
           onChange={e => setInputText(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Message APDS AI..."
@@ -650,48 +580,17 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
           autoCapitalize="sentences"
           spellCheck={false}
         />
-
-        {/* Right Actions: Plus & Send/Mic */}
-        <div className="apds-ai-actions">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".txt,.eml,.csv,.json,.py,.md,.log,.msg"
-            onChange={handleFileAttach}
-            style={{ display: 'none' }}
-          />
-          <button
-            type="button"
-            className="apds-ai-btn-attach"
-            onMouseDown={e => e.preventDefault()}
-            onClick={() => fileInputRef.current?.click()}
-            title="Attach file"
-          >
-            <Plus size={18} strokeWidth={2.4} />
+        <div className="ai-dock-actions">
+          <button type="button" className="ai-icon-btn" onMouseDown={e=>e.preventDefault()} onClick={()=>fileInputRef.current?.click()} title="Attach file">
+            <Plus size={17} strokeWidth={2.4}/>
           </button>
-
           {inputText.trim().length > 0 || attachedFile ? (
-            <button
-              type="button"
-              className="apds-ai-btn-send"
-              onMouseDown={e => e.preventDefault()}
-              onClick={() => handleSend()}
-              disabled={!canSend}
-              title="Send message"
-              aria-label="Send message"
-            >
-              <ArrowUp size={18} strokeWidth={2.8} />
+            <button type="button" className="ai-send-btn-mic" onMouseDown={e=>e.preventDefault()} onClick={()=>handleSend()} disabled={!canSend}>
+              <ArrowUp size={18} strokeWidth={2.8}/>
             </button>
           ) : (
-            <button
-              type="button"
-              className="apds-ai-btn-send"
-              onMouseDown={e => e.preventDefault()}
-              onClick={toggleVoiceInput}
-              title={isListening ? 'Listening...' : 'Voice message'}
-              aria-label="Voice message"
-            >
-              <Mic size={18} strokeWidth={2.2} />
+            <button type="button" className="ai-send-btn-mic" onMouseDown={e=>e.preventDefault()} onClick={toggleVoice}>
+              <Mic size={17} strokeWidth={2.2}/>
             </button>
           )}
         </div>
@@ -701,148 +600,83 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
 
   return (
     <>
-      <style>{CHATBOT_CSS}</style>
-      <div className="apds-ai-canvas">
+      <style>{CSS}</style>
+      <div className="ai-canvas">
+        {FileInputEl}
 
-        {/* ── Scroll Area ── */}
-        <div className="apds-ai-scroll">
+        <div className="ai-scroll">
           {!hasMessages ? (
-            /* ── Clean Hero Welcome Stage ── */
-            <div className="apds-ai-welcome">
-              {/* Glowing Shield Emblem */}
-              <div className="apds-ai-emblem-wrap">
-                <div className="apds-ai-emblem-orbit" />
-                <div className="apds-ai-emblem-core">
-                  <Shield size={38} strokeWidth={2.2} />
+            /* ── WELCOME: Logo + Title + Centered Square Input ── */
+            <div className="ai-welcome">
+              {/* Shield Logo */}
+              <div className="ai-logo-wrap">
+                <div className="ai-logo-ring"/>
+                <div className="ai-logo-core">
+                  <Shield size={38} strokeWidth={2.2}/>
                 </div>
               </div>
 
-              {/* Title & Status */}
-              <div className="apds-ai-title">APDS Sentinel AI</div>
-              <div className="apds-ai-status-pill">
-                <span className="apds-ai-dot" />
-                <span>Neural ML Online (94.6% Accuracy)</span>
+              {/* Brand */}
+              <div className="ai-brand-name">APDS Sentinel AI</div>
+              <div className="ai-online-badge">
+                <span className="ai-dot"/>
+                <span>Neural ML Online · 94.6% Accuracy</span>
               </div>
 
               {/* Greeting */}
-              <h1 className="apds-ai-greeting">
-                How can I help you today, <span>{getUserName()}?</span>
+              <h1 className="ai-greeting">
+                Hi, <span className="ai-greeting-name">{getUserName()}!</span> 👋
               </h1>
-              <p className="apds-ai-subtitle">
-                Ask questions, scan suspicious links, or analyze cybersecurity threats.
-              </p>
+              <p className="ai-greeting-sub">How can I help protect your security today?</p>
 
-              {/* Minimalist Suggestion Cards */}
-              <div className="apds-ai-chips-wrap">
-                {PROMPT_SUGGESTIONS.map(card => {
-                  const Icon = card.icon;
-                  return (
-                    <div
-                      key={card.id}
-                      className="apds-ai-chip-card"
-                      onMouseDown={e => e.preventDefault()}
-                      onClick={() => handleSend(card.query)}
-                    >
-                      <div className="apds-ai-chip-left">
-                        <div className="apds-ai-chip-icon" style={{ background: card.iconBg, color: card.iconColor }}>
-                          <Icon size={16} strokeWidth={2.2} />
-                        </div>
-                        <div className="apds-ai-chip-text">{card.title}</div>
-                      </div>
-                      <ArrowRight size={14} className="apds-ai-chip-arrow" />
-                    </div>
-                  );
-                })}
-              </div>
+              {/* ── Centered Square Input Box ── */}
+              {CenterInputJSX}
             </div>
           ) : (
-            /* ── Active Chat Messages Stream ── */
-            <div style={{ padding: '12px 0', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '0 16px 6px 16px' }}>
-                <button
-                  onMouseDown={e => e.preventDefault()}
-                  onClick={handleNewChat}
-                  style={{
-                    background: 'var(--bg-card, #141f36)',
-                    border: '1px solid var(--border-color, rgba(255, 255, 255, 0.12))',
-                    borderRadius: '9999px',
-                    color: 'var(--text-muted, #8493a8)',
-                    padding: '4px 12px',
-                    fontSize: '0.74rem',
-                    fontWeight: 700,
-                    cursor: 'pointer'
-                  }}
-                >
+            /* ── Active Chat Messages ── */
+            <div className="ai-chat-stream">
+              <div style={{ display:'flex', justifyContent:'flex-end', padding:'0 16px 8px 16px' }}>
+                <button className="ai-new-chat-btn" onMouseDown={e=>e.preventDefault()} onClick={handleNewChat}>
                   + New Chat
                 </button>
               </div>
 
               {messages.map(msg => (
-                <div key={msg.id} className="apds-ai-msg-row">
-                  <div className={`apds-ai-bubble ${msg.sender === 'user' ? 'apds-ai-bubble-user' : 'apds-ai-bubble-bot'}`}>
+                <div key={msg.id} className="ai-msg-row">
+                  <div className={`ai-bubble ${msg.sender==='user' ? 'ai-bubble-user' : 'ai-bubble-bot'}`}>
                     {msg.fileInfo && (
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '5px',
-                        marginBottom: '6px',
-                        fontSize: '0.78rem',
-                        opacity: 0.9,
-                        fontWeight: 700
-                      }}>
-                        <FileText size={13} /> {msg.fileInfo}
+                      <div style={{ display:'flex',alignItems:'center',gap:5,marginBottom:6,fontSize:'0.78rem',fontWeight:700,opacity:0.9 }}>
+                        <FileText size={13}/> {msg.fileInfo}
                       </div>
                     )}
-                    <div style={{ whiteSpace: 'pre-line' }}>{msg.text}</div>
-                    {msg.sender === 'bot' && (
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '6px' }}>
-                        <button
-                          onMouseDown={e => e.preventDefault()}
-                          onClick={() => handleCopy(msg.text, msg.id)}
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            color: 'var(--text-muted, #8493a8)',
-                            fontSize: '0.74rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px'
-                          }}
-                        >
-                          {copiedId === msg.id ? <><Check size={12} color="#10b981" /> Copied</> : <><Copy size={12} /> Copy</>}
-                        </button>
-                      </div>
+                    <div style={{ whiteSpace:'pre-line' }}>{msg.text}</div>
+                    {msg.sender==='bot' && (
+                      <button className="ai-copy-btn" onMouseDown={e=>e.preventDefault()} onClick={()=>handleCopy(msg.text,msg.id)}>
+                        {copiedId===msg.id ? <><Check size={12} color="#10b981"/> Copied</> : <><Copy size={12}/> Copy</>}
+                      </button>
                     )}
                   </div>
-                  <span style={{
-                    fontSize: '0.68rem',
-                    color: 'var(--text-muted, #8493a8)',
-                    marginTop: '3px',
-                    alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
-                    padding: '0 4px'
-                  }}>
+                  <span className="ai-msg-time" style={{ alignSelf: msg.sender==='user' ? 'flex-end' : 'flex-start' }}>
                     {msg.time}
                   </span>
                 </div>
               ))}
 
               {isTyping && (
-                <div className="apds-ai-msg-row">
-                  <div className="apds-ai-bubble apds-ai-bubble-bot" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Shield size={15} color="#3b82f6" />
-                    <span style={{ fontSize: '0.84rem', color: 'var(--text-muted, #8493a8)' }}>Analyzing threat...</span>
+                <div className="ai-msg-row">
+                  <div className="ai-bubble ai-bubble-bot" style={{ display:'flex',alignItems:'center',gap:8 }}>
+                    <Shield size={14} color="#3b82f6"/>
+                    <span style={{ fontSize:'0.84rem',color:'var(--text-muted,#8493a8)' }}>Analyzing...</span>
                   </div>
                 </div>
               )}
-              <div ref={messagesEndRef} />
+              <div ref={messagesEndRef}/>
             </div>
           )}
         </div>
 
-        {/* ── Floating Input Dock at Bottom ── */}
-        {InputCapsuleJSX}
-
+        {/* ── Bottom dock (only in chat mode) ── */}
+        {hasMessages && DockInputJSX}
       </div>
     </>
   );
