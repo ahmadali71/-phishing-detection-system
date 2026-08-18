@@ -186,7 +186,7 @@ function AppInner() {
               t={t}
             />
 
-            <main className="app-main">
+            <main className={`app-main${activeTab === 'ai-assistant' ? ' app-main-chat' : ''}`}>
               {activeTab === 'dashboard' && (
                 <Dashboard stats={stats} recentActivity={recentActivity}
                   onNavigateScan={setActiveTab} onViewDetail={setSelectedRecord} t={t} />
@@ -198,7 +198,7 @@ function AppInner() {
                 <EmailScanner onScanComplete={handleScanComplete} t={t} />
               )}
               {activeTab === 'ai-assistant' && (
-                <AiChatbot t={t} language={language} />
+                <AiChatbot t={t} language={language} onMenuToggle={() => setSidebarOpen(v => !v)} />
               )}
               {activeTab === 'scan-history' && (
                 <ScanHistory

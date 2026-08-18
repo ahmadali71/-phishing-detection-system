@@ -13,23 +13,21 @@ const DEEPSEEK_CSS = `
   .ds-root {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 140px);
-    min-height: 480px;
+    height: 100%;
+    min-height: calc(100vh - 160px);
     background: var(--bg-primary, #ffffff);
-    color: var(--text-primary, #111827);
+    color: var(--text-primary, #0f172a);
     position: relative;
-    border-radius: 20px;
-    overflow: hidden;
-    border: 1px solid var(--border-color, #e5e7eb);
-    font-family: var(--font-sans, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   }
 
-  /* ── Minimal Top Bar ── */
+  /* ── Minimal Top Bar (Exact Match) ── */
   .ds-top-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 20px;
+    padding: 16px 20px 8px 20px;
     background: transparent;
     flex-shrink: 0;
     z-index: 20;
@@ -42,13 +40,16 @@ const DEEPSEEK_CSS = `
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 4px;
+    padding: 6px;
     border-radius: 8px;
     transition: opacity 0.15s;
     -webkit-tap-highlight-color: transparent;
   }
   .ds-icon-btn:hover {
     opacity: 0.7;
+  }
+  .ds-icon-btn:active {
+    transform: scale(0.92);
   }
 
   /* ── Scroll Area ── */
@@ -61,16 +62,16 @@ const DEEPSEEK_CSS = `
     -webkit-overflow-scrolling: touch;
   }
 
-  /* ── Welcome Center Stage ── */
+  /* ── Welcome Center Stage (Exact Match) ── */
   .ds-welcome-center {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 20px 20px 40px 20px;
+    padding: 10px 20px 40px 20px;
     width: 100%;
-    max-width: 480px;
+    max-width: 460px;
     margin: 0 auto;
     box-sizing: border-box;
   }
@@ -81,23 +82,23 @@ const DEEPSEEK_CSS = `
     align-items: center;
     justify-content: center;
     gap: 12px;
-    margin-bottom: 22px;
+    margin-bottom: 20px;
   }
   .ds-title-text {
-    font-size: clamp(1.25rem, 5vw, 1.55rem);
+    font-size: clamp(1.25rem, 5.5vw, 1.55rem);
     font-weight: 800;
     color: var(--text-primary, #0f172a);
     margin: 0;
     letter-spacing: -0.02em;
   }
 
-  /* ── 3 Mode Pills ── */
+  /* ── 3 Mode Pills Row ── */
   .ds-mode-row {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    margin-bottom: 28px;
+    margin-bottom: 26px;
     flex-wrap: wrap;
   }
   .ds-mode-pill {
@@ -159,7 +160,7 @@ const DEEPSEEK_CSS = `
     resize: none;
     background: transparent;
     color: var(--text-primary, #0f172a);
-    font-size: 1.05rem;
+    font-size: 1.02rem;
     line-height: 1.5;
     font-family: inherit;
     min-height: 38px;
@@ -173,10 +174,10 @@ const DEEPSEEK_CSS = `
   }
   .ds-textarea::placeholder {
     color: var(--text-muted, #94a3b8);
-    font-size: 1.02rem;
+    font-size: 1rem;
   }
 
-  /* ── Inner Chips & Actions ── */
+  /* ── Inner Action Chips (DeepThink / Search) ── */
   .ds-chip-btn {
     display: inline-flex;
     align-items: center;
@@ -277,19 +278,19 @@ const DEEPSEEK_CSS = `
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
   }
 
-  /* ── Mobile Layout ── */
+  /* ── Mobile Viewport ── */
   @media (max-width: 768px) {
     .ds-root {
-      height: calc(100dvh - 145px);
+      height: calc(100dvh - 65px - env(safe-area-inset-bottom, 0px));
       min-height: 0;
-      border-radius: 16px;
-      margin: 0;
+      border-radius: 0;
+      border: none;
     }
     .ds-top-bar {
-      padding: 12px 16px;
+      padding: 12px 16px 4px 16px;
     }
     .ds-welcome-center {
-      padding: 10px 16px 20px 16px;
+      padding: 0 16px 20px 16px;
       max-width: 100%;
     }
     .ds-title-text {
@@ -341,7 +342,7 @@ function DeepSeekWhaleLogo({ size = 38 }) {
   );
 }
 
-/* ── Modes Config (Exact Match) ── */
+/* ── Modes Config (Exact Match to Screenshot) ── */
 const MODES = [
   { id: 'instant', label: 'Instant', icon: Zap },
   { id: 'expert',  label: 'Expert',  icon: Gem },
@@ -351,7 +352,7 @@ const MODES = [
 /* ─────────────────────────────────────────────────────────────────
    MAIN COMPONENT
 ───────────────────────────────────────────────────────────────── */
-export default function AiChatbot({ t, language = 'English' }) {
+export default function AiChatbot({ t, language = 'English', onMenuToggle }) {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [activeMode, setActiveMode] = useState('instant');
@@ -467,7 +468,7 @@ export default function AiChatbot({ t, language = 'English' }) {
 
   const canSend = (inputText.trim().length > 0 || attachedFile) && !isTyping;
 
-  /* ── Floating Input Box Component ── */
+  /* ── Floating Input Box Component (Exact DeepSeek Layout) ── */
   const RenderInputBox = () => (
     <div className="ds-input-card">
       {/* File badge if attached */}
@@ -598,17 +599,20 @@ export default function AiChatbot({ t, language = 'English' }) {
     <>
       <style>{DEEPSEEK_CSS}</style>
       <div className="ds-root">
-        {/* Top Minimal Bar */}
+        {/* Top Minimal Bar (Exact Match: Hamburger left, PlusCircle right) */}
         <div className="ds-top-bar">
           <button
             className="ds-icon-btn"
             title="Menu"
             onClick={() => {
-              const menuBtn = document.querySelector('.header-mobile-toggle');
-              if (menuBtn) menuBtn.click();
+              if (onMenuToggle) onMenuToggle();
+              else {
+                const menuBtn = document.querySelector('.hamburger-btn');
+                if (menuBtn) menuBtn.click();
+              }
             }}
           >
-            <Menu size={22} strokeWidth={2.2} />
+            <Menu size={24} strokeWidth={2} />
           </button>
 
           <button
@@ -616,7 +620,7 @@ export default function AiChatbot({ t, language = 'English' }) {
             title="New Chat"
             onClick={handleNewChat}
           >
-            <PlusCircle size={22} strokeWidth={2} />
+            <PlusCircle size={24} strokeWidth={1.8} />
           </button>
         </div>
 
@@ -656,7 +660,7 @@ export default function AiChatbot({ t, language = 'English' }) {
             </div>
           ) : (
             /* ── Active Conversation Messages Stream ── */
-            <div style={{ padding: '8px 0', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '10px 0', display: 'flex', flexDirection: 'column' }}>
               {messages.map(msg => (
                 <div key={msg.id} className="ds-msg-row">
                   <div className={`ds-bubble ${msg.sender === 'user' ? 'ds-bubble-user' : 'ds-bubble-bot'}`}>
