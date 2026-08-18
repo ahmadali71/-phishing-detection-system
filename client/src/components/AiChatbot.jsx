@@ -1,44 +1,41 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
-  Zap, Gem, Image as ImageIcon,
-  MessageSquare, Lightbulb, Code2, PenTool,
-  Atom, Globe, PlusCircle, ArrowUp, Copy, Check,
-  Terminal, X, Paperclip, FileText, ArrowRight
+  Plus, Mic, ArrowUp, Copy, Check, X, FileText, PlusCircle
 } from 'lucide-react';
 import { generateChatbotResponse } from '../utils/chatbotEngine';
 
 /* ─────────────────────────────────────────────────────────────────
-   EXACT 1:1 REPLICA CSS (PIXEL-PERFECT FIT ON ALL SCREEN SIZES)
+   EXACT 1:1 REPLICA OF THE USER'S MINIMALIST SCREENSHOT
 ───────────────────────────────────────────────────────────────── */
-const SCREENSHOT_CSS = `
-  @keyframes orb-pulse-glow {
+const MINIMAL_CSS = `
+  @keyframes ribbon-pulse {
     0%, 100% {
-      box-shadow: 0 0 28px rgba(99, 102, 241, 0.5), 0 0 50px rgba(56, 189, 248, 0.35);
       transform: scale(1);
+      filter: drop-shadow(0 0 25px rgba(99, 102, 241, 0.4)) drop-shadow(0 0 50px rgba(56, 189, 248, 0.25));
     }
     50% {
-      box-shadow: 0 0 40px rgba(99, 102, 241, 0.75), 0 0 75px rgba(168, 85, 247, 0.5);
       transform: scale(1.04);
+      filter: drop-shadow(0 0 38px rgba(168, 85, 247, 0.65)) drop-shadow(0 0 75px rgba(56, 189, 248, 0.45));
     }
   }
 
-  @keyframes sparkle-twinkle {
-    0%, 100% { opacity: 0.3; transform: scale(0.8); }
-    50%      { opacity: 1; transform: scale(1.25); }
+  @keyframes twinkle-sparkle {
+    0%, 100% { opacity: 0.25; transform: scale(0.75); }
+    50%      { opacity: 1; transform: scale(1.3); }
   }
 
-  @keyframes msg-fade-in {
+  @keyframes chat-fade-in {
     from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* ── Canvas Background: Deep Midnight Navy/Black ── */
-  .app-ai-canvas {
+  /* ── Canvas Background: Deep Pure Midnight/Black ── */
+  .minimal-ai-canvas {
     display: flex;
     flex-direction: column;
     height: 100%;
     width: 100%;
-    background: #070a14;
+    background: #03050c;
     color: #ffffff;
     position: relative;
     box-sizing: border-box;
@@ -47,13 +44,42 @@ const SCREENSHOT_CSS = `
     flex: 1 1 0;
     min-height: 0;
   }
-  .light-theme .app-ai-canvas {
-    background: #f8fafc;
-    color: #0f172a;
+  .light-theme .minimal-ai-canvas {
+    background: #0a0e1c;
+    color: #ffffff;
+  }
+
+  /* ── Top Bar (Minimal Top Right + Button) ── */
+  .minimal-ai-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 14px 18px 4px 18px;
+    background: transparent;
+    flex-shrink: 0;
+    z-index: 20;
+  }
+  .minimal-ai-btn-top-plus {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #0d1222;
+    border: 1.5px solid #8b5cf6;
+    box-shadow: 0 0 16px rgba(139, 92, 246, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    cursor: pointer;
+    transition: transform 0.18s, box-shadow 0.18s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .minimal-ai-btn-top-plus:active {
+    transform: scale(0.92);
   }
 
   /* ── Scroll Area ── */
-  .app-ai-scroll {
+  .minimal-ai-scroll {
     flex: 1 1 0;
     min-height: 0;
     overflow-y: auto;
@@ -62,479 +88,254 @@ const SCREENSHOT_CSS = `
     -webkit-overflow-scrolling: touch;
   }
 
-  /* ── Welcome Stage (Compact Vertical Flow) ── */
-  .app-ai-welcome {
-    flex: 1 1 auto;
+  /* ── Welcome Stage (Centered Glowing Ribbon Loop) ── */
+  .minimal-ai-center {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 8px 14px 4px 14px;
+    padding: 20px 20px 40px 20px;
     text-align: center;
-    max-width: 460px;
-    margin: 0 auto;
-    width: 100%;
-    box-sizing: border-box;
+    user-select: none;
   }
 
-  /* ── Central Glowing Star Orb (High Contrast & Vibrant) ── */
-  .app-ai-orb-wrap {
+  .minimal-ai-ribbon-wrap {
     position: relative;
-    width: 74px;
-    height: 74px;
-    margin-bottom: 8px;
+    width: 140px;
+    height: 140px;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-  }
-  .app-ai-orb {
-    width: 66px;
-    height: 66px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #1e1b4b 0%, #0f172a 65%, #030712 100%);
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: orb-pulse-glow 3.6s infinite ease-in-out;
-    box-shadow: 0 0 24px rgba(99, 102, 241, 0.6);
-  }
-  .light-theme .app-ai-orb {
-    background: radial-gradient(circle at 35% 35%, #1e293b 0%, #0f172a 75%, #020617 100%);
-  }
-  .app-ai-orb::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
-    z-index: -1;
   }
 
-  /* Tiny sparkles around orb */
-  .app-ai-twinkle {
+  .minimal-ai-sparkle {
     position: absolute;
     color: #60a5fa;
-    animation: sparkle-twinkle 2.4s infinite ease-in-out;
+    animation: twinkle-sparkle 2.5s infinite ease-in-out;
   }
 
-  /* ── Headlines ── */
-  .app-ai-greeting {
-    font-size: clamp(1.4rem, 5.2vw, 1.75rem);
-    font-weight: 800;
-    color: #ffffff;
-    margin: 0 0 2px 0;
-    letter-spacing: -0.02em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-  }
-  .light-theme .app-ai-greeting {
-    color: #0f172a;
-  }
-  .app-ai-name {
-    background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .app-ai-question {
-    font-size: clamp(1rem, 3.8vw, 1.22rem);
-    font-weight: 700;
-    color: #ffffff;
-    margin: 0 0 10px 0;
-    letter-spacing: -0.01em;
-  }
-  .light-theme .app-ai-question {
-    color: #1e293b;
-  }
-
-  /* ── 3 Mode Selector Bar ── */
-  .app-ai-mode-container {
-    background: #0f172a;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 9999px;
-    padding: 3px;
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    margin-bottom: 10px;
-    flex-shrink: 0;
-  }
-  .light-theme .app-ai-mode-container {
-    background: #e2e8f0;
-    border-color: #cbd5e1;
-  }
-  .app-ai-mode-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 14px;
-    border-radius: 9999px;
-    font-size: 0.78rem;
-    font-weight: 700;
-    cursor: pointer;
-    font-family: inherit;
-    border: none;
-    background: transparent;
-    color: #94a3b8;
-    transition: all 0.18s ease;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .light-theme .app-ai-mode-btn {
-    color: #64748b;
-  }
-  .app-ai-mode-btn.active {
-    background: #1e3a8a;
-    color: #60a5fa;
-    border: 1px solid #3b82f6;
-    box-shadow: 0 0 12px rgba(59, 130, 246, 0.35);
-  }
-  .light-theme .app-ai-mode-btn.active {
-    background: #ffffff;
-    color: #2563eb;
-    border-color: #93c5fd;
-    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
-  }
-
-  /* ── 2x2 Quick Action Cards ── */
-  .app-ai-grid-2x2 {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 6px;
-    width: 100%;
-    margin-bottom: 4px;
-    flex-shrink: 0;
-  }
-  .app-ai-action-card {
-    background: #0d1322;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 14px;
-    padding: 8px 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    text-align: left;
-    transition: all 0.16s cubic-bezier(0.4, 0, 0.2, 1);
-    -webkit-tap-highlight-color: transparent;
-  }
-  .light-theme .app-ai-action-card {
-    background: #ffffff;
-    border-color: #e2e8f0;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-  }
-  .app-ai-action-card:hover {
-    border-color: rgba(99, 102, 241, 0.5);
-    background: #131b2e;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
-  }
-  .light-theme .app-ai-action-card:hover {
-    background: #f1f5f9;
-    border-color: #93c5fd;
-  }
-  .app-ai-action-card:active {
-    transform: scale(0.97);
-  }
-  .app-ai-card-icon {
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .app-ai-card-content {
-    flex: 1;
-    overflow: hidden;
-  }
-  .app-ai-card-title {
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: #ffffff;
-    line-height: 1.2;
-    margin-bottom: 1px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .light-theme .app-ai-card-title {
-    color: #0f172a;
-  }
-  .app-ai-card-desc {
-    font-size: 0.66rem;
-    color: #64748b;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .app-ai-card-arrow {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.05);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #64748b;
-    flex-shrink: 0;
-  }
-
-  /* ── Glowing Floating Input Card (Always Docked & Visible) ── */
-  .app-ai-input-dock {
-    padding: 4px 12px calc(env(safe-area-inset-bottom, 0px) + 6px) 12px;
+  /* ── Floating Glowing Capsule Input Dock ── */
+  .minimal-ai-dock {
+    padding: 8px 16px calc(env(safe-area-inset-bottom, 0px) + 14px) 16px;
     flex-shrink: 0;
     background: transparent;
     z-index: 30;
     width: 100%;
-    max-width: 480px;
+    max-width: 540px;
     margin: 0 auto;
     box-sizing: border-box;
   }
-  .app-ai-input-card {
-    background: #0a0f1d;
+
+  .minimal-ai-capsule {
+    background: #080d1c;
     border: 1.5px solid transparent;
-    border-radius: 20px;
-    background-image: linear-gradient(#0a0f1d, #0a0f1d), linear-gradient(135deg, #38bdf8 0%, #6366f1 50%, #a855f7 100%);
+    border-radius: 9999px;
+    background-image: linear-gradient(#080d1c, #080d1c), linear-gradient(135deg, #38bdf8 0%, #6366f1 50%, #a855f7 100%);
     background-origin: border-box;
     background-clip: padding-box, border-box;
-    padding: 8px 12px 6px 12px;
-    box-shadow: 0 0 18px rgba(99, 102, 241, 0.22), 0 4px 18px rgba(0, 0, 0, 0.4);
+    padding: 6px 10px 6px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 0 24px rgba(99, 102, 241, 0.28), 0 8px 30px rgba(0, 0, 0, 0.6);
     box-sizing: border-box;
-    width: 100%;
-    transition: box-shadow 0.2s;
+    min-height: 52px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .light-theme .app-ai-input-card {
-    background: #ffffff;
-    background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(135deg, #38bdf8 0%, #6366f1 50%, #a855f7 100%);
-    box-shadow: 0 4px 18px rgba(99, 102, 241, 0.15);
+  .minimal-ai-capsule.multiline {
+    border-radius: 26px;
+    align-items: flex-end;
+    padding-bottom: 8px;
   }
-  .app-ai-input-card:focus-within {
-    box-shadow: 0 0 26px rgba(99, 102, 241, 0.4), 0 6px 24px rgba(0, 0, 0, 0.5);
+  .minimal-ai-capsule:focus-within {
+    box-shadow: 0 0 35px rgba(99, 102, 241, 0.45), 0 8px 32px rgba(0, 0, 0, 0.7);
   }
 
   /* ── Auto-Growing Textarea (Never remounts) ── */
-  .app-ai-textarea {
-    width: 100%;
+  .minimal-ai-textarea {
+    flex: 1 1 0;
+    min-width: 0;
     border: none;
     outline: none;
     resize: none;
     background: transparent;
     color: #ffffff;
-    font-size: 0.96rem;
-    line-height: 1.4;
+    font-size: 1rem;
+    line-height: 1.45;
     font-family: inherit;
-    min-height: 28px;
-    max-height: 140px;
-    padding: 0 0 2px 0;
+    min-height: 26px;
+    max-height: 160px;
+    padding: 3px 0;
     box-sizing: border-box;
     display: block;
     overflow-y: auto;
     -webkit-tap-highlight-color: transparent;
   }
-  .light-theme .app-ai-textarea {
-    color: #0f172a;
-  }
-  .app-ai-textarea::placeholder {
+  .minimal-ai-textarea::placeholder {
     color: #64748b;
-    font-size: 0.9rem;
+    font-size: 0.98rem;
   }
 
-  /* ── Input Bottom Action Row ── */
-  .app-ai-action-row {
+  /* ── Right Action Buttons (Plus & Mic/Send) ── */
+  .minimal-ai-actions {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding-top: 2px;
-    gap: 6px;
+    gap: 8px;
+    flex-shrink: 0;
   }
-  .app-ai-chip {
-    display: inline-flex;
+  .minimal-ai-btn-plus {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: transparent;
+    color: #94a3b8;
+    display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 3px 9px;
-    border-radius: 9999px;
-    font-size: 0.74rem;
-    font-weight: 700;
+    justify-content: center;
     cursor: pointer;
-    font-family: inherit;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: #111827;
-    color: #cbd5e1;
     transition: all 0.15s ease;
     -webkit-tap-highlight-color: transparent;
-    user-select: none;
   }
-  .light-theme .app-ai-chip {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
-    color: #475569;
+  .minimal-ai-btn-plus:hover {
+    color: #ffffff;
+    border-color: #6366f1;
   }
-  .app-ai-chip.active {
-    background: #1e3a8a;
-    color: #60a5fa;
-    border-color: #3b82f6;
-  }
-  .light-theme .app-ai-chip.active {
-    background: #dbeafe;
-    color: #1d4ed8;
-    border-color: #93c5fd;
-  }
-
-  /* ── Purple Soundwaves / Send Button ── */
-  .app-ai-btn-purple-circle {
-    width: 32px;
-    height: 32px;
+  .minimal-ai-btn-mic {
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     border: none;
-    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
     color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
+    box-shadow: 0 0 16px rgba(124, 58, 237, 0.5);
     transition: transform 0.18s, box-shadow 0.18s;
     flex-shrink: 0;
     -webkit-tap-highlight-color: transparent;
   }
-  .app-ai-btn-purple-circle:hover {
+  .minimal-ai-btn-mic:hover {
     transform: scale(1.08);
-    box-shadow: 0 0 18px rgba(168, 85, 247, 0.6);
+    box-shadow: 0 0 22px rgba(124, 58, 237, 0.75);
   }
-  .app-ai-btn-purple-circle:active {
+  .minimal-ai-btn-mic:active {
     transform: scale(0.92);
   }
 
-  /* ── Chat Messages ── */
-  .app-ai-msg-item {
+  /* ── Chat Messages Stream ── */
+  .minimal-ai-msg-row {
     display: flex;
     flex-direction: column;
     width: 100%;
-    margin-bottom: 10px;
-    padding: 0 14px;
+    margin-bottom: 14px;
+    padding: 0 16px;
     box-sizing: border-box;
-    animation: msg-fade-in 0.2s ease-out both;
+    animation: chat-fade-in 0.2s ease-out both;
   }
-  .app-ai-bubble {
+  .minimal-ai-bubble {
     max-width: 86%;
-    padding: 10px 14px;
-    font-size: 0.92rem;
-    line-height: 1.5;
-    border-radius: 18px;
+    padding: 12px 18px;
+    font-size: 0.96rem;
+    line-height: 1.6;
+    border-radius: 22px;
     word-break: break-word;
   }
-  .app-ai-bubble-user {
+  .minimal-ai-bubble-user {
     align-self: flex-end;
-    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #6366f1 100%);
     color: #ffffff;
     border-bottom-right-radius: 4px;
-    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.28);
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
   }
-  .app-ai-bubble-bot {
+  .minimal-ai-bubble-bot {
     align-self: flex-start;
-    background: #0f172a;
+    background: #0d1322;
     color: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-bottom-left-radius: 4px;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-  }
-  .light-theme .app-ai-bubble-bot {
-    background: #ffffff;
-    color: #0f172a;
-    border-color: #e2e8f0;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
   }
 
   /* ── Responsive Mobile ── */
   @media (max-width: 768px) {
-    .app-ai-canvas {
+    .minimal-ai-canvas {
       height: 100%;
       border-radius: 0;
       border: none;
     }
-    .app-ai-textarea {
+    .minimal-ai-dock {
+      padding: 6px 12px calc(env(safe-area-inset-bottom, 0px) + 8px) 12px;
+    }
+    .minimal-ai-capsule {
+      min-height: 48px;
+      padding: 5px 8px 5px 14px;
+    }
+    .minimal-ai-textarea {
       font-size: 16px; /* Prevents auto-zoom on iOS */
+    }
+    .minimal-ai-bubble {
+      max-width: 90%;
+      font-size: 0.94rem;
     }
   }
 `;
 
-/* ── 4-Pointed Glowing Star SVG for the Orb Center (Crisp White/Cyan) ── */
-function GlowingStar({ size = 30 }) {
+/* ── Exact 3D Glowing Ribbon Loop SVG Emblem ── */
+function GlowingRibbonEmblem({ size = 120 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path
-        d="M50 0C50 27.614 27.614 50 0 50C27.614 50 50 72.386 50 100C50 72.386 72.386 50 100 50C72.386 50 50 27.614 50 0Z"
-        fill="url(#star_crisp_glow)"
-      />
-      <circle cx="50" cy="50" r="8" fill="#ffffff" />
-      <defs>
-        <linearGradient id="star_crisp_glow" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#ffffff" />
-          <stop offset="30%" stopColor="#38bdf8" />
-          <stop offset="70%" stopColor="#818cf8" />
-          <stop offset="100%" stopColor="#c084fc" />
-        </linearGradient>
-      </defs>
-    </svg>
+    <div style={{ position: 'relative', animation: 'ribbon-pulse 3.8s infinite ease-in-out' }}>
+      <svg width={size} height={size} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="ribbon_flow_1" x1="20" y1="20" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#38bdf8" />
+            <stop offset="35%" stopColor="#60a5fa" />
+            <stop offset="70%" stopColor="#818cf8" />
+            <stop offset="100%" stopColor="#c084fc" />
+          </linearGradient>
+          <linearGradient id="ribbon_flow_2" x1="180" y1="20" x2="20" y2="180" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#ec4899" />
+            <stop offset="40%" stopColor="#a855f7" />
+            <stop offset="75%" stopColor="#6366f1" />
+            <stop offset="100%" stopColor="#38bdf8" />
+          </linearGradient>
+          <filter id="ribbon_aura" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="6" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        {/* Ambient Ring */}
+        <circle cx="100" cy="100" r="76" stroke="rgba(99, 102, 241, 0.25)" strokeWidth="1.5" />
+
+        {/* Outer 3-Lobed Ribbon Knot */}
+        <path
+          d="M100 42 C120 42 145 60 152 85 C158 110 142 135 120 148 C98 160 68 152 50 130 C32 108 40 76 65 55 C78 44 90 42 100 42 Z"
+          stroke="url(#ribbon_flow_1)"
+          strokeWidth="14"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          filter="url(#ribbon_aura)"
+        />
+
+        {/* Inner Counter-Loop Knot */}
+        <path
+          d="M100 52 C75 52 56 75 62 105 C68 135 105 145 130 128 C155 110 145 75 122 58 C112 52 105 52 100 52 Z"
+          stroke="url(#ribbon_flow_2)"
+          strokeWidth="10"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </div>
   );
 }
-
-/* ── Soundwave Bars Icon ── */
-function SoundwavesIcon({ size = 15 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-      <line x1="5" y1="9" x2="5" y2="15" />
-      <line x1="9" y1="6" x2="9" y2="18" />
-      <line x1="13" y1="3" x2="13" y2="21" />
-      <line x1="17" y1="7" x2="17" y2="17" />
-      <line x1="21" y1="10" x2="21" y2="14" />
-    </svg>
-  );
-}
-
-/* ── 4 Quick Actions (Exact Match to Reference Screenshot) ── */
-const ACTION_CARDS = [
-  {
-    id: 'explain',
-    title: 'Explain a concept',
-    desc: 'in simple terms',
-    icon: MessageSquare,
-    iconBg: '#1e3a8a',
-    iconColor: '#60a5fa',
-    query: 'Explain how phishing detection algorithms analyze suspicious URLs in simple terms'
-  },
-  {
-    id: 'ideas',
-    title: 'Get ideas',
-    desc: 'for anything',
-    icon: Lightbulb,
-    iconBg: '#4c1d95',
-    iconColor: '#c084fc',
-    query: 'Give me best security practices and ideas to protect personal accounts from social engineering'
-  },
-  {
-    id: 'code',
-    title: 'Write code',
-    desc: 'or debug',
-    icon: Code2,
-    iconBg: '#064e3b',
-    iconColor: '#34d399',
-    query: 'Show Python ML code for URL feature extraction and Random Forest phishing classification'
-  },
-  {
-    id: 'content',
-    title: 'Write content',
-    desc: 'emails, blogs & more',
-    icon: PenTool,
-    iconBg: '#78350f',
-    iconColor: '#fbbf24',
-    query: 'Write an email security awareness guide warning employees about spear phishing'
-  }
-];
 
 /* ─────────────────────────────────────────────────────────────────
    MAIN COMPONENT
@@ -542,29 +343,18 @@ const ACTION_CARDS = [
 export default function AiChatbot({ t, language = 'English', currentUser }) {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
-  const [activeMode, setActiveMode] = useState('instant');
   const [isTyping, setIsTyping] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
   const [attachedFile, setAttachedFile] = useState(null);
-  const [thinkActive, setThinkActive] = useState(false);
-  const [searchActive, setSearchActive] = useState(true);
+  const [isListening, setIsListening] = useState(false);
 
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
+  const recognitionRef = useRef(null);
 
   const hasMessages = messages.length > 0;
   const canSend = (inputText.trim().length > 0 || !!attachedFile) && !isTyping;
-
-  // Clean User Name: display real name or fallback to "Ahmad"
-  const getUserName = () => {
-    const raw = currentUser?.name || currentUser?.username;
-    if (raw && !raw.toLowerCase().includes('system') && !raw.toLowerCase().includes('admin')) {
-      const first = raw.split(' ')[0];
-      return first.charAt(0).toUpperCase() + first.slice(1);
-    }
-    return 'Ahmad';
-  };
 
   // Auto-scroll
   useEffect(() => {
@@ -576,7 +366,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = 'auto';
-    const minH = 28;
+    const minH = 26;
     const maxH = window.innerWidth <= 768 ? 140 : 160;
     const targetH = Math.min(Math.max(el.scrollHeight, minH), maxH);
     el.style.height = `${targetH}px`;
@@ -585,6 +375,42 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
   useEffect(() => {
     autoResize();
   }, [inputText, autoResize]);
+
+  // Voice speech recognition
+  const toggleVoiceInput = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert('Speech recognition is not supported in this browser.');
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = language === 'Urdu' ? 'ur-PK' : 'en-US';
+
+      recognition.onstart = () => setIsListening(true);
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setInputText(prev => (prev ? `${prev} ${transcript}` : transcript));
+        setIsListening(false);
+      };
+      recognition.onerror = () => setIsListening(false);
+      recognition.onend = () => setIsListening(false);
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch {
+      setIsListening(false);
+    }
+  };
 
   /* ── Send Message ── */
   const handleSend = async (overrideText) => {
@@ -674,45 +500,47 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
     }
   };
 
-  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     INLINE FLOATING INPUT CARD (100% VISIBLE AT BOTTOM)
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-  const InputCardJSX = (
-    <div className="app-ai-input-dock">
-      <div className="app-ai-input-card">
-        {/* File preview tag if attached */}
-        {attachedFile && (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '3px 8px',
-            marginBottom: '4px',
-            background: 'rgba(59, 130, 246, 0.18)',
-            border: '1px solid rgba(59, 130, 246, 0.35)',
-            borderRadius: '8px',
-            fontSize: '0.74rem',
-            color: '#60a5fa',
-            fontWeight: 600
-          }}>
-            <FileText size={12} />
-            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {attachedFile.name}
-            </span>
-            <button
-              onMouseDown={e => e.preventDefault()}
-              onClick={() => setAttachedFile(null)}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#60a5fa', padding: 0 }}
-            >
-              <X size={12} />
-            </button>
-          </div>
-        )}
+  const isMultiLine = inputText.includes('\n') || (textareaRef.current?.scrollHeight || 0) > 34;
 
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     INLINE FLOATING CAPSULE (EXACT MATCH TO SCREENSHOT)
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+  const CapsuleInputJSX = (
+    <div className="minimal-ai-dock">
+      {/* File preview badge */}
+      {attachedFile && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          padding: '4px 12px',
+          marginBottom: '6px',
+          background: 'rgba(99, 102, 241, 0.2)',
+          border: '1px solid rgba(99, 102, 241, 0.35)',
+          borderRadius: '9999px',
+          fontSize: '0.76rem',
+          color: '#93c5fd',
+          fontWeight: 600
+        }}>
+          <FileText size={13} />
+          <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {attachedFile.name}
+          </span>
+          <button
+            onMouseDown={e => e.preventDefault()}
+            onClick={() => setAttachedFile(null)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#93c5fd', padding: 0 }}
+          >
+            <X size={13} />
+          </button>
+        </div>
+      )}
+
+      <div className={`minimal-ai-capsule ${isMultiLine ? 'multiline' : ''}`}>
         {/* Stable Textarea Input — NEVER remounted */}
         <textarea
           ref={textareaRef}
-          className="app-ai-textarea"
+          className="minimal-ai-textarea"
           value={inputText}
           onInput={autoResize}
           onChange={e => setInputText(e.target.value)}
@@ -725,76 +553,50 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
           spellCheck={false}
         />
 
-        {/* Bottom Control Row */}
-        <div className="app-ai-action-row">
-          {/* Left Chips: Think & Search */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <button
-              type="button"
-              onMouseDown={e => e.preventDefault()}
-              onClick={() => setThinkActive(!thinkActive)}
-              className={`app-ai-chip ${thinkActive ? 'active' : ''}`}
-            >
-              <Atom size={12} />
-              <span>Think</span>
-            </button>
+        {/* Right Actions: Plus & Mic/Send */}
+        <div className="minimal-ai-actions">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".txt,.eml,.csv,.json,.py,.md,.log,.msg"
+            onChange={handleFileAttach}
+            style={{ display: 'none' }}
+          />
+          <button
+            type="button"
+            className="minimal-ai-btn-plus"
+            onMouseDown={e => e.preventDefault()}
+            onClick={() => fileInputRef.current?.click()}
+            title="Attach file"
+          >
+            <Plus size={18} strokeWidth={2.4} />
+          </button>
 
+          {/* Glowing Circular Blue/Purple Action Button */}
+          {inputText.trim().length > 0 || attachedFile ? (
             <button
               type="button"
-              onMouseDown={e => e.preventDefault()}
-              onClick={() => setSearchActive(!searchActive)}
-              className={`app-ai-chip ${searchActive ? 'active' : ''}`}
-            >
-              <Globe size={12} />
-              <span>Search</span>
-            </button>
-          </div>
-
-          {/* Right Controls: Plus & Soundwaves / Send button */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".txt,.eml,.csv,.json,.py,.md,.log,.msg"
-              onChange={handleFileAttach}
-              style={{ display: 'none' }}
-            />
-            <button
-              type="button"
-              onMouseDown={e => e.preventDefault()}
-              onClick={() => fileInputRef.current?.click()}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: attachedFile ? '#38bdf8' : '#94a3b8',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '3px'
-              }}
-              title="Add attachment"
-            >
-              <PlusCircle size={18} />
-            </button>
-
-            {/* Circular Purple Soundwaves or Send Arrow */}
-            <button
-              type="button"
-              className="app-ai-btn-purple-circle"
+              className="minimal-ai-btn-mic"
               onMouseDown={e => e.preventDefault()}
               onClick={() => handleSend()}
               disabled={!canSend}
               title="Send message"
               aria-label="Send message"
             >
-              {inputText.trim().length > 0 || attachedFile ? (
-                <ArrowUp size={16} strokeWidth={2.8} />
-              ) : (
-                <SoundwavesIcon size={15} />
-              )}
+              <ArrowUp size={18} strokeWidth={2.8} />
             </button>
-          </div>
+          ) : (
+            <button
+              type="button"
+              className="minimal-ai-btn-mic"
+              onMouseDown={e => e.preventDefault()}
+              onClick={toggleVoiceInput}
+              title={isListening ? 'Listening...' : 'Voice message'}
+              aria-label="Voice message"
+            >
+              <Mic size={19} strokeWidth={2.2} />
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -802,132 +604,59 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
 
   return (
     <>
-      <style>{SCREENSHOT_CSS}</style>
-      <div className="app-ai-canvas">
+      <style>{MINIMAL_CSS}</style>
+      <div className="minimal-ai-canvas">
 
-        {/* ── Scrollable Body Area ── */}
-        <div className="app-ai-scroll">
+        {/* ── Top Bar: Minimal Purple Glowing Plus Circle on Right ── */}
+        <div className="minimal-ai-topbar">
+          <button
+            className="minimal-ai-btn-top-plus"
+            title="New Chat"
+            onMouseDown={e => e.preventDefault()}
+            onClick={handleNewChat}
+          >
+            <Plus size={22} strokeWidth={2.4} />
+          </button>
+        </div>
+
+        {/* ── Scroll Area: Centered Glowing Ribbon Knot or Active Messages ── */}
+        <div className="minimal-ai-scroll">
           {!hasMessages ? (
-            /* ── Welcome Stage (100% Fit on Mobile Screen) ── */
-            <div className="app-ai-welcome">
-              {/* Glowing Orb with Star & Twinkles */}
-              <div className="app-ai-orb-wrap">
-                <span className="app-ai-twinkle" style={{ top: '6%', left: '8%', fontSize: '10px' }}>✦</span>
-                <span className="app-ai-twinkle" style={{ top: '12%', right: '6%', fontSize: '12px', animationDelay: '0.8s' }}>✦</span>
-                <span className="app-ai-twinkle" style={{ bottom: '8%', left: '10%', fontSize: '11px', animationDelay: '1.4s' }}>✦</span>
-                <span className="app-ai-twinkle" style={{ bottom: '12%', right: '8%', fontSize: '9px', animationDelay: '1.9s' }}>✦</span>
+            /* ── Pure Minimalist Center (Exact Match to Screenshot) ── */
+            <div className="minimal-ai-center">
+              <div className="minimal-ai-ribbon-wrap">
+                {/* Floating sparkles around ribbon */}
+                <span className="minimal-ai-sparkle" style={{ top: '8%', left: '0%', fontSize: '11px' }}>✦</span>
+                <span className="minimal-ai-sparkle" style={{ top: '15%', right: '4%', fontSize: '13px', animationDelay: '0.8s' }}>✦</span>
+                <span className="minimal-ai-sparkle" style={{ bottom: '15%', left: '4%', fontSize: '12px', animationDelay: '1.4s' }}>✦</span>
+                <span className="minimal-ai-sparkle" style={{ bottom: '10%', right: '0%', fontSize: '10px', animationDelay: '1.9s' }}>✦</span>
 
-                <div className="app-ai-orb">
-                  <GlowingStar size={32} />
-                </div>
-              </div>
-
-              {/* Greeting & Headline */}
-              <h1 className="app-ai-greeting">
-                Hi, <span className="app-ai-name">{getUserName()}!</span> 👋
-              </h1>
-              <h2 className="app-ai-question">
-                How can I help you today?
-              </h2>
-
-              {/* Mode Selector Pill Bar */}
-              <div className="app-ai-mode-container">
-                <button
-                  type="button"
-                  onMouseDown={e => e.preventDefault()}
-                  onClick={() => setActiveMode('instant')}
-                  className={`app-ai-mode-btn ${activeMode === 'instant' ? 'active' : ''}`}
-                >
-                  <Zap size={12} strokeWidth={2.5} />
-                  <span>Instant</span>
-                </button>
-                <button
-                  type="button"
-                  onMouseDown={e => e.preventDefault()}
-                  onClick={() => setActiveMode('expert')}
-                  className={`app-ai-mode-btn ${activeMode === 'expert' ? 'active' : ''}`}
-                >
-                  <Gem size={12} strokeWidth={2} />
-                  <span>Expert</span>
-                </button>
-                <button
-                  type="button"
-                  onMouseDown={e => e.preventDefault()}
-                  onClick={() => setActiveMode('vision')}
-                  className={`app-ai-mode-btn ${activeMode === 'vision' ? 'active' : ''}`}
-                >
-                  <ImageIcon size={12} strokeWidth={2} />
-                  <span>Vision</span>
-                </button>
-              </div>
-
-              {/* 2x2 Action Cards */}
-              <div className="app-ai-grid-2x2">
-                {ACTION_CARDS.map(card => {
-                  const Icon = card.icon;
-                  return (
-                    <div
-                      key={card.id}
-                      className="app-ai-action-card"
-                      onMouseDown={e => e.preventDefault()}
-                      onClick={() => handleSend(card.query)}
-                    >
-                      <div className="app-ai-card-icon" style={{ background: card.iconBg, color: card.iconColor }}>
-                        <Icon size={15} strokeWidth={2.2} />
-                      </div>
-                      <div className="app-ai-card-content">
-                        <div className="app-ai-card-title">{card.title}</div>
-                        <div className="app-ai-card-desc">{card.desc}</div>
-                      </div>
-                      <div className="app-ai-card-arrow">
-                        <ArrowRight size={10} strokeWidth={2.5} />
-                      </div>
-                    </div>
-                  );
-                })}
+                {/* 3D Glowing Ribbon Emblem */}
+                <GlowingRibbonEmblem size={120} />
               </div>
             </div>
           ) : (
             /* ── Active Chat Messages Stream ── */
-            <div style={{ padding: '10px 0', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '0 14px 6px 14px' }}>
-                <button
-                  onMouseDown={e => e.preventDefault()}
-                  onClick={handleNewChat}
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.08)',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                    borderRadius: '9999px',
-                    color: '#94a3b8',
-                    padding: '3px 10px',
-                    fontSize: '0.72rem',
-                    fontWeight: 600,
-                    cursor: 'pointer'
-                  }}
-                >
-                  + New Chat
-                </button>
-              </div>
-
+            <div style={{ padding: '12px 0', display: 'flex', flexDirection: 'column' }}>
               {messages.map(msg => (
-                <div key={msg.id} className="app-ai-msg-item">
-                  <div className={`app-ai-bubble ${msg.sender === 'user' ? 'app-ai-bubble-user' : 'app-ai-bubble-bot'}`}>
+                <div key={msg.id} className="minimal-ai-msg-row">
+                  <div className={`minimal-ai-bubble ${msg.sender === 'user' ? 'minimal-ai-bubble-user' : 'minimal-ai-bubble-bot'}`}>
                     {msg.fileInfo && (
                       <div style={{
                         display: 'flex',
                         alignItems: 'center',
                         gap: '5px',
-                        marginBottom: '4px',
-                        fontSize: '0.76rem',
+                        marginBottom: '6px',
+                        fontSize: '0.78rem',
                         opacity: 0.9,
                         fontWeight: 700
                       }}>
-                        <FileText size={12} /> {msg.fileInfo}
+                        <FileText size={13} /> {msg.fileInfo}
                       </div>
                     )}
                     <div style={{ whiteSpace: 'pre-line' }}>{msg.text}</div>
                     {msg.sender === 'bot' && (
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '6px' }}>
                         <button
                           onMouseDown={e => e.preventDefault()}
                           onClick={() => handleCopy(msg.text, msg.id)}
@@ -936,7 +665,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                             border: 'none',
                             cursor: 'pointer',
                             color: '#94a3b8',
-                            fontSize: '0.72rem',
+                            fontSize: '0.74rem',
                             display: 'flex',
                             alignItems: 'center',
                             gap: '4px'
@@ -948,9 +677,9 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
                     )}
                   </div>
                   <span style={{
-                    fontSize: '0.66rem',
+                    fontSize: '0.68rem',
                     color: '#64748b',
-                    marginTop: '2px',
+                    marginTop: '3px',
                     alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
                     padding: '0 4px'
                   }}>
@@ -960,10 +689,10 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
               ))}
 
               {isTyping && (
-                <div className="app-ai-msg-item">
-                  <div className="app-ai-bubble app-ai-bubble-bot" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <GlowingStar size={14} />
-                    <span style={{ fontSize: '0.82rem', color: '#94a3b8' }}>Thinking...</span>
+                <div className="minimal-ai-msg-row">
+                  <div className="minimal-ai-bubble minimal-ai-bubble-bot" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#818cf8', animation: 'twinkle-sparkle 1s infinite' }} />
+                    <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Thinking...</span>
                   </div>
                 </div>
               )}
@@ -972,8 +701,8 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
           )}
         </div>
 
-        {/* ── Floating Input Dock at Bottom (Always 100% Visible) ── */}
-        {InputCardJSX}
+        {/* ── Floating Capsule Pill Dock at Bottom (Always 100% Visible) ── */}
+        {CapsuleInputJSX}
 
       </div>
     </>
