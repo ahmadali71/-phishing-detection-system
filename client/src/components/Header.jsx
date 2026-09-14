@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Shield, Bell, Moon, Sun, Search, X, Trash2, Menu } from 'lucide-react';
+import { Shield, Bell, Moon, Sun, Search, X, Trash2, Menu, Home, ExternalLink } from 'lucide-react';
+import Logo from './Logo';
 
 export default function Header({
   activeTab,
+  setActiveTab,
   theme, setTheme,
   currentUser, onOpenAuth, onLogout,
   notifications, onMarkNotificationRead, onClearNotifications,
@@ -17,20 +19,18 @@ export default function Header({
 
   const getPageTitle = () => {
     switch (activeTab) {
-      case 'dashboard':      return 'Dashboard';
-      case 'url-detection':  return 'URL Detection';
-      case 'email-detection':return 'Email Detection';
-      case 'scan-history':   return 'Scan History';
-      case 'profile-settings':return 'Settings';
-      case 'ai-assistant':   return 'AI Assistant';
-      case 'admin-panel':    return 'Reports';
-      default:               return 'APDS';
+      case 'home':             return 'Home';
+      case 'dashboard':        return 'Dashboard';
+      case 'url-detection':    return 'URL Detection';
+      case 'email-detection':  return 'Email Detection';
+      case 'image-detection':  return 'Screenshot Analysis';
+      case 'message-detection':return 'SMS & Message Analysis';
+      case 'scan-history':     return 'Scan History';
+      case 'profile-settings': return 'Settings';
+      case 'ai-assistant':     return 'AI Assistant';
+      case 'admin-panel':      return 'Admin Reports';
+      default:                 return 'PhishGuard';
     }
-  };
-
-  const getPageNum = () => {
-    const map = { 'dashboard':'4','url-detection':'5','email-detection':'6','scan-history':'8','profile-settings':'9','ai-assistant':'AI','admin-panel':'R' };
-    return map[activeTab] || '4';
   };
 
   useEffect(() => {
@@ -55,12 +55,10 @@ export default function Header({
           <Menu size={20} />
         </button>
 
-        <div className="header-brand-wrap">
-          <div className="header-brand-icon">
-            <Shield size={16} color="#fff" />
-          </div>
+        <div className="header-brand-wrap" onClick={() => setActiveTab && setActiveTab('home')} style={{ cursor: 'pointer' }}>
+          <Logo size="xs" showText={false} />
           <div className="header-brand-info">
-            <span className="header-brand-title">APDS</span>
+            <span className="header-brand-title">PhishGuard</span>
             <span className="header-brand-page">{getPageTitle()}</span>
           </div>
         </div>
@@ -68,7 +66,28 @@ export default function Header({
 
       {/* ── RIGHT: Actions ── */}
       <div className="header-right">
-        {/* Search toggle (mobile only icon, expands) */}
+        {/* Quick Link to Home / Dashboard */}
+        {activeTab !== 'home' ? (
+          <button
+            onClick={() => setActiveTab && setActiveTab('home')}
+            className="hdr-home-pill-btn"
+            title="Browse Landing Page"
+          >
+            <Home size={14} />
+            <span>Home</span>
+          </button>
+        ) : (
+          <button
+            onClick={() => setActiveTab && setActiveTab('dashboard')}
+            className="hdr-home-pill-btn"
+            title="Open Security Dashboard"
+          >
+            <ExternalLink size={14} />
+            <span>Dashboard</span>
+          </button>
+        )}
+
+        {/* Search toggle */}
         <button
           onClick={() => setShowSearch(v => !v)}
           className="hdr-btn"
@@ -132,7 +151,7 @@ export default function Header({
             </div>
             <div className="hdr-user-info">
               <span className="hdr-user-name">{currentUser.name}</span>
-              <span className="hdr-user-role">{currentUser.role || 'Premium User'}</span>
+              <span className="hdr-user-role">{currentUser.role || 'User'}</span>
             </div>
           </div>
         ) : (
@@ -142,7 +161,7 @@ export default function Header({
         )}
       </div>
 
-      {/* ── Search overlay bar (expands below header on mobile) ── */}
+      {/* ── Search overlay bar ── */}
       {showSearch && (
         <div className="hdr-search-bar">
           <Search size={15} color="var(--text-muted)" />
@@ -161,6 +180,28 @@ export default function Header({
           )}
         </div>
       )}
+
+      <style>{`
+        .hdr-home-pill-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 12px;
+          border-radius: 999px;
+          background: rgba(37, 99, 235, 0.1);
+          border: 1px solid rgba(37, 99, 235, 0.25);
+          color: #2563eb;
+          font-size: 0.8rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .hdr-home-pill-btn:hover {
+          background: #2563eb;
+          color: #ffffff;
+        }
+      `}</style>
     </header>
   );
 }

@@ -1,19 +1,16 @@
 import React from 'react';
-import { LayoutDashboard, Globe, Mail, Bot, History, Settings, Shield } from 'lucide-react';
+import { Home, LayoutDashboard, Globe, Mail, Image, MessageSquare, History, Settings, Shield } from 'lucide-react';
 
 export default function BottomNav({ activeTab, setActiveTab, currentUser, t }) {
   const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'Admin' || currentUser?.email?.toLowerCase().includes('admin');
 
   const navItems = [
-    { id: 'dashboard',        label: 'Home',    icon: LayoutDashboard },
-    { id: 'url-detection',    label: 'URL',     icon: Globe },
-    { id: 'email-detection',  label: 'Email',   icon: Mail },
-    { id: 'ai-assistant',     label: 'AI',      icon: Bot },
-    { id: 'scan-history',     label: 'History', icon: History },
-    ...(isAdmin
-      ? [{ id: 'admin-panel', label: 'Admin', icon: Shield }]
-      : [{ id: 'profile-settings', label: 'Profile', icon: Settings }]
-    ),
+    { id: 'home',              label: 'Home',       icon: Home },
+    { id: 'dashboard',         label: 'Dashboard',  icon: LayoutDashboard },
+    { id: 'url-detection',     label: 'URL',        icon: Globe },
+    { id: 'image-detection',   label: 'Vision',     icon: Image },
+    { id: 'message-detection', label: 'Smish',      icon: MessageSquare },
+    { id: 'scan-history',      label: 'History',    icon: History },
   ];
 
   return (

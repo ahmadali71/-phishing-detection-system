@@ -1,13 +1,17 @@
 import React from 'react';
 import {
-  LayoutDashboard, Globe, Mail, Bot, History,
+  Home, LayoutDashboard, Globe, Mail, Image, MessageSquare, Bot, History,
   FileText, Settings, LogOut, Shield, Award, X
 } from 'lucide-react';
+import Logo from './Logo';
 
 const NAV_ITEMS = [
+  { id: 'home',             label: 'Home Page',          icon: Home },
   { id: 'dashboard',        label: 'Dashboard',          icon: LayoutDashboard },
   { id: 'url-detection',    label: 'URL Detection',      icon: Globe },
   { id: 'email-detection',  label: 'Email Detection',    icon: Mail },
+  { id: 'image-detection',  label: 'Screenshot / Image', icon: Image },
+  { id: 'message-detection',label: 'SMS & Smishing',     icon: MessageSquare },
   { id: 'ai-assistant',     label: 'AI Assistant',       icon: Bot },
   { id: 'scan-history',     label: 'Scan History',       icon: History },
   { id: 'admin-panel',      label: 'Admin Panel',        icon: Shield, adminOnly: true },
@@ -41,10 +45,7 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
         {/* ── Header ── */}
         <div className="sidebar-header">
           <div className="sidebar-logo">
-            <div className="sidebar-logo-icon">
-              <Shield size={18} color="#fff" />
-            </div>
-            <span className="sidebar-logo-text">APDS</span>
+            <Logo size="sm" showSubtitle={false} />
           </div>
           <button className="sidebar-close-btn" onClick={onClose} aria-label="Close">
             <X size={18} />

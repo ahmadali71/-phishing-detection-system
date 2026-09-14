@@ -1,4 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 /* ================================================================
    1. COLOR DESIGN TOKENS & CYBER THEME PALETTE
@@ -1044,12 +1044,12 @@ tr:hover td {
 /* ================================================================
    12. FORM INPUTS & TOGGLE SWITCHES
 ================================================================ */
-input[type="text"],
-input[type="password"],
-input[type="email"],
-input[type="date"],
-select,
-textarea {
+.app-layout input[type="text"],
+.app-layout input[type="password"],
+.app-layout input[type="email"],
+.app-layout input[type="date"],
+.app-layout select,
+.app-layout textarea {
   background: var(--bg-input) !important;
   border: 1px solid var(--border-color) !important;
   color: var(--text-primary) !important;
@@ -1061,7 +1061,9 @@ textarea {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-input:focus, select:focus, textarea:focus {
+.app-layout input:focus,
+.app-layout select:focus,
+.app-layout textarea:focus {
   border-color: var(--accent-blue) !important;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
 }

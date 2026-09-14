@@ -3,9 +3,12 @@ import { useAppData, AppDataProvider } from './context/AppDataContext';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import BottomNav from './components/BottomNav';
+import LandingPage from './components/LandingPage';
 import Dashboard from './components/Dashboard';
 import UrlScanner from './components/UrlScanner';
 import EmailScanner from './components/EmailScanner';
+import ImageScanner from './components/ImageScanner';
+import MessageScanner from './components/MessageScanner';
 import AiChatbot from './components/AiChatbot';
 import ScanHistory from './components/ScanHistory';
 import AdminPanel from './components/AdminPanel';
@@ -27,12 +30,16 @@ function AppInner() {
   const [language, setLanguage] = useState('English');
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [guestView, setGuestView] = useState(() => {
+    return window.location.hash.includes('auth') || window.location.hash.includes('login') ? 'auth' : 'landing';
+  });
+  const [authInitialMode, setAuthInitialMode] = useState('login');
 
   const t = TRANSLATIONS[language] || TRANSLATIONS['English'];
 
   const [notifications, setNotifications] = useState([
     { id: 1, title: 'High-Risk Phishing Intercepted', message: 'paypal-secure-login.com blocked with 90/100 risk.', type: 'THREAT', time: '10 min ago', read: false },
-    { id: 2, title: 'ML Engine Status', message: 'Random Forest and NLP BERT models synchronized.', type: 'INFO', time: '1 hour ago', read: false },
+    { id: 2, title: 'ML Engine Status', message: 'Random Forest, Vision OCR and NLP BERT models synchronized.', type: 'INFO', time: '1 hour ago', read: false },
   ]);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
@@ -72,13 +79,13 @@ function AppInner() {
   }, [addLog]);
 
   const handleScanComplete = useCallback((scanObj) => {
-    const isPhishing = scanObj.verdict.includes('Phishing');
-    const isSuspicious = scanObj.verdict.includes('Suspicious');
+    const isPhishing = scanObj.verdict.includes('Phishing') || scanObj.verdict.includes('Threat') || scanObj.verdict.includes('Smishing');
+    const isSuspicious = scanObj.verdict.includes('Suspicious') || scanObj.verdict.includes('Warning');
     const verdictType = isPhishing ? 'Phishing' : isSuspicious ? 'Suspicious' : 'Safe';
-    const inputLabel = scanObj.inputUrl || scanObj.fileName || scanObj.contentSnippet || 'Email Text';
+    const inputLabel = scanObj.inputUrl || scanObj.fileName || scanObj.contentSnippet || 'Cyber Payload';
 
     const scanRecord = {
-      type: scanObj.inputUrl ? 'URL' : 'Email',
+      type: scanObj.type || (scanObj.inputUrl ? 'URL' : 'Email'),
       input: inputLabel,
       result: verdictType,
       riskScore: `${scanObj.riskScore}/100`,
@@ -91,7 +98,7 @@ function AppInner() {
 
     addSystemLog(
       isPhishing ? 'THREAT' : isSuspicious ? 'WARN' : 'INFO',
-      scanObj.inputUrl ? 'URL Scanner' : 'NLP Email Engine',
+      scanObj.type || (scanObj.inputUrl ? 'URL Scanner' : 'NLP Email Engine'),
       `Scan "${inputLabel}". Verdict: ${verdictType} (${scanObj.riskScore}/100)`
     );
 
@@ -152,15 +159,50 @@ function AppInner() {
   return (
     <>
       {!currentUser ? (
-        <AuthPage onLoginSuccess={handleLoginSuccess} />
+        guestView === 'landing' ? (
+          <LandingPage
+            onNavigateAuth={(mode = 'login') => {
+              setAuthInitialMode(mode);
+              setGuestView('auth');
+            }}
+            onNavigateDashboard={() => {
+              if (!currentUser) {
+                setAuthInitialMode('login');
+                setGuestView('auth');
+              } else {
+                setActiveTab('dashboard');
+              }
+            }}
+            onNavigateScanner={(page) => {
+              if (!currentUser) {
+                setAuthInitialMode('login');
+                setGuestView('auth');
+              } else {
+                setActiveTab(page);
+              }
+            }}
+            theme={theme}
+            setTheme={setTheme}
+            currentUser={currentUser}
+          />
+        ) : (
+          <AuthPage
+            initialMode={authInitialMode}
+            onLoginSuccess={handleLoginSuccess}
+            onNavigateHome={() => setGuestView('landing')}
+            theme={theme}
+            setTheme={setTheme}
+          />
+        )
       ) : (
         <div className="app-layout">
           <Header
             activeTab={activeTab}
+            setActiveTab={setActiveTab}
             theme={theme} setTheme={setTheme}
             currentUser={currentUser}
             onOpenAuth={() => setIsAuthOpen(true)}
-            onLogout={() => { localStorage.removeItem('user'); setCurrentUser(null); }}
+            onLogout={() => { localStorage.removeItem('user'); setCurrentUser(null); setGuestView('landing'); }}
             notifications={notifications}
             onMarkNotificationRead={(id) => setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))}
             onClearNotifications={() => setNotifications([])}
@@ -179,7 +221,7 @@ function AppInner() {
               activeTab={activeTab}
               setActiveTab={setActiveTab}
               currentUser={currentUser}
-              onLogout={() => { localStorage.removeItem('user'); setCurrentUser(null); }}
+              onLogout={() => { localStorage.removeItem('user'); setCurrentUser(null); setGuestView('auth'); }}
               onOpenAuth={() => setIsAuthOpen(true)}
               isOpen={sidebarOpen}
               onClose={() => setSidebarOpen(false)}
@@ -187,6 +229,17 @@ function AppInner() {
             />
 
             <main className={`app-main${activeTab === 'ai-assistant' ? ' app-main-chat' : ''}`}>
+              {activeTab === 'home' && (
+                <LandingPage
+                  onNavigateAuth={() => setIsAuthOpen(true)}
+                  onNavigateDashboard={() => setActiveTab('dashboard')}
+                  onNavigateScanner={(page) => setActiveTab(page)}
+                  theme={theme}
+                  setTheme={setTheme}
+                  currentUser={currentUser}
+                  isInsideApp={true}
+                />
+              )}
               {activeTab === 'dashboard' && (
                 <Dashboard stats={stats} recentActivity={recentActivity}
                   onNavigateScan={setActiveTab} onViewDetail={setSelectedRecord} t={t} />
@@ -196,6 +249,12 @@ function AppInner() {
               )}
               {activeTab === 'email-detection' && (
                 <EmailScanner onScanComplete={handleScanComplete} t={t} />
+              )}
+              {activeTab === 'image-detection' && (
+                <ImageScanner onScanComplete={handleScanComplete} onViewDetail={setSelectedRecord} t={t} />
+              )}
+              {activeTab === 'message-detection' && (
+                <MessageScanner onScanComplete={handleScanComplete} onViewDetail={setSelectedRecord} t={t} />
               )}
               {activeTab === 'ai-assistant' && (
                 <AiChatbot t={t} language={language} currentUser={currentUser} />

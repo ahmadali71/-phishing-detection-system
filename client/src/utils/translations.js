@@ -6,13 +6,22 @@
 export const TRANSLATIONS = {
   English: {
     // Nav
+    home: 'Home Page',
     dashboard: 'Dashboard',
     urlDetection: 'URL Detection',
     emailDetection: 'Email Detection',
+    'url-detection': 'URL Detection',
+    'email-detection': 'Email Detection',
+    'image-detection': 'Screenshot / Image',
+    'message-detection': 'SMS & Smishing',
     aiAssistant: 'AI Assistant',
+    'ai-assistant': 'AI Assistant',
     scanHistory: 'Scan History',
+    'scan-history': 'Scan History',
     adminPanel: 'Admin Panel',
+    'admin-panel': 'Admin Panel',
     profileSettings: 'Profile & Settings',
+    'profile-settings': 'Profile & Settings',
     logout: 'Logout',
     loginRegister: 'Login / Register',
 
