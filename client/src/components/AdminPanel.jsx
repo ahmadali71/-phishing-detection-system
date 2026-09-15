@@ -6,7 +6,8 @@ import {
   Activity,
   Users,
   Trash2,
-  Check
+  Check,
+  Sparkles
 } from 'lucide-react';
 
 export default function AdminPanel({
@@ -66,47 +67,33 @@ export default function AdminPanel({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px', maxWidth: '1000px', margin: '0 auto' }}>
-      {/* Desktop Header */}
-      <div className="desktop-header-wrap">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-              <span className="badge badge-warning">System Administrator</span>
-              <span style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>Real-Time Orchestration</span>
-            </div>
-            <h2 style={{ fontSize: 'clamp(1.25rem, 4vw, 1.8rem)', fontWeight: '800' }}>Admin Management Suite</h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
-              Manage active ML models, inspect live system event logs, monitor compute performance, and manage access.
-            </p>
+      {/* ── VIBRANT HERO CARD (Exact Match to User Reference) ── */}
+      <div className="scanner-vibrant-hero">
+        <div className="scanner-vibrant-hero-content">
+          <div className="scanner-vibrant-pill-tag">
+            <Sparkles size={14} />
+            <span>SYSTEM ADMINISTRATION • CONTROL SUITE</span>
           </div>
-          <button onClick={() => setShowUploadModal(true)} className="btn-primary">
-            <Upload size={16} /> Deploy New Model
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Vibrant Hero Banner (ONLY ON MOBILE) */}
-      <div className="mobile-vibrant-hero">
-        <div className="mobile-vibrant-hero-content">
-          <h2 className="mobile-vibrant-hero-title">Admin Management Suite</h2>
-          <p className="mobile-vibrant-hero-desc">
-            Orchestrate machine learning model weights, audit security telemetry streams, and govern user privilege roles.
+          <h2 className="scanner-vibrant-hero-title">Admin Management Suite</h2>
+          <p className="scanner-vibrant-hero-desc">
+            Manage active ML models, inspect live system event logs, monitor compute performance, and govern user privilege roles.
           </p>
-          <div className="mobile-vibrant-chips">
-            <div className="mobile-vibrant-chip-item">🧠 ML Models ({models.length})</div>
-            <div className="mobile-vibrant-chip-item">📋 Live Logs ({logs.length})</div>
-            <div className="mobile-vibrant-chip-item">⚡ Performance</div>
-            <div className="mobile-vibrant-chip-item">👥 Users &amp; Roles</div>
+          <div className="scanner-vibrant-chips">
+            <div className="scanner-vibrant-chip-item">🧠 ML Models ({models.length})</div>
+            <div className="scanner-vibrant-chip-item">📋 Live Logs ({logs.length})</div>
+            <div className="scanner-vibrant-chip-item">⚡ Performance</div>
+            <div className="scanner-vibrant-chip-item">👥 Users & Roles</div>
           </div>
           <button
+            type="button"
             onClick={() => setShowUploadModal(true)}
-            className="mobile-vibrant-hero-btn"
+            className="scanner-vibrant-hero-btn"
           >
-            Deploy Model →
+            Deploy New Model →
           </button>
         </div>
-        <div className="mobile-vibrant-hero-circle">
-          <Cpu size={42} strokeWidth={2.2} />
+        <div className="scanner-vibrant-hero-circle">
+          <Cpu size={46} strokeWidth={2.2} />
         </div>
       </div>
 

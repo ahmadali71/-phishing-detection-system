@@ -2,7 +2,8 @@ import React from 'react';
 import {
   Search,
   Zap,
-  ExternalLink
+  ExternalLink,
+  Sparkles
 } from 'lucide-react';
 
 export default function Dashboard({ stats, recentActivity, onNavigateScan, onViewDetail, t }) {
@@ -30,110 +31,66 @@ export default function Dashboard({ stats, recentActivity, onNavigateScan, onVie
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
-      {/* ── Desktop Top Badge, Title & Quick Actions (Hidden on Mobile to Prevent Duplicate Section) ── */}
-      <div className="desktop-header-wrap">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-          <div style={{
-            background: 'linear-gradient(135deg, #1d4ed8, #2563eb)',
-            color: '#ffffff',
-            width: '28px',
-            height: '28px',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: '900',
-            fontSize: '0.9rem',
-            boxShadow: '0 2px 8px rgba(37, 99, 235, 0.4)',
-            flexShrink: 0
-          }}>
-            4
+      {/* ── VIBRANT HERO CARD (Exact Match to User Reference) ── */}
+      <div className="scanner-vibrant-hero">
+        <div className="scanner-vibrant-hero-content">
+          <div className="scanner-vibrant-pill-tag">
+            <Sparkles size={14} />
+            <span>ANALYTICS & CONTROL • DASHBOARD PORTAL</span>
           </div>
-          <span style={{
-            fontWeight: '900',
-            fontSize: '0.88rem',
-            letterSpacing: '0.08em',
-            color: 'var(--accent-blue)',
-            fontFamily: 'var(--font-display)',
-            textTransform: 'uppercase'
-          }}>
-            DASHBOARD
-          </span>
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-          <div>
-            <h2 style={{ fontSize: 'clamp(1.4rem, 4vw, 1.85rem)', fontWeight: '800' }}>Dashboard</h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-              Overview of your security activity
-            </p>
-          </div>
-          <div className="dashboard-actions" style={{ display: 'flex', gap: '10px' }}>
-            <button onClick={() => onNavigateScan('url-detection')} className="btn-primary" style={{ padding: '10px 20px', fontSize: '0.88rem' }}>
-              <Search size={16} /> Scan URL Now
-            </button>
-            <button onClick={() => onNavigateScan('email-detection')} className="btn-secondary" style={{ padding: '10px 20px', fontSize: '0.88rem' }}>
-              <Zap size={16} /> Analyze Email
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Mobile Vibrant Hero Banner (ONLY ON MOBILE, Exact Match to Reference Image) ── */}
-      <div className="mobile-vibrant-hero">
-        <div className="mobile-vibrant-hero-content">
-          <h2 className="mobile-vibrant-hero-title">Automated Threat Monitoring</h2>
-          <p className="mobile-vibrant-hero-desc">
+          <h2 className="scanner-vibrant-hero-title">Automated Threat Monitoring</h2>
+          <p className="scanner-vibrant-hero-desc">
             Multi-layered ML & NLP analysis pipeline protecting web users against domain typosquatting, email social engineering, and fraudulent links.
           </p>
-          <div className="mobile-vibrant-chips">
-            <div className="mobile-vibrant-chip-item">🛡️ Dual ML Scanners</div>
-            <div className="mobile-vibrant-chip-item">⚡ Sub-Second Scans</div>
-            <div className="mobile-vibrant-chip-item">🎯 94.6% Accuracy</div>
-            <div className="mobile-vibrant-chip-item">🔒 Risk Scoring Gauge</div>
+          <div className="scanner-vibrant-chips">
+            <div className="scanner-vibrant-chip-item">🛡️ Dual ML Scanners</div>
+            <div className="scanner-vibrant-chip-item">⚡ Sub-Second Scans</div>
+            <div className="scanner-vibrant-chip-item">🎯 94.6% Accuracy</div>
+            <div className="scanner-vibrant-chip-item">🔒 Risk Scoring Gauge</div>
           </div>
           <button
+            type="button"
             onClick={() => onNavigateScan('url-detection')}
-            className="mobile-vibrant-hero-btn"
+            className="scanner-vibrant-hero-btn"
           >
             Scan URL Now →
           </button>
         </div>
-        <div className="mobile-vibrant-hero-circle">
-          <Zap size={42} strokeWidth={2.2} />
+        <div className="scanner-vibrant-hero-circle">
+          <Zap size={46} strokeWidth={2.2} />
         </div>
       </div>
 
-      {/* ── 4 Stat Metric Cards (Exact Match to PDF Page 61 Screen 4) ── */}
+      {/* ── 4 Stat Metric Cards ── */}
       <div className="responsive-grid-4">
         {/* Total Scans */}
-        <div className="glass-panel" style={{ padding: '20px 22px', background: 'var(--bg-card)' }}>
-          <div style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', fontWeight: '700' }}>Total Scans</div>
-          <div style={{ fontSize: '2.2rem', fontWeight: '900', margin: '4px 0', color: '#2563eb', fontFamily: 'var(--font-display)' }}>
+        <div className="glass-panel stat-card-box" style={{ padding: '16px 18px', background: 'var(--bg-card)' }}>
+          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: '700' }}>Total Scans</div>
+          <div className="stat-card-val" style={{ fontSize: 'clamp(1.3rem, 5vw, 2.1rem)', fontWeight: '900', margin: '4px 0', color: '#2563eb', fontFamily: 'var(--font-display)', wordBreak: 'break-word' }}>
             {stats.totalScans ? stats.totalScans.toLocaleString() : '2,568'}
           </div>
         </div>
 
         {/* Phishing Detected */}
-        <div className="glass-panel" style={{ padding: '20px 22px', background: 'var(--bg-card)' }}>
-          <div style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', fontWeight: '700' }}>Phishing Detected</div>
-          <div style={{ fontSize: '2.2rem', fontWeight: '900', margin: '4px 0', color: '#ef4444', fontFamily: 'var(--font-display)' }}>
+        <div className="glass-panel stat-card-box" style={{ padding: '16px 18px', background: 'var(--bg-card)' }}>
+          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: '700' }}>Phishing Detected</div>
+          <div className="stat-card-val" style={{ fontSize: 'clamp(1.3rem, 5vw, 2.1rem)', fontWeight: '900', margin: '4px 0', color: '#ef4444', fontFamily: 'var(--font-display)', wordBreak: 'break-word' }}>
             {stats.phishingDetected ? stats.phishingDetected.toLocaleString() : '642'}
           </div>
         </div>
 
         {/* Safe Items */}
-        <div className="glass-panel" style={{ padding: '20px 22px', background: 'var(--bg-card)' }}>
-          <div style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', fontWeight: '700' }}>Safe Items</div>
-          <div style={{ fontSize: '2.2rem', fontWeight: '900', margin: '4px 0', color: '#10b981', fontFamily: 'var(--font-display)' }}>
+        <div className="glass-panel stat-card-box" style={{ padding: '16px 18px', background: 'var(--bg-card)' }}>
+          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: '700' }}>Safe Items</div>
+          <div className="stat-card-val" style={{ fontSize: 'clamp(1.3rem, 5vw, 2.1rem)', fontWeight: '900', margin: '4px 0', color: '#10b981', fontFamily: 'var(--font-display)', wordBreak: 'break-word' }}>
             {stats.safeItems ? stats.safeItems.toLocaleString() : '1,926'}
           </div>
         </div>
 
         {/* Accuracy */}
-        <div className="glass-panel" style={{ padding: '20px 22px', background: 'var(--bg-card)' }}>
-          <div style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', fontWeight: '700' }}>Accuracy</div>
-          <div style={{ fontSize: '2.2rem', fontWeight: '900', margin: '4px 0', color: '#3b82f6', fontFamily: 'var(--font-display)' }}>
+        <div className="glass-panel stat-card-box" style={{ padding: '16px 18px', background: 'var(--bg-card)' }}>
+          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: '700' }}>Accuracy</div>
+          <div className="stat-card-val" style={{ fontSize: 'clamp(1.3rem, 5vw, 2.1rem)', fontWeight: '900', margin: '4px 0', color: '#3b82f6', fontFamily: 'var(--font-display)', wordBreak: 'break-word' }}>
             {stats.accuracyRate ? `${stats.accuracyRate}%` : '94.6%'}
           </div>
         </div>
@@ -146,7 +103,7 @@ export default function Dashboard({ stats, recentActivity, onNavigateScan, onVie
           <h3 style={{ fontSize: '1.05rem', fontWeight: '800', marginBottom: '16px' }}>Threats Detected (This Week)</h3>
 
           <div style={{ width: '100%', height: '190px', position: 'relative' }}>
-            <svg viewBox="0 0 380 200" style={{ width: '100%', height: '100%' }}>
+            <svg viewBox="0 0 380 200" preserveAspectRatio="xMidYMid meet" style={{ width: '100%', height: '100%' }}>
               {/* Y-axis grid labels */}
               <text x="10" y="38" fill="var(--text-muted)" fontSize="11" fontWeight="600">200</text>
               <text x="10" y="78" fill="var(--text-muted)" fontSize="11" fontWeight="600">150</text>

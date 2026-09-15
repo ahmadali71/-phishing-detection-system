@@ -212,71 +212,36 @@ export default function ProfileSettings({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '1120px', margin: '0 auto' }}>
-      {/* ── Desktop Top Badge & Title ── */}
-      <div className="desktop-header-wrap">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-          <div style={{
-            background: 'linear-gradient(135deg, #1d4ed8, #2563eb)',
-            color: '#ffffff',
-            width: '28px',
-            height: '28px',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: '900',
-            fontSize: '0.92rem',
-            boxShadow: '0 3px 8px rgba(37, 99, 235, 0.4)'
-          }}>
-            9
+      {/* ── VIBRANT HERO CARD (Exact Match to User Reference) ── */}
+      <div className="scanner-vibrant-hero">
+        <div className="scanner-vibrant-hero-content">
+          <div className="scanner-vibrant-pill-tag">
+            <Sparkles size={14} />
+            <span>ACCOUNT & SECURITY • PROFILE SETTINGS</span>
           </div>
-          <span style={{
-            fontWeight: '900',
-            fontSize: '0.9rem',
-            letterSpacing: '0.08em',
-            color: 'var(--accent-blue)',
-            fontFamily: 'var(--font-display)',
-            textTransform: 'uppercase'
-          }}>
-            {t?.profileSettings || 'PROFILE & SETTINGS'}
-          </span>
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-          <div>
-            <h2 style={{ fontSize: 'clamp(1.35rem, 4vw, 1.85rem)', fontWeight: '800' }}>Account Settings</h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
-              Manage your personal security credentials, authentication protocols, and system preferences.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Mobile Vibrant Hero Banner ── */}
-      <div className="mobile-vibrant-hero">
-        <div className="mobile-vibrant-hero-content">
-          <h2 className="mobile-vibrant-hero-title">Profile &amp; Security Settings</h2>
-          <p className="mobile-vibrant-hero-desc">
+          <h2 className="scanner-vibrant-hero-title">Profile & Security Settings</h2>
+          <p className="scanner-vibrant-hero-desc">
             Manage your account credentials, multi-factor authentication, privacy controls, and security alert channels.
           </p>
-          <div className="mobile-vibrant-chips">
-            <div className="mobile-vibrant-chip-item">👤 Personal Profile</div>
-            <div className="mobile-vibrant-chip-item">🔒 2FA Protection</div>
-            <div className="mobile-vibrant-chip-item">🔔 Alert Channels</div>
-            <div className="mobile-vibrant-chip-item">🎨 Theme Customizer</div>
+          <div className="scanner-vibrant-chips">
+            <div className="scanner-vibrant-chip-item">👤 Personal Profile</div>
+            <div className="scanner-vibrant-chip-item">🔒 2FA Protection</div>
+            <div className="scanner-vibrant-chip-item">🔔 Alert Channels</div>
+            <div className="scanner-vibrant-chip-item">🎨 Theme Customizer</div>
           </div>
           <button
+            type="button"
             onClick={() => {
               setActiveTab('Profile');
               setIsEditing(true);
             }}
-            className="mobile-vibrant-hero-btn"
+            className="scanner-vibrant-hero-btn"
           >
             Edit Profile →
           </button>
         </div>
-        <div className="mobile-vibrant-hero-circle">
-          <Settings size={42} strokeWidth={2.2} />
+        <div className="scanner-vibrant-hero-circle">
+          <Settings size={46} strokeWidth={2.2} />
         </div>
       </div>
 
@@ -784,12 +749,9 @@ export default function ProfileSettings({
                 </label>
                 <div className="theme-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
                   {[
-                    { id: 'light', label: t?.lightTheme || 'Light', color: '#f8fafc', dot: '#3b82f6' },
-                    { id: 'dark', label: t?.darkThemeLabel || 'Dark', color: '#0f172a', dot: '#f8fafc' },
-                    { id: 'ocean', label: t?.oceanTheme || 'Ocean', color: '#0f2140', dot: '#38bdf8' },
-                    { id: 'purple', label: t?.purpleTheme || 'Indigo', color: '#1a102d', dot: '#635fec' },
-                    { id: 'emerald', label: t?.emeraldTheme || 'Emerald', color: '#0a1f12', dot: '#34d399' },
-                    { id: 'royal', label: t?.royalTheme || 'Royal', color: '#0f1530', dot: '#818cf8' },
+                    { id: 'light', label: t?.lightTheme || 'Light Mode', color: '#f8fafc', dot: '#3b82f6' },
+                    { id: 'dark', label: t?.darkThemeLabel || 'Dark Mode', color: '#0f172a', dot: '#f8fafc' },
+                    { id: 'royal', label: t?.royalTheme || 'Royal Blue', color: '#0f1530', dot: '#818cf8' },
                   ].map(opt => {
                     const active = theme === opt.id;
                     return (

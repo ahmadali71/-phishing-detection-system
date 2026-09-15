@@ -1,12 +1,12 @@
 import React from 'react';
 
-export default function Logo({ size = 'md', showText = true, showSubtitle = false, lightText = false, className = '' }) {
+export default function Logo({ size = 'md', showText = true, showSubtitle = false, lightText = false, useShort = false, className = '' }) {
   const sizeMap = {
-    xs: { icon: 24, fontSize: '0.95rem', subSize: '0.55rem' },
-    sm: { icon: 32, fontSize: '1.15rem', subSize: '0.62rem' },
-    md: { icon: 42, fontSize: '1.45rem', subSize: '0.7rem' },
-    lg: { icon: 54, fontSize: '1.85rem', subSize: '0.8rem' },
-    xl: { icon: 68, fontSize: '2.3rem', subSize: '0.9rem' },
+    xs: { icon: 22, fontSize: '0.95rem', subSize: '0.5rem' },
+    sm: { icon: 28, fontSize: '1.1rem', subSize: '0.58rem' },
+    md: { icon: 36, fontSize: '1.35rem', subSize: '0.64rem' },
+    lg: { icon: 48, fontSize: '1.65rem', subSize: '0.75rem' },
+    xl: { icon: 60, fontSize: '2rem', subSize: '0.85rem' },
   };
 
   const current = sizeMap[size] || sizeMap.md;
@@ -77,13 +77,17 @@ export default function Logo({ size = 'md', showText = true, showSubtitle = fals
           <span
             style={{
               fontSize: current.fontSize,
-              fontWeight: 800,
+              fontWeight: 900,
               fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
-              letterSpacing: '-0.03em',
+              letterSpacing: '-0.02em',
               color: lightText ? '#ffffff' : 'var(--text-primary, #0f172a)',
             }}
           >
-            Phish<span style={{ color: '#2563eb' }}>Guard</span>
+            {useShort ? (
+              <>AP<span style={{ color: '#2563eb' }}>DS</span></>
+            ) : (
+              <>Automatic Phishing <span style={{ color: '#2563eb' }}>Detection System</span></>
+            )}
           </span>
           {showSubtitle && (
             <span
@@ -96,7 +100,7 @@ export default function Logo({ size = 'md', showText = true, showSubtitle = fals
                 marginTop: '2px',
               }}
             >
-              SMARTER • SAFER • TOGETHER
+              AUTOMATIC PHISHING DETECTION SYSTEM
             </span>
           )}
         </div>

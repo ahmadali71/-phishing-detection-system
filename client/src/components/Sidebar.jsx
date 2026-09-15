@@ -45,7 +45,7 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
         {/* ── Header ── */}
         <div className="sidebar-header">
           <div className="sidebar-logo">
-            <Logo size="sm" showSubtitle={false} />
+            <Logo size="sm" useShort={true} showSubtitle={false} />
           </div>
           <button className="sidebar-close-btn" onClick={onClose} aria-label="Close">
             <X size={18} />

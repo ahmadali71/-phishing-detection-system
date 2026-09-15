@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, ExternalLink } from 'lucide-react';
+import { Download, ExternalLink, Sparkles } from 'lucide-react';
 
 export default function ScanHistory({ scanHistory, onViewDetail, onExportPdf, t, searchQuery }) {
   const [filter, setFilter] = useState('All');
@@ -26,69 +26,33 @@ export default function ScanHistory({ scanHistory, onViewDetail, onExportPdf, t,
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px', maxWidth: '1080px', margin: '0 auto' }}>
-      {/* ── Desktop Top Badge & Title (Hidden on Mobile to Prevent Duplicate Section) ── */}
-      <div className="desktop-header-wrap">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-          <div style={{
-            background: 'linear-gradient(135deg, #1d4ed8, #2563eb)',
-            color: '#ffffff',
-            width: '28px',
-            height: '28px',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: '900',
-            fontSize: '0.9rem',
-            boxShadow: '0 2px 8px rgba(37, 99, 235, 0.4)',
-            flexShrink: 0
-          }}>
-            8
+      {/* ── VIBRANT HERO CARD (Exact Match to User Reference) ── */}
+      <div className="scanner-vibrant-hero">
+        <div className="scanner-vibrant-hero-content">
+          <div className="scanner-vibrant-pill-tag">
+            <Sparkles size={14} />
+            <span>SCAN HISTORY & REPORTS • FORENSIC AUDIT</span>
           </div>
-          <span style={{
-            fontWeight: '900',
-            fontSize: '0.88rem',
-            letterSpacing: '0.08em',
-            color: 'var(--accent-blue)',
-            fontFamily: 'var(--font-display)',
-            textTransform: 'uppercase'
-          }}>
-            SCAN HISTORY &amp; REPORTS
-          </span>
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-          <div>
-            <h2 style={{ fontSize: 'clamp(1.35rem, 4vw, 1.85rem)', fontWeight: '800' }}>Scan History</h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
-              View and manage your past scan records and download security audit reports.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Mobile Vibrant Hero Banner (ONLY ON MOBILE, Exact Match to Reference Image) ── */}
-      <div className="mobile-vibrant-hero">
-        <div className="mobile-vibrant-hero-content">
-          <h2 className="mobile-vibrant-hero-title">Scan History &amp; Reports</h2>
-          <p className="mobile-vibrant-hero-desc">
-            Review detailed forensic logs of all past URL and Email scans, filter by threat category, and export formal PDF audit dossiers.
+          <h2 className="scanner-vibrant-hero-title">Scan History & Audit Reports</h2>
+          <p className="scanner-vibrant-hero-desc">
+            View and manage your past scan records and download security audit reports.
           </p>
-          <div className="mobile-vibrant-chips">
-            <div className="mobile-vibrant-chip-item">📋 Forensic Audit Log</div>
-            <div className="mobile-vibrant-chip-item">🔍 Category Filters</div>
-            <div className="mobile-vibrant-chip-item">📄 PDF Export</div>
-            <div className="mobile-vibrant-chip-item">⏱️ Timestamps</div>
+          <div className="scanner-vibrant-chips">
+            <div className="scanner-vibrant-chip-item">📋 Forensic Audit Log</div>
+            <div className="scanner-vibrant-chip-item">🔍 Category Filters</div>
+            <div className="scanner-vibrant-chip-item">📄 PDF Export</div>
+            <div className="scanner-vibrant-chip-item">⏱️ Timestamps</div>
           </div>
           <button
+            type="button"
             onClick={() => onExportPdf?.()}
-            className="mobile-vibrant-hero-btn"
+            className="scanner-vibrant-hero-btn"
           >
-            Export PDF →
+            Export Audit PDF →
           </button>
         </div>
-        <div className="mobile-vibrant-hero-circle">
-          <Download size={38} strokeWidth={2.2} />
+        <div className="scanner-vibrant-hero-circle">
+          <Download size={46} strokeWidth={2.2} />
         </div>
       </div>
 

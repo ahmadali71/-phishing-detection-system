@@ -26,13 +26,15 @@ export default function LandingPage({
   const [faqOpen, setFaqOpen] = useState({ 0: true });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const toggleTheme = () => {
+  const cycleTheme = () => {
     if (setTheme) {
-      setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+      setTheme(prev => prev === 'light' ? 'dark' : prev === 'dark' ? 'navy' : 'light');
     }
   };
 
   const isDark = theme === 'dark';
+  const isNavy = theme === 'navy';
+  const isLight = !isDark && !isNavy;
 
   const demoPresets = [
     { label: 'Fake PayPal Domain', type: 'url', val: 'https://paypa1-security-verification.cc/login' },
@@ -151,14 +153,15 @@ export default function LandingPage({
   ];
 
   return (
-    <div className={`pg-landing-root ${isDark ? 'theme-dark' : 'theme-light'}`}>
+    <div className={`pg-landing-root ${isDark ? 'theme-dark' : isNavy ? 'theme-navy' : 'theme-light'}`}>
       
       {/* ── TOP NAVIGATION (Guest Only) ── */}
       {!isInsideApp && (
         <header className="pg-nav-bar">
           <div className="pg-nav-inner">
             <div className="pg-nav-brand">
-              <Logo size="md" showSubtitle={true} lightText={isDark} />
+              <Logo size="sm" useShort={true} showSubtitle={false} lightText={isDark || isNavy} />
+              <span className="pg-nav-brand-full">Automatic Phishing Detection System</span>
             </div>
 
             <nav className="pg-nav-links">
@@ -170,26 +173,26 @@ export default function LandingPage({
             </nav>
 
             <div className="pg-nav-actions">
-              <button type="button" onClick={toggleTheme} className="pg-theme-btn" title="Toggle theme">
-                {isDark ? <Sun size={18} /> : <Moon size={18} />}
+              <button type="button" onClick={cycleTheme} className="pg-theme-btn" title={`Theme: ${theme}`}>
+                {isDark ? <Sun size={18} /> : isNavy ? <Moon size={18} color="#818cf8" /> : <Moon size={18} />}
               </button>
 
               {currentUser ? (
-                <button onClick={onNavigateDashboard} className="pg-btn-primary">
+                <button onClick={onNavigateDashboard} className="pg-btn-primary pg-desktop-only">
                   <span>Dashboard</span>
                   <ArrowRight size={16} />
                 </button>
               ) : (
                 <>
                   <button onClick={() => onNavigateAuth('login')} className="pg-btn-ghost pg-desktop-only">Sign In</button>
-                  <button onClick={() => onNavigateAuth('register')} className="pg-btn-primary">
+                  <button onClick={() => onNavigateAuth('register')} className="pg-btn-primary pg-desktop-only">
                     <span>Get Started</span>
                     <ArrowRight size={16} />
                   </button>
                 </>
               )}
 
-              {/* Hamburger (mobile only) */}
+              {/* Hamburger (mobile only - three lines) */}
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(v => !v)}
@@ -201,7 +204,7 @@ export default function LandingPage({
             </div>
           </div>
 
-          {/* Mobile Dropdown Menu */}
+          {/* Mobile Dropdown Menu (The Three Lines Menu) */}
           {mobileMenuOpen && (
             <div className="pg-mobile-menu">
               <a href="#features" className="pg-mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Features</a>
@@ -209,9 +212,21 @@ export default function LandingPage({
               <a href="#capabilities" className="pg-mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Capabilities</a>
               <a href="#how-it-works" className="pg-mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>How It Works</a>
               <a href="#faq" className="pg-mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
-              {!currentUser && (
-                <button onClick={() => { onNavigateAuth('login'); setMobileMenuOpen(false); }} className="pg-mobile-signin-btn">
-                  Sign In
+              
+              {!currentUser ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--card-border)' }}>
+                  <button onClick={() => { onNavigateAuth('register'); setMobileMenuOpen(false); }} className="pg-btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '10px 16px' }}>
+                    <span>Get Started</span>
+                    <ArrowRight size={16} />
+                  </button>
+                  <button onClick={() => { onNavigateAuth('login'); setMobileMenuOpen(false); }} className="pg-mobile-signin-btn" style={{ width: '100%', padding: '9px 16px' }}>
+                    Sign In
+                  </button>
+                </div>
+              ) : (
+                <button onClick={() => { onNavigateDashboard(); setMobileMenuOpen(false); }} className="pg-btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '10px' }}>
+                  <span>Dashboard</span>
+                  <ArrowRight size={16} />
                 </button>
               )}
             </div>
@@ -236,7 +251,7 @@ export default function LandingPage({
             </h1>
 
             <p className="pg-hero-lead">
-              PhishGuard deploys intelligent multi-layer AI to identify and neutralize malicious URLs, deceptive emails, screenshot impersonations, and SMS smishing before damage occurs.
+              Automatic Phishing Detection System deploys intelligent multi-layer AI to identify and neutralize malicious URLs, deceptive emails, screenshot impersonations, and SMS smishing before damage occurs.
             </p>
 
             <div className="pg-hero-cta-group">
@@ -245,13 +260,23 @@ export default function LandingPage({
                 <span>Try Live Scanner</span>
               </a>
 
-              <button
-                onClick={currentUser ? onNavigateDashboard : () => onNavigateAuth('login')}
-                className="pg-btn-hero-secondary"
-              >
-                <span>{currentUser ? 'Open App Suite' : 'Explore Platform'}</span>
-                <ArrowRight size={18} />
-              </button>
+              {!currentUser ? (
+                <button
+                  onClick={() => onNavigateAuth('register')}
+                  className="pg-btn-hero-secondary"
+                >
+                  <span>Get Started Free</span>
+                  <ArrowRight size={18} />
+                </button>
+              ) : (
+                <button
+                  onClick={onNavigateDashboard}
+                  className="pg-btn-hero-secondary"
+                >
+                  <span>Open App Suite</span>
+                  <ArrowRight size={18} />
+                </button>
+              )}
             </div>
 
             {/* Live Stats Row */}
@@ -285,7 +310,7 @@ export default function LandingPage({
 
               <img
                 src={landingHero}
-                alt="PhishGuard Autonomous Shield"
+                alt="Automatic Phishing Detection System Autonomous Shield"
                 className="pg-hero-main-image"
               />
 
@@ -329,7 +354,7 @@ export default function LandingPage({
           <div className="pg-subhead-pill">360° Cyber Threat Intelligence</div>
           <h2 className="pg-section-title">Offensive Cyber Threat Vectors vs. Autonomous AI Defense</h2>
           <p className="pg-section-desc">
-            See how modern attackers engineer deceptive phishing campaigns and how PhishGuard's neural shield intercepts them in real-time.
+            See how modern attackers engineer deceptive phishing campaigns and how Automatic Phishing Detection System's neural shield intercepts them in real-time.
           </p>
         </div>
 
@@ -382,7 +407,7 @@ export default function LandingPage({
             <div className="pg-matrix-body">
               <h3 className="pg-matrix-title blue-title">Real-Time AI Neutralization &amp; Heuristics</h3>
               <p className="pg-matrix-desc">
-                PhishGuard's multi-modal AI engine evaluates domain WHOIS entropy, computer vision logo matching, and NLP coercion signals in &lt;115ms.
+                Automatic Phishing Detection System's multi-modal AI engine evaluates domain WHOIS entropy, computer vision logo matching, and NLP coercion signals in &lt;115ms.
               </p>
 
               <div className="pg-matrix-bullets">
@@ -410,7 +435,7 @@ export default function LandingPage({
           <div className="pg-subhead-pill">Interactive Demo</div>
           <h2 className="pg-section-title">Test Any Link, Message, or Email Instantly</h2>
           <p className="pg-section-desc">
-            Experience PhishGuard's multi-layered intelligence directly in your browser. Choose a preset or test your own content.
+            Experience Automatic Phishing Detection System's multi-layered intelligence directly in your browser. Choose a preset or test your own content.
           </p>
         </div>
 
@@ -510,7 +535,7 @@ export default function LandingPage({
           <div className="pg-subhead-pill">All-In-One Defense Suite</div>
           <h2 className="pg-section-title">Engineered to Neutralize Every Cyber Attack Vector</h2>
           <p className="pg-section-desc">
-            Modern phishing is no longer just bad emails. PhishGuard protects against multi-modal threats across URLs, email text, screenshots, and SMS messages.
+            Modern phishing is no longer just bad emails. Automatic Phishing Detection System protects against multi-modal threats across URLs, email text, screenshots, and SMS messages.
           </p>
         </div>
 
@@ -542,7 +567,7 @@ export default function LandingPage({
       <section id="how-it-works" className="pg-process-section">
         <div className="pg-section-header">
           <div className="pg-subhead-pill">Workflow</div>
-          <h2 className="pg-section-title">How PhishGuard Protects You in 3 Steps</h2>
+          <h2 className="pg-section-title">How Automatic Phishing Detection System Protects You in 3 Steps</h2>
         </div>
 
         <div className="pg-process-grid">
@@ -576,11 +601,11 @@ export default function LandingPage({
         <div className="pg-faq-list">
           {[
             {
-              q: 'How does PhishGuard detect Zero-Day phishing links?',
-              a: 'Instead of relying purely on static blacklists, PhishGuard computes behavioral heuristics: domain registration age via WHOIS, SSL issuer reputation, character entropy, Punycode homoglyph substitution (such as replacing "o" with "0"), and DNS redirect topology.'
+              q: 'How does Automatic Phishing Detection System detect Zero-Day phishing links?',
+              a: 'Instead of relying purely on static blacklists, Automatic Phishing Detection System computes behavioral heuristics: domain registration age via WHOIS, SSL issuer reputation, character entropy, Punycode homoglyph substitution (such as replacing "o" with "0"), and DNS redirect topology.'
             },
             {
-              q: 'Can PhishGuard inspect screenshots of fake websites and QR codes?',
+              q: 'Can Automatic Phishing Detection System inspect screenshots of fake websites and QR codes?',
               a: 'Yes! The new Screenshot & Image Analysis engine uses computer vision and OCR to extract text from images, detect visual brand impersonation (e.g., fraudulent PayPal or Microsoft login screens), and scan embedded QR code traps.'
             },
             {
@@ -588,8 +613,8 @@ export default function LandingPage({
               a: 'The message analyzer evaluates three crucial components simultaneously: sender phone number spoof probability, high-urgency social engineering triggers, and shortlinks (unmasking bit.ly, tinyurl, and suspicious redirects).'
             },
             {
-              q: 'Is PhishGuard free to use?',
-              a: 'Yes, PhishGuard provides full access to URL, Email, Screenshot, and SMS analyzers, alongside an interactive AI cybersecurity copilot.'
+              q: 'Is Automatic Phishing Detection System free to use?',
+              a: 'Yes, Automatic Phishing Detection System provides full access to URL, Email, Screenshot, and SMS analyzers, alongside an interactive AI cybersecurity copilot.'
             }
           ].map((item, idx) => (
             <div
@@ -671,7 +696,7 @@ export default function LandingPage({
         </div>
 
         <div className="pg-footer-bottom">
-          <span>© {new Date().getFullYear()} PhishGuard Cybersecurity Platform. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} Automatic Phishing Detection System. All rights reserved.</span>
           <span>Department of Computer Science &amp; IT • Academic &amp; Enterprise Security</span>
         </div>
       </footer>
@@ -701,7 +726,7 @@ export default function LandingPage({
         .pg-landing-root.theme-dark {
           background: #080c16;
           color: #f8fafc;
-          --bg-nav: rgba(8, 12, 22, 0.85);
+          --bg-nav: rgba(8, 12, 22, 0.9);
           --card-bg: #0f172a;
           --card-border: rgba(59, 130, 246, 0.2);
           --text-primary: #f8fafc;
@@ -710,15 +735,28 @@ export default function LandingPage({
           --section-alt: #0c1220;
         }
 
+        .pg-landing-root.theme-navy {
+          background: #05082e;
+          color: #e8eaff;
+          --bg-nav: rgba(5, 8, 46, 0.92);
+          --card-bg: #0c1150;
+          --card-border: rgba(99, 102, 241, 0.25);
+          --text-primary: #e8eaff;
+          --text-secondary: #c7d2fe;
+          --text-muted: #a5b4fc;
+          --section-alt: #080b3a;
+        }
+
         /* ── NAVBAR ── */
         .pg-nav-bar {
           position: sticky;
           top: 0;
           z-index: 99;
           background: var(--bg-nav);
-          backdrop-filter: blur(14px);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
           border-bottom: 1px solid var(--card-border);
-          padding: 14px 24px;
+          padding: 12px 24px;
         }
 
         .pg-nav-inner {
@@ -727,6 +765,25 @@ export default function LandingPage({
           display: flex;
           align-items: center;
           justify-content: space-between;
+          gap: 16px;
+        }
+
+        .pg-nav-brand {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-shrink: 0;
+          min-width: 0;
+        }
+
+        .pg-nav-brand-full {
+          font-size: 0.78rem;
+          font-weight: 700;
+          color: var(--text-muted);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 280px;
         }
 
         .pg-nav-links {

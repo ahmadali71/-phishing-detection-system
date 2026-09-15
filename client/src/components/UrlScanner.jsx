@@ -122,60 +122,25 @@ export default function UrlScanner({ onScanComplete, t }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '980px', margin: '0 auto' }}>
-      {/* ── Desktop Top Badge & Header (Screen 5) ── */}
-      <div className="desktop-header-wrap">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-          <div style={{
-            background: 'linear-gradient(135deg, #1d4ed8, #2563eb)',
-            color: '#ffffff',
-            width: '28px',
-            height: '28px',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: '900',
-            fontSize: '0.92rem',
-            boxShadow: '0 3px 8px rgba(37, 99, 235, 0.4)'
-          }}>
-            5
+      {/* ── VIBRANT HERO CARD (Exact Match to User Reference) ── */}
+      <div className="scanner-vibrant-hero">
+        <div className="scanner-vibrant-hero-content">
+          <div className="scanner-vibrant-pill-tag">
+            <Sparkles size={14} />
+            <span>URL PHISHING DETECTION • REAL-TIME AI SCANNER</span>
           </div>
-          <span style={{
-            fontWeight: '900',
-            fontSize: '0.9rem',
-            letterSpacing: '0.08em',
-            color: 'var(--accent-blue)',
-            fontFamily: 'var(--font-display)',
-            textTransform: 'uppercase'
-          }}>
-            {t.urlDetectionHeader || 'URL PHISHING DETECTION'}
-          </span>
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-          <div>
-            <h2 style={{ fontSize: 'clamp(1.35rem, 4vw, 1.85rem)', fontWeight: '800' }}>Real-Time URL Threat Inspector</h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
-              Inspects 25+ lexical, host-based, cryptographic, and machine learning indicators in real time.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Mobile Vibrant Hero Banner (ONLY ON MOBILE) ── */}
-      <div className="mobile-vibrant-hero">
-        <div className="mobile-vibrant-hero-content">
-          <h2 className="mobile-vibrant-hero-title">URL Phishing Detection</h2>
-          <p className="mobile-vibrant-hero-desc">
-            Analyze any website link in real time to detect typosquatting, raw IP hosting, SSL anomalies, and blacklisted domains.
+          <h2 className="scanner-vibrant-hero-title">Real-Time URL Threat Inspector</h2>
+          <p className="scanner-vibrant-hero-desc">
+            Inspects 25+ lexical, host-based, cryptographic, and machine learning indicators in real time.
           </p>
-          <div className="mobile-vibrant-chips">
-            <div className="mobile-vibrant-chip-item">⚡ 25+ Heuristic Checks</div>
-            <div className="mobile-vibrant-chip-item">🧠 Random Forest Engine</div>
-            <div className="mobile-vibrant-chip-item">🔒 SSL Handshake Audit</div>
-            <div className="mobile-vibrant-chip-item">🛡️ 94.6% Accuracy</div>
+          <div className="scanner-vibrant-chips">
+            <div className="scanner-vibrant-chip-item">⚡ 25+ Heuristic Checks</div>
+            <div className="scanner-vibrant-chip-item">🧠 Random Forest Engine</div>
+            <div className="scanner-vibrant-chip-item">🔒 SSL Handshake Audit</div>
+            <div className="scanner-vibrant-chip-item">🛡️ 94.6% Accuracy</div>
           </div>
           <button
+            type="button"
             onClick={() => {
               const inputEl = document.getElementById('url-scan-input');
               if (inputEl) {
@@ -183,13 +148,13 @@ export default function UrlScanner({ onScanComplete, t }) {
                 inputEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
               }
             }}
-            className="mobile-vibrant-hero-btn"
+            className="scanner-vibrant-hero-btn"
           >
-            Scan Now →
+            Scan URL Now →
           </button>
         </div>
-        <div className="mobile-vibrant-hero-circle">
-          <Globe size={42} strokeWidth={2.2} />
+        <div className="scanner-vibrant-hero-circle">
+          <Globe size={46} strokeWidth={2.2} />
         </div>
       </div>
 
@@ -288,12 +253,13 @@ export default function UrlScanner({ onScanComplete, t }) {
                 Classification Result
               </div>
               <div style={{
-                fontSize: '1.5rem',
+                fontSize: 'clamp(1rem, 4vw, 1.5rem)',
                 fontWeight: '900',
                 color: isPhishing ? '#ef4444' : (isSuspicious ? '#f59e0b' : '#10b981'),
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px'
+                gap: '10px',
+                flexWrap: 'wrap'
               }}>
                 {isPhishing ? <ShieldAlert size={28} /> : (isSuspicious ? <AlertTriangle size={28} /> : <CheckCircle2 size={28} />)}
                 {scanResult.verdict}
@@ -303,7 +269,7 @@ export default function UrlScanner({ onScanComplete, t }) {
                   ? 'This URL exhibits strong phishing indicators, deceptive heuristics, or blacklisted hosting infrastructure.'
                   : (isSuspicious ? 'This URL contains non-standard domain parameters or credential prompts. Exercise caution.' : 'This domain is authenticated under standard enterprise registries with valid SSL encryption.')}
               </p>
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '10px', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '10px', fontFamily: 'var(--font-mono)', wordBreak: 'break-all', overflowWrap: 'break-word', lineHeight: 1.4 }}>
                 Target: {scanResult.hostname}
               </div>
             </div>

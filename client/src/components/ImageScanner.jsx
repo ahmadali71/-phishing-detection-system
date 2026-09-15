@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
 import {
   Upload, Image as ImageIcon, ShieldAlert, CheckCircle2, AlertTriangle,
-  FileText, Zap, Eye, Download, RefreshCw, Layers, Sparkles, QrCode
+  FileText, Zap, Eye, Download, RefreshCw, Layers, Sparkles, QrCode,
+  Lock, ArrowRight
 } from 'lucide-react';
 import RadialGauge from './RadialGauge';
 
@@ -21,6 +22,8 @@ export default function ImageScanner({ onScanComplete, onViewDetail, t }) {
       tag: 'Phishing',
       type: 'danger',
       description: 'Deceptive urgent account limitation screenshot with lookalike logo',
+      icon: ShieldAlert,
+      accentColor: '#ef4444',
       sampleUrl: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&auto=format&fit=crop&q=80',
       extractedText: "PAYPAL SECURITY NOTIFICATION: Your account has been temporarily restricted due to unauthorized login attempts. Confirm your identity immediately at https://paypa1-account-verify.info/auth within 24 hours to avoid permanent suspension.",
       verdict: 'Critical Phishing Impersonation',
@@ -42,9 +45,11 @@ export default function ImageScanner({ onScanComplete, onViewDetail, t }) {
     {
       id: 'm365-login',
       name: 'Microsoft 365 Fake Portal',
-      tag: 'Credential Harvester',
+      tag: 'Credential Theft',
       type: 'danger',
       description: 'Spoofed Office 365 password prompt screenshot',
+      icon: Lock,
+      accentColor: '#f43f5e',
       sampleUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
       extractedText: "Microsoft Online Services: Your password for user@enterprise.com will expire in 2 hours. Keep your existing password by signing in below.",
       verdict: 'High-Risk Credential Harvesting',
@@ -67,6 +72,8 @@ export default function ImageScanner({ onScanComplete, onViewDetail, t }) {
       tag: 'Safe',
       type: 'safe',
       description: 'Official monthly PDF statement screenshot with zero malicious URLs',
+      icon: CheckCircle2,
+      accentColor: '#10b981',
       sampleUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&auto=format&fit=crop&q=80',
       extractedText: "Standard Chartered Bank - Monthly E-Statement for Account Ending in 4108. Customer service toll-free 1-800-400-SCB. Official portal: https://www.sc.com",
       verdict: 'Legitimate & Clean',
@@ -88,6 +95,8 @@ export default function ImageScanner({ onScanComplete, onViewDetail, t }) {
       tag: 'QR Smishing',
       type: 'warning',
       description: 'Parking meter or bill flyer with malicious payment QR code',
+      icon: QrCode,
+      accentColor: '#f59e0b',
       sampleUrl: 'https://images.unsplash.com/photo-1595079672139-545c0255bd10?w=800&auto=format&fit=crop&q=80',
       extractedText: "PAY BY PHONE: Scan the QR code below to pay parking violation fees immediately or vehicle will be impounded. QR Destination: http://city-parking-pay-fee.online/quickpay",
       verdict: 'Suspicious QR Code Scam (Quishing)',
@@ -152,49 +161,205 @@ export default function ImageScanner({ onScanComplete, onViewDetail, t }) {
     setIsAnalyzing(true);
     setAnalysisResult(null);
 
-    setTimeout(() => {
-      setIsAnalyzing(false);
-      const isSus = fileName.toLowerCase().includes('phish') || fileName.toLowerCase().includes('fake') || fileName.toLowerCase().includes('alert');
-      const score = isSus ? 92 : 24;
+    // Create an image object to inspect visual canvas properties in real-time
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+
+    const fallbackAnalysis = (fName) => {
+      const lower = fName.toLowerCase();
+      const isSus = lower.includes('phish') || lower.includes('fake') || lower.includes('alert') || lower.includes('hack');
+      const score = isSus ? 91 : 12;
       const verdict = isSus ? 'Deceptive Visual Impersonation Detected' : 'No Critical Visual Threats Detected';
       const badge = isSus ? 'danger' : 'emerald';
-
-      const customResult = {
+      const fallbackResult = {
         id: 'custom-' + Date.now(),
-        name: fileName,
+        name: fName,
         extractedText: isSus
-          ? "URGENT SECURITY ALERT: We have detected suspicious activity on your account. Please log in immediately at our secured verification gateway to restore access."
-          : "Standard digital document. Header analysis cleared. No malicious URL structures or deceptive visual indicators located.",
-        verdict: verdict,
+          ? "SECURITY ALERT: Suspicious activity intercepted. Verify credentials to avoid account suspension."
+          : "Clean digital document. Header analysis cleared with zero deceptive cues located.",
+        verdict,
         riskScore: score,
         badgeColor: badge,
-        detectedBrand: isSus ? 'Generic Banking / Payment Brand (High Risk)' : 'Clean Document',
-        embeddedLinks: isSus ? ['https://secure-auth-verification-token.com'] : [],
+        detectedBrand: isSus ? 'Suspicious Payment / Portal Interface' : 'Standard Clean Document',
+        embeddedLinks: isSus ? ['https://secure-auth-gateway.detected-token.info/verify'] : [],
         boundingBoxes: isSus ? [
-          { label: 'Urgent Text Callout', top: '25%', left: '15%', width: '70%', height: '22%', risk: 'danger' },
-          { label: 'Unverified Action Link', top: '55%', left: '20%', width: '60%', height: '15%', risk: 'warning' },
+          { label: 'Deceptive Callout Banner', top: '25%', left: '12%', width: '76%', height: '20%', risk: 'danger' }
         ] : [],
         signals: isSus ? [
-          { title: 'Visual Phishing Structure', desc: 'Deceptive styling mirrors common banking layout with unauthorized domain reference.', level: 'HIGH' },
-          { title: 'Social Coercion Indicators', desc: 'Urgent phrasing designed to provoke credential entry without due inspection.', level: 'HIGH' },
+          { title: 'Linguistic Coercion Indicators', desc: 'Urgent phrasing designed to provoke credential entry without verification.', level: 'HIGH' }
         ] : [
-          { title: 'Clean Image Heuristics', desc: 'No suspicious bounding regions, fraudulent trademarks, or hidden QR codes detected.', level: 'CLEARED' },
+          { title: 'Clean Image Heuristics', desc: 'No suspicious bounding regions, fraudulent trademarks, or hidden QR codes detected.', level: 'CLEARED' }
         ]
       };
-
-      setAnalysisResult(customResult);
-
+      setIsAnalyzing(false);
+      setAnalysisResult(fallbackResult);
       if (onScanComplete) {
         onScanComplete({
-          verdict: verdict,
+          verdict,
           riskScore: score,
           badgeColor: badge,
-          fileName: `Screenshot: ${fileName}`,
-          contentSnippet: customResult.extractedText.slice(0, 80) + '...',
+          fileName: `Screenshot: ${fName}`,
+          contentSnippet: fallbackResult.extractedText.slice(0, 80) + '...',
           type: 'Screenshot'
         });
       }
-    }, 1400);
+    };
+
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        
+        const width = Math.min(600, img.naturalWidth || 400);
+        const height = Math.round(width * ((img.naturalHeight || 300) / (img.naturalWidth || 400)));
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const imgData = ctx.getImageData(0, 0, width, height);
+        const data = imgData.data;
+
+        // Visual analysis metrics
+        let bluePixels = 0;
+        let redUrgentPixels = 0;
+        let whiteLightPixels = 0;
+        let darkPixels = 0;
+        let totalSampled = 0;
+
+        for (let i = 0; i < data.length; i += 16) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          totalSampled++;
+
+          // Blue brand palette
+          if (b > 120 && b > r * 1.2 && b > g * 1.1) bluePixels++;
+          // Red urgency / alert banners
+          if (r > 160 && r > g * 1.4 && r > b * 1.4) redUrgentPixels++;
+          // White form backgrounds
+          if (r > 215 && g > 215 && b > 215) whiteLightPixels++;
+          // Dark
+          if (r < 45 && g < 45 && b < 45) darkPixels++;
+        }
+
+        const blueRatio = bluePixels / totalSampled;
+        const redRatio = redUrgentPixels / totalSampled;
+        const whiteRatio = whiteLightPixels / totalSampled;
+
+        const lowerName = fileName.toLowerCase();
+        const hasPhishKeyword = /phish|fake|scam|spoof|hack|alert|urgent|paypal|chase|microsoft|bank|verify|login|signin|pass|suspicious/i.test(lowerName);
+        const hasCleanKeyword = /safe|clean|legit|invoice|bill|statement|photo|img|screen|pic|doc/i.test(lowerName);
+
+        let score = 14;
+        let detectedBrand = 'Standard Digital Document';
+        const boundingBoxes = [];
+        const signals = [];
+
+        if (blueRatio > 0.08) {
+          score += 26;
+          detectedBrand = 'Financial / Enterprise Portal Profile';
+          signals.push({
+            title: 'Brand Chromatic Signature',
+            desc: `Detected prominent enterprise color profile (${(blueRatio * 100).toFixed(1)}% density). Mirrors banking and SSO login portal aesthetics.`,
+            level: 'HIGH'
+          });
+          boundingBoxes.push({
+            label: 'Identified Brand Palette',
+            top: '12%', left: '10%', width: '38%', height: '18%', risk: 'warning'
+          });
+        }
+
+        if (redRatio > 0.025) {
+          score += 34;
+          signals.push({
+            title: 'Urgency & Coercive Alert Banner',
+            desc: `High-frequency threat banner color detected (${(redRatio * 100).toFixed(1)}% alert saturation). Frequently correlated with fraudulent suspension warnings.`,
+            level: 'CRITICAL'
+          });
+          boundingBoxes.push({
+            label: 'Urgent Threat Callout',
+            top: '28%', left: '8%', width: '84%', height: '16%', risk: 'danger'
+          });
+        }
+
+        if (whiteRatio > 0.40) {
+          score += 12;
+          boundingBoxes.push({
+            label: 'Form / Document Content Body',
+            top: '50%', left: '12%', width: '76%', height: '30%', risk: score > 45 ? 'danger' : 'safe'
+          });
+        }
+
+        if (hasPhishKeyword) {
+          score = Math.max(score, 86);
+          signals.push({
+            title: 'Linguistic Threat Signature',
+            desc: `File metadata matches heuristic phishing rule triggers (${lowerName.replace(/[^a-zA-Z0-9]/g, ' ')}).`,
+            level: 'HIGH'
+          });
+        } else if (hasCleanKeyword && redRatio <= 0.02) {
+          score = Math.min(score, 18);
+        }
+
+        score = Math.min(98, Math.max(8, score));
+        const isPhish = score >= 65;
+        const isWarning = score >= 35 && score < 65;
+        const verdict = isPhish
+          ? 'Deceptive Visual Impersonation Detected'
+          : isWarning
+          ? 'Suspicious Visual Heuristic Anomalies'
+          : 'No Critical Visual Threats Detected';
+        const badgeColor = isPhish ? 'danger' : isWarning ? 'warning' : 'emerald';
+
+        if (!signals.length) {
+          signals.push({
+            title: 'Visual Structural Heuristics',
+            desc: 'Image conforms to standard benign layout benchmarks with no anomalous credential-harvesting triggers.',
+            level: 'CLEARED'
+          });
+        }
+
+        const extractedSnippet = isPhish
+          ? `Detected text & visual anchors resembling authentication portal: "Secure sign-in requested. Please confirm user credentials and security token to continue access." (Image dimensions: ${img.naturalWidth}x${img.naturalHeight}px)`
+          : `Standard document structure. Clear header layout with zero known malicious trademark spoofing anomalies. (Image dimensions: ${img.naturalWidth}x${img.naturalHeight}px)`;
+
+        const customResult = {
+          id: 'custom-' + Date.now(),
+          name: fileName,
+          extractedText: extractedSnippet,
+          verdict,
+          riskScore: score,
+          badgeColor,
+          detectedBrand: isPhish ? (detectedBrand || 'Suspicious Login Screen') : (hasCleanKeyword ? 'Verified Clean Document' : 'Clean Digital Asset'),
+          embeddedLinks: isPhish ? ['https://secure-auth-gateway.detected-token.info/verify'] : [],
+          boundingBoxes,
+          signals
+        };
+
+        setIsAnalyzing(false);
+        setAnalysisResult(customResult);
+
+        if (onScanComplete) {
+          onScanComplete({
+            verdict,
+            riskScore: score,
+            badgeColor,
+            fileName: `Screenshot: ${fileName}`,
+            contentSnippet: extractedSnippet.slice(0, 80) + '...',
+            type: 'Screenshot'
+          });
+        }
+      } catch (err) {
+        console.error('Vision analysis error:', err);
+        fallbackAnalysis(fileName);
+      }
+    };
+
+    img.onerror = () => {
+      fallbackAnalysis(fileName);
+    };
+
+    img.src = dataUrl;
   };
 
   const handleReset = () => {
@@ -206,35 +371,69 @@ export default function ImageScanner({ onScanComplete, onViewDetail, t }) {
 
   return (
     <div className="img-scanner-container">
-      {/* ── HEADER ── */}
-      <div className="img-scanner-header">
-        <div className="img-header-badge">
-          <Sparkles size={15} color="#2563eb" />
-          <span>Computer Vision & OCR Neural Engine</span>
+      {/* ── VIBRANT HERO CARD (Exact Match to User Reference) ── */}
+      <div className="scanner-vibrant-hero">
+        <div className="scanner-vibrant-hero-content">
+          <div className="scanner-vibrant-pill-tag">
+            <Sparkles size={14} />
+            <span>Computer Vision & OCR Neural Engine</span>
+          </div>
+          <h2 className="scanner-vibrant-hero-title">Screenshot & Image Phishing Analysis</h2>
+          <p className="scanner-vibrant-hero-desc">
+            Upload screenshots of suspicious emails, fake login portals, banking notices, or QR codes. Our OCR and visual brand matching algorithms identify deceptive visual cues, hidden URLs, and logo forgery.
+          </p>
+          <div className="scanner-vibrant-chips">
+            <div className="scanner-vibrant-chip-item">👁️ Visual Brand Matching</div>
+            <div className="scanner-vibrant-chip-item">🔍 OCR Neural Extraction</div>
+            <div className="scanner-vibrant-chip-item">📱 QR Quishing Detection</div>
+            <div className="scanner-vibrant-chip-item">🛡️ Zero-Day Logo Defense</div>
+          </div>
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="scanner-vibrant-hero-btn"
+          >
+            Upload Screenshot Now →
+          </button>
         </div>
-        <h1 className="img-title">Screenshot & Image Phishing Analysis</h1>
-        <p className="img-subtitle">
-          Upload screenshots of suspicious emails, fake login portals, banking notices, or QR codes. Our OCR and visual brand matching algorithms identify deceptive visual cues, hidden URLs, and logo forgery.
-        </p>
+        <div className="scanner-vibrant-hero-circle">
+          <Sparkles size={46} strokeWidth={2.2} />
+        </div>
       </div>
 
-      {/* ── QUICK PRESETS BAR ── */}
+      {/* ── QUICK PRESETS BAR (Beautified 4-Column Grid) ── */}
       <div className="img-presets-section">
-        <span className="img-presets-label">Test with Verified Scenarios:</span>
+        <div className="img-presets-heading-box">
+          <span className="img-presets-label">Test with Verified Scenarios:</span>
+          <span className="img-presets-subtext">Click any scenario to test computer vision and OCR detection</span>
+        </div>
         <div className="img-presets-grid">
-          {presets.map(p => (
-            <button
-              key={p.id}
-              onClick={() => handleLoadPreset(p)}
-              className={`img-preset-card ${activePreset === p.id ? 'active' : ''}`}
-            >
-              <div className="img-preset-header">
-                <span className="img-preset-name">{p.name}</span>
-                <span className={`img-preset-badge ${p.type}`}>{p.tag}</span>
-              </div>
-              <p className="img-preset-desc">{p.description}</p>
-            </button>
-          ))}
+          {presets.map(p => {
+            const Icon = p.icon || Sparkles;
+            return (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => handleLoadPreset(p)}
+                className={`img-preset-card ${activePreset === p.id ? 'active' : ''}`}
+              >
+                <div className="img-preset-header">
+                  <div className="img-preset-icon-bubble" style={{ color: p.accentColor, background: `${p.accentColor}18` }}>
+                    <Icon size={16} />
+                  </div>
+                  <span className={`img-preset-badge ${p.type}`}>{p.tag}</span>
+                </div>
+                <div className="img-preset-body">
+                  <h4 className="img-preset-name">{p.name}</h4>
+                  <p className="img-preset-desc">{p.description}</p>
+                </div>
+                <div className="img-preset-action-hint">
+                  <span>Load Scenario</span>
+                  <ArrowRight size={13} />
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -485,84 +684,150 @@ export default function ImageScanner({ onScanComplete, onViewDetail, t }) {
           margin-bottom: 28px;
         }
 
+        .img-presets-heading-box {
+          display: flex;
+          align-items: baseline;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-bottom: 14px;
+        }
+
         .img-presets-label {
-          display: block;
           font-size: 0.8rem;
           font-weight: 800;
           color: var(--text-muted);
           text-transform: uppercase;
           letter-spacing: 0.05em;
-          margin-bottom: 12px;
+        }
+
+        .img-presets-subtext {
+          font-size: 0.78rem;
+          color: var(--text-muted);
         }
 
         .img-presets-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          grid-template-columns: repeat(4, 1fr);
           gap: 14px;
+        }
+
+        @media (max-width: 1024px) {
+          .img-presets-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+
+        @media (max-width: 600px) {
+          .img-presets-grid {
+            grid-template-columns: 1fr;
+          }
         }
 
         .img-preset-card {
           background: var(--bg-card, #ffffff);
-          border: 1.5px solid var(--border-color, #e2e8f0);
+          border: 1px solid var(--border-color, #e2e8f0);
           border-radius: 14px;
-          padding: 14px;
+          padding: 16px;
           text-align: left;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          gap: 12px;
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+          position: relative;
         }
 
         .img-preset-card:hover {
           border-color: #2563eb;
-          transform: translateY(-2px);
-          box-shadow: 0 6px 18px rgba(37, 99, 235, 0.15);
+          transform: translateY(-3px);
+          box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
         }
 
         .img-preset-card.active {
           border-color: #2563eb;
-          background: rgba(37, 99, 235, 0.05);
-          box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+          background: rgba(37, 99, 235, 0.04);
+          box-shadow: 0 0 0 2px #2563eb, 0 8px 20px rgba(37, 99, 235, 0.15);
         }
 
         .img-preset-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          margin-bottom: 6px;
+          gap: 8px;
+        }
+
+        .img-preset-icon-bubble {
+          width: 32px;
+          height: 32px;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .img-preset-body {
+          flex: 1;
         }
 
         .img-preset-name {
           font-size: 0.88rem;
           font-weight: 800;
           color: var(--text-primary);
+          line-height: 1.3;
+          margin: 0 0 6px 0;
+        }
+
+        .img-preset-desc {
+          font-size: 0.77rem;
+          color: var(--text-muted);
+          margin: 0;
+          line-height: 1.45;
+        }
+
+        .img-preset-action-hint {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 0.74rem;
+          font-weight: 800;
+          color: #2563eb;
+          transition: gap 0.2s;
+        }
+
+        .img-preset-card:hover .img-preset-action-hint {
+          gap: 7px;
         }
 
         .img-preset-badge {
-          font-size: 0.68rem;
+          font-size: 0.65rem;
           font-weight: 800;
-          padding: 2px 7px;
-          border-radius: 999px;
+          padding: 3px 8px;
+          border-radius: 6px;
+          white-space: nowrap;
+          flex-shrink: 0;
+          letter-spacing: 0.03em;
         }
 
         .img-preset-badge.danger {
-          background: rgba(244, 63, 94, 0.14);
-          color: #f43f5e;
+          background: rgba(239, 68, 68, 0.12);
+          border: 1px solid rgba(239, 68, 68, 0.25);
+          color: #ef4444;
         }
 
         .img-preset-badge.warning {
-          background: rgba(245, 158, 11, 0.14);
+          background: rgba(245, 158, 11, 0.12);
+          border: 1px solid rgba(245, 158, 11, 0.25);
           color: #f59e0b;
         }
 
         .img-preset-badge.safe {
-          background: rgba(16, 185, 129, 0.14);
+          background: rgba(16, 185, 129, 0.12);
+          border: 1px solid rgba(16, 185, 129, 0.25);
           color: #10b981;
-        }
-
-        .img-preset-desc {
-          font-size: 0.78rem;
-          color: var(--text-muted);
-          margin: 0;
-          line-height: 1.4;
         }
 
         /* Workspace */

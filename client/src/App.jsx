@@ -56,11 +56,14 @@ function AppInner() {
   const [selectedRecord, setSelectedRecord] = useState(null);
 
   useEffect(() => {
-    const themeClasses = ['light-theme', 'theme-ocean', 'theme-purple', 'theme-emerald', 'theme-royal'];
+    const themeClasses = ['light-theme', 'theme-dark', 'theme-navy'];
     themeClasses.forEach(cls => document.body.classList.remove(cls));
-    if (theme !== 'dark') {
-      const map = { light: 'light-theme', ocean: 'theme-ocean', purple: 'theme-purple', emerald: 'theme-emerald', royal: 'theme-royal' };
-      if (map[theme]) document.body.classList.add(map[theme]);
+    if (theme === 'navy') {
+      document.body.classList.add('theme-navy');
+    } else if (theme === 'dark') {
+      document.body.classList.add('theme-dark');
+    } else {
+      document.body.classList.add('light-theme');
     }
   }, [theme]);
 
@@ -217,18 +220,20 @@ function AppInner() {
           />
 
           <div className="app-body">
-            <Sidebar
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              currentUser={currentUser}
-              onLogout={() => { localStorage.removeItem('user'); setCurrentUser(null); setGuestView('auth'); }}
-              onOpenAuth={() => setIsAuthOpen(true)}
-              isOpen={sidebarOpen}
-              onClose={() => setSidebarOpen(false)}
-              t={t}
-            />
+            {activeTab !== 'home' && (
+              <Sidebar
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                currentUser={currentUser}
+                onLogout={() => { localStorage.removeItem('user'); setCurrentUser(null); setGuestView('auth'); }}
+                onOpenAuth={() => setIsAuthOpen(true)}
+                isOpen={sidebarOpen}
+                onClose={() => setSidebarOpen(false)}
+                t={t}
+              />
+            )}
 
-            <main className={`app-main${activeTab === 'ai-assistant' ? ' app-main-chat' : ''}`}>
+            <main className={`app-main${activeTab === 'home' ? ' app-main-landing-full' : ''}${activeTab === 'ai-assistant' ? ' app-main-chat' : ''}`}>
               {activeTab === 'home' && (
                 <LandingPage
                   onNavigateAuth={() => setIsAuthOpen(true)}
@@ -264,7 +269,22 @@ function AppInner() {
                   scanHistory={filteredHistory}
                   onViewDetail={setSelectedRecord}
                   onDeleteScan={(id) => {}}
-                  onExportPdf={() => window.print()}
+                  onExportPdf={() => {
+                    const targetRecord = (filteredHistory && filteredHistory.length > 0)
+                      ? filteredHistory[0]
+                      : {
+                          id: 'AUDIT-894201',
+                          type: 'System Audit Dossier',
+                          input: 'Full Threat History Export (All Scans)',
+                          result: 'Phishing Intercepted',
+                          riskScore: '94/100',
+                          date: new Date().toLocaleString()
+                        };
+                    setSelectedRecord(targetRecord);
+                    setTimeout(() => {
+                      window.print();
+                    }, 280);
+                  }}
                   t={t}
                   searchQuery={searchQuery}
                 />

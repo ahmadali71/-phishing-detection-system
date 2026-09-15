@@ -58,72 +58,36 @@ export default function EmailScanner({ onScanComplete, t }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '980px', margin: '0 auto' }}>
-      {/* ── Desktop Top Badge & Title (Hidden on Mobile) ── */}
-      <div className="desktop-header-wrap">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-          <div style={{
-            background: 'linear-gradient(135deg, #4f46e5, #6366f1)',
-            color: '#ffffff',
-            width: '28px',
-            height: '28px',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: '900',
-            fontSize: '0.9rem',
-            boxShadow: '0 2px 8px rgba(99, 102, 241, 0.4)',
-            flexShrink: 0
-          }}>
-            6
+      {/* ── VIBRANT HERO CARD (Exact Match to User Reference) ── */}
+      <div className="scanner-vibrant-hero">
+        <div className="scanner-vibrant-hero-content">
+          <div className="scanner-vibrant-pill-tag">
+            <Sparkles size={14} />
+            <span>EMAIL DETECTION SCREEN • NLP THREAT ENGINE</span>
           </div>
-          <span style={{
-            fontWeight: '900',
-            fontSize: '0.88rem',
-            letterSpacing: '0.08em',
-            color: '#818cf8',
-            fontFamily: 'var(--font-display)',
-            textTransform: 'uppercase'
-          }}>
-            {t.emailDetectionHeader || 'EMAIL DETECTION SCREEN'}
-          </span>
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-          <div>
-            <h2 style={{ fontSize: 'clamp(1.35rem, 4vw, 1.85rem)', fontWeight: '800' }}>NLP Email Threat Inspector</h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
-              Deep linguistic and semantic scanning for social engineering, urgency coercions, and embedded malicious links.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Mobile Vibrant Hero Banner (ONLY ON MOBILE) ── */}
-      <div className="mobile-vibrant-hero">
-        <div className="mobile-vibrant-hero-content">
-          <h2 className="mobile-vibrant-hero-title">Email Phishing Detection</h2>
-          <p className="mobile-vibrant-hero-desc">
-            Scans email content for manufactured urgency, deceptive links, financial harvesting phrasing, and malicious attachments.
+          <h2 className="scanner-vibrant-hero-title">NLP Email Threat Inspector</h2>
+          <p className="scanner-vibrant-hero-desc">
+            Deep linguistic and semantic scanning for social engineering, urgency coercions, and embedded malicious links.
           </p>
-          <div className="mobile-vibrant-chips">
-            <div className="mobile-vibrant-chip-item">⏱️ Urgency Triggers</div>
-            <div className="mobile-vibrant-chip-item">🔗 Deceptive Links</div>
-            <div className="mobile-vibrant-chip-item">💳 Credential Phishing</div>
-            <div className="mobile-vibrant-chip-item">📎 Malicious Files</div>
+          <div className="scanner-vibrant-chips">
+            <div className="scanner-vibrant-chip-item">⏱️ Urgency Triggers</div>
+            <div className="scanner-vibrant-chip-item">🔗 Deceptive Links</div>
+            <div className="scanner-vibrant-chip-item">💳 Credential Phishing</div>
+            <div className="scanner-vibrant-chip-item">📎 Malicious Files</div>
           </div>
           <button
+            type="button"
             onClick={() => {
               const el = document.getElementById('email-scan-textarea');
-              if (el) { el.focus(); el.scrollIntoView({ behavior: 'smooth' }); }
+              if (el) { el.focus(); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
             }}
-            className="mobile-vibrant-hero-btn"
+            className="scanner-vibrant-hero-btn"
           >
-            Analyze Now →
+            Inspect Email Now →
           </button>
         </div>
-        <div className="mobile-vibrant-hero-circle">
-          <Mail size={42} strokeWidth={2.2} />
+        <div className="scanner-vibrant-hero-circle">
+          <Mail size={46} strokeWidth={2.2} />
         </div>
       </div>
 

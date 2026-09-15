@@ -270,6 +270,50 @@
   --shadow-danger: 0 0 25px rgba(244, 63, 94, 0.3);
 }
 
+/* NAVY BLUE THEME (alias for theme-royal, user-facing name) */
+.theme-navy {
+  --bg-primary: #0a0f1e;
+  --bg-secondary: #0f1530;
+  --bg-card: #141d3d;
+  --bg-card-header: #0f1530;
+  --bg-card-hover: #1a254d;
+  --bg-input: #0c1230;
+  --border-color: rgba(99, 102, 241, 0.2);
+  --border-card: rgba(99, 102, 241, 0.3);
+  --border-card-hover: rgba(99, 102, 241, 0.6);
+
+  --text-primary: #eef2ff;
+  --text-secondary: #c7d2fe;
+  --text-muted: #a5b4fc;
+
+  --accent-blue: #6366f1;
+  --accent-blue-hover: #4f46e5;
+  --accent-purple: #818cf8;
+  --accent-cyan: #22d3ee;
+
+  --color-danger-bg: rgba(244, 63, 94, 0.18);
+  --color-danger-border: rgba(244, 63, 94, 0.4);
+  --color-warning-bg: rgba(245, 158, 11, 0.18);
+  --color-warning-border: rgba(245, 158, 11, 0.4);
+  --color-emerald-bg: rgba(16, 185, 129, 0.18);
+  --color-emerald-border: rgba(16, 185, 129, 0.4);
+
+  --hero-bg: linear-gradient(135deg, #0a0f1e 0%, #0f1530 50%, #0c1230 100%);
+  --hero-text: #eef2ff;
+  --hero-subtitle: #c7d2fe;
+
+  --chat-bubble-bot-bg: #141d3d;
+  --chat-bubble-bot-text: #eef2ff;
+  --chat-bubble-user-bg: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  --chat-bubble-user-text: #ffffff;
+  --chat-bar-bg: #0c1230;
+
+  --academic-card-bg: linear-gradient(135deg, rgba(20, 29, 61, 0.95), rgba(15, 21, 48, 0.95));
+  --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.55);
+  --shadow-glow: 0 0 25px rgba(99, 102, 241, 0.25);
+  --shadow-danger: 0 0 25px rgba(244, 63, 94, 0.3);
+}
+
 .rtl-layout {
   --font-display: 'Noto Nastaliq Urdu', 'Outfit', sans-serif;
   --font-sans: 'Noto Nastaliq Urdu', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -1210,7 +1254,7 @@ tr:hover td {
   top: 0;
   z-index: 200;
   gap: 12px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .header-left {
@@ -1884,6 +1928,11 @@ tr:hover td {
 
   .app-main {
     padding: 22px 20px 96px 20px;
+  }
+  .app-main.app-main-landing-full {
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
   }
 
   /* Grid collapses */
@@ -3038,10 +3087,150 @@ tr:hover td {
   }
 }
 
-/* STRICTLY HIDE MOBILE HERO ON DESKTOP */
-@media (min-width: 1025px) {
-  .mobile-vibrant-hero {
+/* SCANNER VIBRANT HERO CARD (FOR URL, SCREENSHOT & SMS SCANNERS) */
+.scanner-vibrant-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #6265f1 0%, #5956eb 50%, #4f46e5 100%) !important;
+  padding: 24px 22px;
+  color: #ffffff;
+  box-shadow: 0 12px 36px rgba(89, 86, 235, 0.32);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.scanner-vibrant-hero-content {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.scanner-vibrant-pill-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #ffffff;
+  width: fit-content;
+  letter-spacing: 0.02em;
+}
+
+.scanner-vibrant-hero-title {
+  font-size: clamp(1.25rem, 3.5vw, 1.65rem) !important;
+  font-weight: 900 !important;
+  color: #ffffff !important;
+  font-family: var(--font-display) !important;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+  margin: 0 !important;
+}
+
+.scanner-vibrant-hero-desc {
+  font-size: 0.86rem !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+  line-height: 1.5 !important;
+  margin: 0 !important;
+  max-width: 780px;
+}
+
+.scanner-vibrant-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 4px;
+}
+
+.scanner-vibrant-chip-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.26) !important;
+  font-size: 0.73rem;
+  font-weight: 700;
+  color: #ffffff !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  white-space: nowrap;
+}
+
+.scanner-vibrant-hero-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  margin-top: 6px;
+  padding: 10px 20px;
+  background: #ffffff !important;
+  color: #5956eb !important;
+  font-weight: 800 !important;
+  font-size: 0.86rem !important;
+  font-family: var(--font-display) !important;
+  border-radius: 12px;
+  border: none !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16) !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.scanner-vibrant-hero-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.22) !important;
+}
+
+.scanner-vibrant-hero-btn:active {
+  transform: scale(0.97);
+}
+
+.scanner-vibrant-hero-circle {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff !important;
+  flex-shrink: 0;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  z-index: 2;
+}
+
+@media (max-width: 680px) {
+  .scanner-vibrant-hero {
+    padding: 18px 14px !important;
+    gap: 12px !important;
+  }
+  .scanner-vibrant-hero-circle {
     display: none !important;
+  }
+  .scanner-vibrant-chips {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 6px !important;
+  }
+  .scanner-vibrant-chip-item {
+    font-size: 0.68rem !important;
+    padding: 4px 8px !important;
   }
 }
 
@@ -3299,5 +3488,120 @@ tr:hover td {
 
   .glass-panel {
     padding: 14px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GLOBAL MOBILE OVERFLOW PROTECTION
+═══════════════════════════════════════════════════════════════ */
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Fix URL/result text overflow on small screens */
+@media (max-width: 768px) {
+  /* Fix scanner result card text */
+  .glass-panel [style*="font-family: var(--font-mono)"],
+  .glass-panel [style*="fontFamily: 'JetBrains Mono'"],
+  .glass-panel [style*="fontFamily: var(--font-mono)"] {
+    word-break: break-all;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    font-size: 0.75rem !important;
+  }
+
+  /* Fix any inline-flex result rows that overflow */
+  .glass-panel > div {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  /* Fix content pages scrolling */
+  .content-area {
+    overflow-x: hidden !important;
+  }
+
+  /* Navbar brand full text hide on small screens */
+  .pg-nav-brand-full {
+    display: none !important;
+  }
+
+  /* Header page chip text smaller on mobile */
+  .header-page-chip {
+    font-size: 0.6rem;
+    padding: 2px 6px;
+  }
+
+  /* Hamburger always show */
+  .hamburger-btn {
+    display: flex !important;
+  }
+
+  /* Fix result verdict large text on narrow screens */
+  .glass-panel div[style*="fontSize: '1.5rem'"] {
+    font-size: 1.1rem !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .pg-nav-brand .phishguard-logo-container span {
+    display: none;
+  }
+  .header-brand-wrap .header-page-chip {
+    display: none;
+  }
+}
+
+/* ================================================================
+   CRITICAL GLOBAL PRINT & PDF EXPORT STYLES
+   Ensures clean, professional audit dossiers on window.print()
+================================================================ */
+@media print {
+  /* Hide all web application chrome */
+  header, footer, nav, sidebar,
+  .app-header, .app-sidebar, .bottom-nav-root,
+  .scanner-vibrant-hero, .scan-history-filter-bar,
+  .scan-history-mobile-cards, .scan-history-table-container,
+  .no-print, button, input, select, textarea,
+  .auth-nav-bar, .auth-left-features, .auth-glass-card {
+    display: none !important;
+  }
+
+  body, html, #root, .app-layout, .app-body, .app-main {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .report-modal-overlay {
+    position: static !important;
+    background: #ffffff !important;
+    padding: 0 !important;
+    inset: auto !important;
+    backdrop-filter: none !important;
+    z-index: 99999 !important;
+  }
+
+  .report-modal-container {
+    display: none !important;
+  }
+
+  .only-print, .print-dossier-root, .print-dossier-root * {
+    display: block !important;
+    visibility: visible !important;
+    color: #0f172a !important;
+  }
+
+  .print-dossier-root {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 24px !important;
+    box-sizing: border-box !important;
   }
 }
