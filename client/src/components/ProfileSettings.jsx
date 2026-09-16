@@ -216,7 +216,6 @@ export default function ProfileSettings({
       <div className="scanner-vibrant-hero">
         <div className="scanner-vibrant-hero-content">
           <div className="scanner-vibrant-pill-tag">
-            <Sparkles size={14} />
             <span>ACCOUNT & SECURITY • PROFILE SETTINGS</span>
           </div>
           <h2 className="scanner-vibrant-hero-title">Profile & Security Settings</h2>

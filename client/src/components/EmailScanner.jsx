@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   Mail, Upload, Clock, Download, Info, AlertTriangle,
-  CheckCircle2, FileText, Link, ShieldAlert, Cpu, Sparkles, Check, X
+  CheckCircle2, FileText, Link, ShieldAlert, Cpu, Shield, Sparkles, Check, X
 } from 'lucide-react';
 import { analyzeEmailText } from '../utils/emailAnalyzer';
 import RadialGauge from './RadialGauge';
@@ -62,7 +62,6 @@ export default function EmailScanner({ onScanComplete, t }) {
       <div className="scanner-vibrant-hero">
         <div className="scanner-vibrant-hero-content">
           <div className="scanner-vibrant-pill-tag">
-            <Sparkles size={14} />
             <span>EMAIL DETECTION SCREEN • NLP THREAT ENGINE</span>
           </div>
           <h2 className="scanner-vibrant-hero-title">NLP Email Threat Inspector</h2>

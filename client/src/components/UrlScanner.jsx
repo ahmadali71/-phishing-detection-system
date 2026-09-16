@@ -126,7 +126,6 @@ export default function UrlScanner({ onScanComplete, t }) {
       <div className="scanner-vibrant-hero">
         <div className="scanner-vibrant-hero-content">
           <div className="scanner-vibrant-pill-tag">
-            <Sparkles size={14} />
             <span>URL PHISHING DETECTION • REAL-TIME AI SCANNER</span>
           </div>
           <h2 className="scanner-vibrant-hero-title">Real-Time URL Threat Inspector</h2>

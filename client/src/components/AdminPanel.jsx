@@ -7,6 +7,7 @@ import {
   Users,
   Trash2,
   Check,
+  Shield,
   Sparkles
 } from 'lucide-react';
 
@@ -71,7 +72,6 @@ export default function AdminPanel({
       <div className="scanner-vibrant-hero">
         <div className="scanner-vibrant-hero-content">
           <div className="scanner-vibrant-pill-tag">
-            <Sparkles size={14} />
             <span>SYSTEM ADMINISTRATION • CONTROL SUITE</span>
           </div>
           <h2 className="scanner-vibrant-hero-title">Admin Management Suite</h2>

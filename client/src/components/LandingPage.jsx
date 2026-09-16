@@ -237,89 +237,104 @@ export default function LandingPage({
       {/* ── HERO SECTION ── */}
       <section className="pg-hero-section">
         <div className="pg-hero-glow-bg"></div>
+        <div className="pg-hero-orb pg-hero-orb-1"></div>
+        <div className="pg-hero-orb pg-hero-orb-2"></div>
+
         <div className="pg-hero-grid">
-          
+
+          {/* LEFT: copy */}
           <div className="pg-hero-left">
+
             <div className="pg-badge-pill">
-              <Sparkles size={14} className="text-blue-500" />
-              <span>Next-Gen Autonomous Phishing Defense • Live</span>
+              <span className="pg-badge-live-dot"></span>
+              <span>AUTOMATIC PHISHING DETECTION SYSTEM</span>
             </div>
 
             <h1 className="pg-main-hero-title">
               Stop Phishing Attacks.<br />
-              <span className="pg-gradient-text">Protect What Matters.</span>
+              <span className="pg-gradient-text">Protect Your Enterprise.</span>
             </h1>
 
             <p className="pg-hero-lead">
-              Automatic Phishing Detection System deploys intelligent multi-layer AI to identify and neutralize malicious URLs, deceptive emails, screenshot impersonations, and SMS smishing before damage occurs.
+              Multi-engine AI identifies and neutralizes malicious URLs, deceptive emails,
+              screenshot impersonations, and SMS smishing — before damage occurs.
             </p>
+
+            {/* Feature capability pills */}
+            <div className="pg-hero-feature-pills">
+              <span className="pg-feat-pill">⚡ 25+ Lexical Checks</span>
+              <span className="pg-feat-pill">🧠 BERT NLP Engine</span>
+              <span className="pg-feat-pill">👁️ Vision OCR Match</span>
+              <span className="pg-feat-pill pg-feat-pill-accent">🛡️ 99.4% Verified Accuracy</span>
+            </div>
 
             <div className="pg-hero-cta-group">
               <a href="#sandbox" className="pg-btn-hero-primary">
-                <Search size={18} />
+                <Search size={15} />
                 <span>Try Live Scanner</span>
               </a>
-
               {!currentUser ? (
-                <button
-                  onClick={() => onNavigateAuth('register')}
-                  className="pg-btn-hero-secondary"
-                >
+                <button onClick={() => onNavigateAuth('register')} className="pg-btn-hero-secondary">
                   <span>Get Started Free</span>
-                  <ArrowRight size={18} />
+                  <ArrowRight size={15} />
                 </button>
               ) : (
-                <button
-                  onClick={onNavigateDashboard}
-                  className="pg-btn-hero-secondary"
-                >
+                <button onClick={onNavigateDashboard} className="pg-btn-hero-secondary">
                   <span>Open App Suite</span>
-                  <ArrowRight size={18} />
+                  <ArrowRight size={15} />
                 </button>
               )}
             </div>
 
-            {/* Live Stats Row */}
+            {/* Stat cards */}
             <div className="pg-hero-stats-row">
-              <div className="pg-stat-box">
+              <div className="pg-stat-card">
                 <div className="pg-stat-num">99.4%</div>
                 <div className="pg-stat-lbl">Detection Accuracy</div>
               </div>
-              <div className="pg-stat-divider" />
-              <div className="pg-stat-box">
+              <div className="pg-stat-card">
                 <div className="pg-stat-num">&lt; 115ms</div>
                 <div className="pg-stat-lbl">Real-time Inference</div>
               </div>
-              <div className="pg-stat-divider" />
-              <div className="pg-stat-box">
+              <div className="pg-stat-card">
                 <div className="pg-stat-num">148k+</div>
                 <div className="pg-stat-lbl">Threats Intercepted</div>
               </div>
             </div>
           </div>
 
+          {/* RIGHT: visual */}
           <div className="pg-hero-right">
             <div className="pg-hero-visual-card">
+              <div className="pg-hero-scan-line" />
+
               <div className="pg-card-badge-floating">
-                <ShieldCheck size={18} color="#10b981" />
+                <ShieldCheck size={15} color="#10b981" />
                 <div>
-                  <div style={{ fontWeight: 800, fontSize: '0.85rem' }}>Autonomous Shield Active</div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Heuristics + Vision + NLP Synchronized</div>
+                  <div style={{ fontWeight: 800, fontSize: '0.76rem' }}>Autonomous Shield Active</div>
+                  <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.7)' }}>Heuristics · Vision · NLP</div>
                 </div>
               </div>
 
               <img
                 src={landingHero}
-                alt="Automatic Phishing Detection System Autonomous Shield"
+                alt="APDS AI Shield"
                 className="pg-hero-main-image"
               />
 
               <div className="pg-card-badge-bottom">
-                <AlertTriangle size={18} color="#f43f5e" />
+                <AlertTriangle size={14} color="#f43f5e" />
                 <div>
-                  <div style={{ fontWeight: 800, fontSize: '0.82rem', color: '#f43f5e' }}>Suspicious Email Blocked</div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Homoglyph spoofing quarantined</div>
+                  <div style={{ fontWeight: 800, fontSize: '0.72rem', color: '#f43f5e' }}>Threat Blocked · Score 96/100</div>
+                  <div style={{ fontSize: '0.63rem', color: 'rgba(255,255,255,0.7)' }}>Homoglyph spoofing quarantined</div>
                 </div>
+              </div>
+
+              {/* Risk score bar */}
+              <div className="pg-hero-score-bar">
+                <div className="pg-score-label">Risk Score</div>
+                <div className="pg-score-track"><div className="pg-score-fill"></div></div>
+                <div className="pg-score-val">96</div>
               </div>
             </div>
           </div>
@@ -861,182 +876,367 @@ export default function LandingPage({
         /* ── HERO ── */
         .pg-hero-section {
           position: relative;
-          padding: 80px 24px 60px;
+          padding: 26px 24px 18px;
           max-width: 1240px;
           margin: 0 auto;
+          overflow: hidden;
+        }
+
+        /* Floating animated orbs */
+        .pg-hero-orb {
+          position: absolute;
+          border-radius: 50%;
+          pointer-events: none;
+          z-index: 0;
+          filter: blur(60px);
+        }
+        .pg-hero-orb-1 {
+          width: 340px;
+          height: 340px;
+          background: radial-gradient(circle, rgba(37,99,235,0.18) 0%, transparent 70%);
+          top: -80px;
+          right: 10%;
+          animation: orbFloat1 8s ease-in-out infinite;
+        }
+        .pg-hero-orb-2 {
+          width: 220px;
+          height: 220px;
+          background: radial-gradient(circle, rgba(99,102,241,0.14) 0%, transparent 70%);
+          bottom: -40px;
+          left: 5%;
+          animation: orbFloat2 10s ease-in-out infinite;
+        }
+        @keyframes orbFloat1 {
+          0%,100% { transform: translateY(0) scale(1); }
+          50% { transform: translateY(-20px) scale(1.06); }
+        }
+        @keyframes orbFloat2 {
+          0%,100% { transform: translateY(0) scale(1); }
+          50% { transform: translateY(16px) scale(0.94); }
+        }
+
+        .pg-hero-glow-bg {
+          position: absolute;
+          top: -40px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 760px;
+          height: 300px;
+          background: radial-gradient(ellipse, rgba(37,99,235,0.13) 0%, rgba(6,182,212,0.07) 40%, transparent 70%);
+          pointer-events: none;
+          z-index: 0;
+          filter: blur(40px);
         }
 
         .pg-hero-grid {
+          position: relative;
+          z-index: 1;
           display: grid;
-          grid-template-columns: 1.15fr 0.85fr;
-          gap: 48px;
+          grid-template-columns: 1.1fr 0.9fr;
+          gap: 28px;
           align-items: center;
         }
 
+        /* Badge pill with live dot */
         .pg-badge-pill {
           display: inline-flex;
           align-items: center;
-          gap: 8px;
-          padding: 6px 14px;
+          gap: 7px;
+          padding: 4px 12px 4px 8px;
           border-radius: 999px;
-          background: rgba(37, 99, 235, 0.1);
-          border: 1px solid rgba(37, 99, 235, 0.25);
+          background: rgba(37,99,235,0.09);
+          border: 1px solid rgba(37,99,235,0.28);
           color: #2563eb;
-          font-size: 0.82rem;
-          font-weight: 700;
-          margin-bottom: 20px;
+          font-size: 0.67rem;
+          font-weight: 800;
+          letter-spacing: 0.04em;
+          margin-bottom: 12px;
+          backdrop-filter: blur(8px);
+        }
+        .pg-badge-live-dot {
+          display: inline-block;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #2563eb;
+          box-shadow: 0 0 6px rgba(37,99,235,0.7);
+          animation: pgPulseDot 1.8s ease-in-out infinite;
+          flex-shrink: 0;
+        }
+        @keyframes pgPulseDot {
+          0%,100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.45; transform: scale(0.75); }
         }
 
         .pg-main-hero-title {
-          font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+          font-size: clamp(1.7rem, 2.5vw, 2.3rem);
           font-weight: 900;
-          line-height: 1.12;
+          line-height: 1.16;
           letter-spacing: -0.04em;
-          margin: 0 0 20px 0;
+          margin: 0 0 10px 0;
           color: var(--text-primary);
         }
 
         .pg-gradient-text {
-          background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+          background: linear-gradient(135deg, #2563eb 0%, #0ea5e9 50%, #6366f1 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
 
         .pg-hero-lead {
-          font-size: 1.12rem;
-          line-height: 1.6;
+          font-size: 0.875rem;
+          line-height: 1.52;
           color: var(--text-secondary);
-          margin-bottom: 32px;
-          max-width: 580px;
+          margin-bottom: 14px;
+          max-width: 460px;
+          font-weight: 450;
+        }
+
+        /* Feature pills strip */
+        .pg-hero-feature-pills {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin-bottom: 18px;
+        }
+        .pg-feat-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          padding: 3px 9px;
+          border-radius: 6px;
+          background: var(--card-bg);
+          border: 1px solid var(--card-border);
+          font-size: 0.69rem;
+          font-weight: 700;
+          color: var(--text-secondary);
+          white-space: nowrap;
+          transition: all 0.18s ease;
+        }
+        .pg-feat-pill:hover {
+          border-color: #2563eb;
+          color: #2563eb;
+          background: rgba(37,99,235,0.06);
+        }
+        .pg-feat-pill-accent {
+          background: rgba(37,99,235,0.08);
+          border-color: rgba(37,99,235,0.3);
+          color: #2563eb;
         }
 
         .pg-hero-cta-group {
           display: flex;
-          gap: 16px;
-          margin-bottom: 40px;
+          gap: 10px;
+          margin-bottom: 18px;
           flex-wrap: wrap;
+          align-items: center;
         }
 
         .pg-btn-hero-primary {
-          padding: 14px 26px;
+          padding: 10px 20px;
           background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-          border-radius: 14px;
-          color: #ffffff;
-          font-size: 0.98rem;
-          font-weight: 700;
+          border-radius: 10px;
+          color: #ffffff !important;
+          font-size: 0.84rem;
+          font-weight: 800;
           text-decoration: none;
           display: inline-flex;
           align-items: center;
-          gap: 10px;
-          box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
-          transition: all 0.2s ease;
+          gap: 7px;
+          box-shadow: 0 4px 18px -3px rgba(37,99,235,0.4);
+          transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
+          border: none;
         }
-
         .pg-btn-hero-primary:hover {
           transform: translateY(-2px);
-          box-shadow: 0 10px 25px rgba(37, 99, 235, 0.45);
+          box-shadow: 0 8px 24px -3px rgba(37,99,235,0.52);
         }
 
         .pg-btn-hero-secondary {
-          padding: 14px 26px;
+          padding: 10px 20px;
           background: var(--card-bg);
           border: 1.5px solid var(--card-border);
-          border-radius: 14px;
+          border-radius: 10px;
           color: var(--text-primary);
-          font-size: 0.98rem;
-          font-weight: 700;
+          font-size: 0.84rem;
+          font-weight: 800;
           cursor: pointer;
           display: inline-flex;
           align-items: center;
-          gap: 10px;
-          transition: all 0.2s ease;
+          gap: 7px;
+          transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
         }
-
         .pg-btn-hero-secondary:hover {
-          background: rgba(37, 99, 235, 0.08);
           border-color: #2563eb;
+          color: #2563eb;
+          transform: translateY(-1px);
+          background: rgba(37,99,235,0.05);
         }
 
-        /* Stats Row */
+        /* Stat cards grid */
         .pg-hero-stats-row {
-          display: flex;
-          align-items: center;
-          gap: 24px;
-          padding-top: 24px;
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 10px;
+          padding-top: 14px;
           border-top: 1px solid var(--card-border);
         }
-
-        .pg-stat-box {
+        .pg-stat-card {
           display: flex;
           flex-direction: column;
+          gap: 2px;
+          padding: 10px 12px;
+          border-radius: 10px;
+          background: var(--card-bg);
+          border: 1px solid var(--card-border);
+          transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-
+        .pg-stat-card:hover {
+          border-color: rgba(37,99,235,0.35);
+          box-shadow: 0 4px 12px rgba(37,99,235,0.08);
+        }
         .pg-stat-num {
-          font-size: 1.6rem;
+          font-size: 1.2rem;
           font-weight: 900;
-          letter-spacing: -0.03em;
+          letter-spacing: -0.04em;
           color: #2563eb;
+          line-height: 1;
         }
-
         .pg-stat-lbl {
-          font-size: 0.8rem;
-          font-weight: 600;
+          font-size: 0.65rem;
+          font-weight: 700;
           color: var(--text-muted);
-        }
-
-        .pg-stat-divider {
-          width: 1px;
-          height: 36px;
-          background: var(--card-border);
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
         }
 
         /* Hero Right Visual */
         .pg-hero-visual-card {
           position: relative;
-          border-radius: 24px;
+          border-radius: 18px;
           overflow: hidden;
-          box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.35);
+          box-shadow: 0 24px 52px -12px rgba(37,99,235,0.28), 0 10px 28px -10px rgba(0,0,0,0.2);
           border: 1px solid var(--card-border);
           background: var(--card-bg);
+          animation: pgHeroFloat 5.5s ease-in-out infinite;
+        }
+
+        .pg-hero-scan-line {
+          position: absolute;
+          left: 0;
+          top: -20%;
+          width: 100%;
+          height: 6px;
+          background: linear-gradient(to bottom, rgba(56,189,248,0) 0%, rgba(56,189,248,0.85) 50%, rgba(56,189,248,0) 100%);
+          box-shadow: 0 0 14px #38bdf8;
+          z-index: 5;
+          pointer-events: none;
+          animation: scanLineSweep 3.5s linear infinite;
+        }
+
+        @keyframes scanLineSweep {
+          0% { top: -10%; opacity: 0; }
+          15% { opacity: 1; }
+          85% { opacity: 1; }
+          100% { top: 110%; opacity: 0; }
+        }
+        @keyframes pgHeroFloat {
+          0%,100% { transform: translateY(0); }
+          50% { transform: translateY(-7px); }
         }
 
         .pg-hero-main-image {
           width: 100%;
-          height: auto;
+          max-height: 320px;
           display: block;
           object-fit: cover;
+          transition: transform 0.4s ease;
+        }
+        .pg-hero-visual-card:hover .pg-hero-main-image {
+          transform: scale(1.025);
         }
 
         .pg-card-badge-floating {
           position: absolute;
-          top: 18px;
-          left: 18px;
-          background: rgba(15, 23, 42, 0.88);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(16, 185, 129, 0.3);
-          border-radius: 12px;
-          padding: 10px 14px;
+          top: 12px;
+          left: 12px;
+          background: rgba(10,17,35,0.92);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(16,185,129,0.45);
+          border-radius: 9px;
+          padding: 6px 11px;
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 7px;
           color: #ffffff;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+          z-index: 4;
+          box-shadow: 0 6px 18px rgba(0,0,0,0.35);
         }
 
         .pg-card-badge-bottom {
           position: absolute;
-          bottom: 18px;
-          right: 18px;
-          background: rgba(15, 23, 42, 0.88);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(244, 63, 94, 0.3);
-          border-radius: 12px;
-          padding: 10px 14px;
+          bottom: 38px;
+          right: 12px;
+          background: rgba(10,17,35,0.92);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(244,63,94,0.45);
+          border-radius: 9px;
+          padding: 6px 11px;
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 7px;
           color: #ffffff;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+          z-index: 4;
+          box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+        }
+
+        /* Risk score bar at bottom of image card */
+        .pg-hero-score-bar {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background: rgba(10,17,35,0.88);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          padding: 6px 12px;
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          z-index: 4;
+          border-top: 1px solid rgba(244,63,94,0.25);
+        }
+        .pg-score-label {
+          font-size: 0.62rem;
+          font-weight: 800;
+          color: rgba(255,255,255,0.75);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+        .pg-score-track {
+          flex: 1;
+          height: 5px;
+          border-radius: 99px;
+          background: rgba(255,255,255,0.14);
+          overflow: hidden;
+        }
+        .pg-score-fill {
+          height: 100%;
+          width: 96%;
+          border-radius: 99px;
+          background: linear-gradient(90deg, #f59e0b 0%, #ef4444 60%, #dc2626 100%);
+          box-shadow: 0 0 8px rgba(239,68,68,0.6);
+        }
+        .pg-score-val {
+          font-size: 0.72rem;
+          font-weight: 900;
+          color: #ef4444;
+          flex-shrink: 0;
         }
 
         /* ── TICKER ── */
@@ -1908,12 +2108,13 @@ export default function LandingPage({
           .pg-hamburger { display: flex; }
 
           .pg-hero-section {
-            padding: 24px 16px 36px;
+            padding: 20px 16px 28px;
           }
+          .pg-hero-orb-1, .pg-hero-orb-2 { display: none; }
 
           .pg-hero-grid {
             grid-template-columns: 1fr;
-            gap: 24px;
+            gap: 20px;
           }
 
           .pg-hero-left {
@@ -1922,56 +2123,61 @@ export default function LandingPage({
           }
 
           .pg-main-hero-title {
-            font-size: clamp(2rem, 7.5vw, 2.75rem);
-            line-height: 1.15;
-            letter-spacing: -0.03em;
+            font-size: clamp(1.9rem, 7vw, 2.6rem);
+            line-height: 1.14;
+            letter-spacing: -0.04em;
           }
 
           .pg-hero-lead {
-            font-size: 0.94rem;
-            line-height: 1.55;
-            margin-bottom: 20px;
+            font-size: 0.9rem;
+            line-height: 1.52;
+            margin-bottom: 14px;
+          }
+
+          .pg-hero-feature-pills {
+            margin-bottom: 14px;
+          }
+          .pg-feat-pill {
+            font-size: 0.67rem;
+            padding: 3px 8px;
           }
 
           .pg-hero-cta-group {
             gap: 10px;
-            margin-bottom: 22px;
+            margin-bottom: 16px;
             flex-direction: row;
             flex-wrap: wrap;
           }
 
           .pg-btn-hero-primary,
           .pg-btn-hero-secondary {
-            padding: 12px 18px;
-            font-size: 0.88rem;
+            padding: 10px 16px;
+            font-size: 0.84rem;
             flex: 1;
-            min-width: 140px;
+            min-width: 130px;
             justify-content: center;
           }
 
           .pg-hero-stats-row {
-            gap: 12px;
-            display: grid;
             grid-template-columns: repeat(3, 1fr);
-            padding-top: 16px;
-            margin-top: 16px;
+            gap: 8px;
+            padding-top: 14px;
           }
-
-          .pg-stat-num { font-size: 1.25rem; }
-          .pg-stat-lbl { font-size: 0.68rem; }
+          .pg-stat-card { padding: 8px 10px; }
+          .pg-stat-num { font-size: 1.1rem; }
+          .pg-stat-lbl { font-size: 0.62rem; }
 
           .pg-hero-right {
             order: 2;
           }
 
           .pg-hero-visual-card {
-            border-radius: 18px;
+            border-radius: 16px;
           }
 
           .pg-card-badge-floating,
           .pg-card-badge-bottom {
-            padding: 7px 10px;
-            font-size: 0.72rem;
+            padding: 5px 9px;
           }
 
           .pg-ticker-section {

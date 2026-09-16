@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, ExternalLink, Sparkles } from 'lucide-react';
+import { Download, ExternalLink, Shield } from 'lucide-react';
 
 export default function ScanHistory({ scanHistory, onViewDetail, onExportPdf, t, searchQuery }) {
   const [filter, setFilter] = useState('All');
@@ -30,7 +30,6 @@ export default function ScanHistory({ scanHistory, onViewDetail, onExportPdf, t,
       <div className="scanner-vibrant-hero">
         <div className="scanner-vibrant-hero-content">
           <div className="scanner-vibrant-pill-tag">
-            <Sparkles size={14} />
             <span>SCAN HISTORY & REPORTS • FORENSIC AUDIT</span>
           </div>
           <h2 className="scanner-vibrant-hero-title">Scan History & Audit Reports</h2>

@@ -358,7 +358,6 @@ export default function MessageScanner({ onScanComplete, onViewDetail, t }) {
       <div className="scanner-vibrant-hero">
         <div className="scanner-vibrant-hero-content">
           <div className="scanner-vibrant-pill-tag">
-            <Sparkles size={14} />
             <span>Multi-Vector Smishing & Phone Spoofing Engine</span>
           </div>
           <h2 className="scanner-vibrant-hero-title">Message, Link & Phone Number Analysis</h2>
