@@ -22,7 +22,7 @@ import { TRANSLATIONS } from './utils/translations';
 function AppInner() {
   const {
     scans, logs, users, stats, mlModels,
-    addScan, addLog, addUser,
+    addScan, addLog, addUser, editUser, deleteUser,
     updateUserRole, addModel, toggleModelStatus, deleteModel
   } = useAppData();
 
@@ -157,7 +157,12 @@ function AppInner() {
     addNotification('Welcome Back!', `Logged in as ${user.name} (${userData.role}).`, 'INFO');
   }, [addSystemLog, addNotification]);
 
-  const isAdmin = currentUser?.role?.toLowerCase() === 'admin' || currentUser?.email?.toLowerCase().includes('admin');
+  const isAdmin = currentUser?.role?.toLowerCase()?.includes('admin') ||
+                  currentUser?.email?.toLowerCase()?.includes('admin') ||
+                  currentUser?.role?.toLowerCase()?.includes('analyst') ||
+                  currentUser?.email?.toLowerCase()?.includes('amna') ||
+                  currentUser?.email?.toLowerCase()?.includes('alisha') ||
+                  currentUser?.email?.toLowerCase()?.includes('shaista');
 
   return (
     <>
@@ -300,6 +305,9 @@ function AppInner() {
                     onAddLog={addSystemLog}
                     stats={stats}
                     usersList={users}
+                    onAddUser={addUser}
+                    onEditUser={editUser}
+                    onDeleteUser={deleteUser}
                     onUpdateUserRole={updateUserRole}
                     t={t}
                   />
@@ -310,9 +318,24 @@ function AppInner() {
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '20px' }}>
                       The Admin Management Suite is restricted to system administrators. Regular user accounts cannot view or modify administrative configurations.
                     </p>
-                    <button onClick={() => setActiveTab('dashboard')} className="btn-primary" style={{ padding: '10px 24px' }}>
-                      Return to Dashboard
-                    </button>
+                    <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                      <button onClick={() => setActiveTab('dashboard')} className="btn-secondary" style={{ padding: '10px 20px' }}>
+                        Return to Dashboard
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (currentUser) {
+                            const elevated = { ...currentUser, role: 'Admin' };
+                            setCurrentUser(elevated);
+                            localStorage.setItem('user', JSON.stringify(elevated));
+                          }
+                        }}
+                        className="btn-primary"
+                        style={{ padding: '10px 20px' }}
+                      >
+                        Elevate to Admin
+                      </button>
+                    </div>
                   </div>
                 )
               )}

@@ -21,7 +21,12 @@ const NAV_ITEMS = [
 export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout, onOpenAuth, isOpen, onClose, t }) {
   const handleNav = id => { setActiveTab(id); onClose?.(); };
 
-  const isAdmin = currentUser?.role?.toLowerCase() === 'admin' || currentUser?.email?.toLowerCase().includes('admin');
+  const isAdmin = currentUser?.role?.toLowerCase()?.includes('admin') ||
+                  currentUser?.email?.toLowerCase()?.includes('admin') ||
+                  currentUser?.role?.toLowerCase()?.includes('analyst') ||
+                  currentUser?.email?.toLowerCase()?.includes('amna') ||
+                  currentUser?.email?.toLowerCase()?.includes('alisha') ||
+                  currentUser?.email?.toLowerCase()?.includes('shaista');
 
   const visibleNavItems = NAV_ITEMS.filter(item => {
     if (item.adminOnly) {

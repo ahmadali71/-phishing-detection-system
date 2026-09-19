@@ -69,7 +69,7 @@ export default function LandingPage({
           reasons: [
             'Domain matches verified registrar with multi-year trust history',
             'Valid high-assurance SSL/TLS certificate issued to Google LLC',
-            'Zero presence on 72 global cybersecurity threat blocklists'
+            'Zero presence on PhishTank and global threat intelligence lists'
           ]
         });
       } else if (isMedium) {
@@ -133,7 +133,7 @@ export default function LandingPage({
       icon: Activity,
       color: '#10b981',
       title: 'Multi-Model Machine Learning',
-      desc: 'Ensemble Random Forest, XGBoost, and BERT neural transformers provide benchmarked 99.4% detection accuracy.',
+      desc: 'Ensemble Random Forest, SVM, and BERT neural transformers provide benchmarked 94.6% detection accuracy.',
       page: 'dashboard'
     },
     {
@@ -146,10 +146,10 @@ export default function LandingPage({
   ];
 
   const liveIntercepts = [
-    { id: 1, target: 'paypa1-account-security-alert.net', threat: 'High Phishing', score: 96, time: 'Just now' },
-    { id: 2, target: 'USPS-Package-Fee: bit.ly/usps-resched (+1-888-421)', threat: 'Smishing Alert', score: 91, time: '18s ago' },
-    { id: 3, target: 'https://www.github.com/security', threat: 'Verified Safe', score: 2, time: '34s ago' },
-    { id: 4, target: 'micros0ft365-password-renew.live', threat: 'Credential Theft', score: 98, time: '1m ago' },
+    { id: 1, target: 'paypal-secure-login.com', threat: 'High Phishing', score: 90, time: '2 min ago' },
+    { id: 2, target: 'Verify your account.eml', threat: 'Suspicious Email', score: 65, time: '15 min ago' },
+    { id: 3, target: 'microsoft.com', threat: 'Verified Safe', score: 10, time: '1 hour ago' },
+    { id: 4, target: 'secure-login.bank.com', threat: 'Phishing Intercepted', score: 95, time: '3 hours ago' },
   ];
 
   return (
@@ -265,7 +265,7 @@ export default function LandingPage({
               <span className="pg-feat-pill">⚡ 25+ Lexical Checks</span>
               <span className="pg-feat-pill">🧠 BERT NLP Engine</span>
               <span className="pg-feat-pill">👁️ Vision OCR Match</span>
-              <span className="pg-feat-pill pg-feat-pill-accent">🛡️ 99.4% Verified Accuracy</span>
+              <span className="pg-feat-pill pg-feat-pill-accent">🛡️ 94.6% Validated Accuracy</span>
             </div>
 
             <div className="pg-hero-cta-group">
@@ -289,7 +289,7 @@ export default function LandingPage({
             {/* Stat cards */}
             <div className="pg-hero-stats-row">
               <div className="pg-stat-card">
-                <div className="pg-stat-num">99.4%</div>
+                <div className="pg-stat-num">94.6%</div>
                 <div className="pg-stat-lbl">Detection Accuracy</div>
               </div>
               <div className="pg-stat-card">
@@ -297,8 +297,8 @@ export default function LandingPage({
                 <div className="pg-stat-lbl">Real-time Inference</div>
               </div>
               <div className="pg-stat-card">
-                <div className="pg-stat-num">148k+</div>
-                <div className="pg-stat-lbl">Threats Intercepted</div>
+                <div className="pg-stat-num">2,568</div>
+                <div className="pg-stat-lbl">Total System Scans</div>
               </div>
             </div>
           </div>
@@ -311,7 +311,7 @@ export default function LandingPage({
               <div className="pg-card-badge-floating">
                 <ShieldCheck size={15} color="#10b981" />
                 <div>
-                  <div style={{ fontWeight: 800, fontSize: '0.76rem' }}>Autonomous Shield Active</div>
+                  <div style={{ fontWeight: 800, fontSize: '0.76rem' }}>Automated Shield Active</div>
                   <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.7)' }}>Heuristics · Vision · NLP</div>
                 </div>
               </div>
@@ -325,16 +325,16 @@ export default function LandingPage({
               <div className="pg-card-badge-bottom">
                 <AlertTriangle size={14} color="#f43f5e" />
                 <div>
-                  <div style={{ fontWeight: 800, fontSize: '0.72rem', color: '#f43f5e' }}>Threat Blocked · Score 96/100</div>
-                  <div style={{ fontSize: '0.63rem', color: 'rgba(255,255,255,0.7)' }}>Homoglyph spoofing quarantined</div>
+                  <div style={{ fontWeight: 800, fontSize: '0.72rem', color: '#f43f5e' }}>Threat Blocked · Score 90/100</div>
+                  <div style={{ fontSize: '0.63rem', color: 'rgba(255,255,255,0.7)' }}>paypal-secure-login.com flagged</div>
                 </div>
               </div>
 
               {/* Risk score bar */}
               <div className="pg-hero-score-bar">
                 <div className="pg-score-label">Risk Score</div>
-                <div className="pg-score-track"><div className="pg-score-fill"></div></div>
-                <div className="pg-score-val">96</div>
+                <div className="pg-score-track"><div className="pg-score-fill" style={{ width: '90%' }}></div></div>
+                <div className="pg-score-val">90</div>
               </div>
             </div>
           </div>
@@ -367,7 +367,7 @@ export default function LandingPage({
       <section id="features" className="pg-matrix-section">
         <div className="pg-section-header">
           <div className="pg-subhead-pill">360° Cyber Threat Intelligence</div>
-          <h2 className="pg-section-title">Offensive Cyber Threat Vectors vs. Autonomous AI Defense</h2>
+          <h2 className="pg-section-title">Offensive Cyber Threat Vectors vs. Automated AI Defense</h2>
           <p className="pg-section-desc">
             See how modern attackers engineer deceptive phishing campaigns and how Automatic Phishing Detection System's neural shield intercepts them in real-time.
           </p>
@@ -388,21 +388,21 @@ export default function LandingPage({
             <div className="pg-matrix-body">
               <h3 className="pg-matrix-title red-title">Attacker Infrastructure &amp; Social Engineering</h3>
               <p className="pg-matrix-desc">
-                Cybercriminals deploy mass automated campaign engines, homoglyph typosquatting (<code className="pg-code">paypa1.com</code>), and urgency triggers to harvest enterprise credentials.
+                Cybercriminals deploy mass automated campaign engines, homoglyph typosquatting (<code className="pg-code">paypa1.com</code>), and urgency triggers to harvest credentials and banking data.
               </p>
 
               <div className="pg-matrix-bullets">
                 <div className="pg-mb-item">
                   <span className="pg-mb-dot red-dot" />
-                  <span><strong>50,000+ Phishing Emails/Min:</strong> Scaled spoofing infrastructure targeting employees.</span>
+                  <span><strong>Typosquatting &amp; Homoglyphs:</strong> Fake deceptive domains mimicking trusted brands and services.</span>
                 </div>
                 <div className="pg-mb-item">
                   <span className="pg-mb-dot red-dot" />
-                  <span><strong>Visual Impersonation:</strong> Cloned login portals targeting banking &amp; corporate SSO.</span>
+                  <span><strong>Visual Impersonation:</strong> Cloned login portals targeting banking, corporate SSO, and email accounts.</span>
                 </div>
                 <div className="pg-mb-item">
                   <span className="pg-mb-dot red-dot" />
-                  <span><strong>SMS Shortlink Traps:</strong> Masked shortlinks bypassing legacy email filters.</span>
+                  <span><strong>SMS Shortlink Traps:</strong> Masked shortlinks (bit.ly/tinyurl) and deceptive mobile payment alerts.</span>
                 </div>
               </div>
             </div>
@@ -412,7 +412,7 @@ export default function LandingPage({
           <div className="pg-matrix-card defensive-card">
             <div className="pg-matrix-badge defensive-badge">
               <ShieldCheck size={14} />
-              <span>AUTONOMOUS DEFENSIVE SHIELD</span>
+              <span>AUTOMATED DEFENSIVE SHIELD</span>
             </div>
 
             <div className="pg-matrix-img-wrap">
@@ -422,21 +422,21 @@ export default function LandingPage({
             <div className="pg-matrix-body">
               <h3 className="pg-matrix-title blue-title">Real-Time AI Neutralization &amp; Heuristics</h3>
               <p className="pg-matrix-desc">
-                Automatic Phishing Detection System's multi-modal AI engine evaluates domain WHOIS entropy, computer vision logo matching, and NLP coercion signals in &lt;115ms.
+                Automatic Phishing Detection System's multi-modal AI engine evaluates URL Shannon entropy, domain age, SSL validity, OCR text extraction, and NLP coercion signals in &lt;115ms.
               </p>
 
               <div className="pg-matrix-bullets">
                 <div className="pg-mb-item">
                   <span className="pg-mb-dot blue-dot" />
-                  <span><strong>99.4% Detection Accuracy:</strong> Ensemble Random Forest + BERT model.</span>
+                  <span><strong>94.6% Validated Accuracy:</strong> Random Forest, SVM &amp; DistilBERT NLP trained on PhishTank &amp; Enron.</span>
                 </div>
                 <div className="pg-mb-item">
                   <span className="pg-mb-dot blue-dot" />
-                  <span><strong>Computer Vision OCR:</strong> Detects visual logo forgery &amp; QR traps.</span>
+                  <span><strong>Computer Vision OCR:</strong> Analyzes screenshots to catch visual brand spoofing &amp; QR code traps.</span>
                 </div>
                 <div className="pg-mb-item">
                   <span className="pg-mb-dot blue-dot" />
-                  <span><strong>Automated SOC Intercept:</strong> Real-time domain quarantine &amp; threat feeds.</span>
+                  <span><strong>SMS Smishing &amp; AI Copilot:</strong> Unmasks shortlinks and provides real-time interactive security guidance.</span>
                 </div>
               </div>
             </div>

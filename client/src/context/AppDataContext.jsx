@@ -44,11 +44,26 @@ export function AppDataProvider({ children }) {
   // Data state
   const [scans, setScans] = useState(() => loadFromStorage(STORAGE_KEYS.scans, INITIAL_SCAN_HISTORY));
   const [logs, setLogs] = useState(() => loadFromStorage(STORAGE_KEYS.logs, INITIAL_SYSTEM_LOGS));
-  const [users, setUsers] = useState(() => loadFromStorage(STORAGE_KEYS.users, [
-    { name: 'Amna Najam', email: 'amnanajam2003@gmail.com', role: 'BS IT Student / Security Analyst' },
-    { name: 'Alisha Noor', email: 'ashkapoor887@gmail.com', role: 'BS IT Student / Security Analyst' },
-    { name: 'Mam Shaista Ghafoor', email: 'shaista.ghafoor@uos.edu.pk', role: 'Admin / Head of Department' },
-  ]));
+  const [users, setUsers] = useState(() => {
+    const raw = loadFromStorage(STORAGE_KEYS.users, null);
+    if (raw && Array.isArray(raw) && raw.length > 0) {
+      return raw.map(u => ({
+        id: u.id || `usr-${Math.random().toString(36).substring(2, 9)}`,
+        name: u.name || 'User',
+        email: u.email || 'user@apds.edu',
+        role: u.role || 'Security Analyst',
+        department: u.department || 'Dept of CS & IT, UOS',
+        status: u.status || 'Active',
+        joinedDate: u.joinedDate || '2026-01-15'
+      }));
+    }
+    return [
+      { id: 'usr-01', name: 'Amna Najam', email: 'amnanajam2003@gmail.com', role: 'Admin', department: 'BS IT (Dept of CS & IT, UOS)', status: 'Active', joinedDate: '2026-01-15' },
+      { id: 'usr-02', name: 'Alisha Noor', email: 'ashkapoor887@gmail.com', role: 'Admin', department: 'BS IT (Dept of CS & IT, UOS)', status: 'Active', joinedDate: '2026-01-15' },
+      { id: 'usr-03', name: 'Mam Shaista Ghafoor', email: 'shaista.ghafoor@uos.edu.pk', role: 'Admin', department: 'Head of Department / Supervisor', status: 'Active', joinedDate: '2025-09-01' },
+      { id: 'usr-04', name: 'Cyber Security Auditor', email: 'auditor@apds.uos.edu.pk', role: 'Security Analyst', department: 'Forensic Lab', status: 'Active', joinedDate: '2026-02-20' },
+    ];
+  });
   const [stats, setStats] = useState(() => loadFromStorage(STORAGE_KEYS.stats, INITIAL_STATS));
   const [mlModels, setMlModels] = useState(() => loadFromStorage(STORAGE_KEYS.mlModels, INITIAL_ML_MODELS));
 
@@ -118,7 +133,10 @@ export function AppDataProvider({ children }) {
           });
           break;
         case 'USER_UPDATED':
-          setUsers(prev => prev.map(u => u.email === msg.payload.email ? { ...u, ...msg.payload } : u));
+          setUsers(prev => prev.map(u => u.email.toLowerCase() === msg.payload.email.toLowerCase() ? { ...u, ...msg.payload } : u));
+          break;
+        case 'USER_DELETED':
+          setUsers(prev => prev.filter(u => u.email.toLowerCase() !== msg.payload.email.toLowerCase()));
           break;
         case 'MODEL_ADDED':
           setMlModels(prev => {
@@ -232,12 +250,22 @@ export function AppDataProvider({ children }) {
   }, [broadcast]);
 
   const addUser = useCallback((userData) => {
-    const newUser = { ...userData, id: userData.email || Date.now().toString() };
+    const newUser = {
+      id: userData.id || `usr-${Date.now()}`,
+      name: userData.name || 'Anonymous User',
+      email: userData.email,
+      role: userData.role || 'Security Analyst',
+      department: userData.department || 'Dept of CS & IT, UOS',
+      status: userData.status || 'Active',
+      joinedDate: userData.joinedDate || new Date().toISOString().split('T')[0]
+    };
 
     setUsers(prev => {
-      const exists = prev.some(u => u.email === newUser.email);
-      if (exists) return prev;
-      const next = [...prev, newUser];
+      const exists = prev.some(u => u.email.toLowerCase() === newUser.email.toLowerCase());
+      if (exists) {
+        return prev.map(u => u.email.toLowerCase() === newUser.email.toLowerCase() ? { ...u, ...newUser } : u);
+      }
+      const next = [newUser, ...prev];
       saveToStorage(STORAGE_KEYS.users, next);
       return next;
     });
@@ -246,9 +274,32 @@ export function AppDataProvider({ children }) {
     return newUser;
   }, [broadcast]);
 
+  const editUser = useCallback((originalEmail, updatedData) => {
+    setUsers(prev => {
+      const next = prev.map(u => {
+        if (u.email.toLowerCase() !== originalEmail.toLowerCase()) return u;
+        return { ...u, ...updatedData };
+      });
+      saveToStorage(STORAGE_KEYS.users, next);
+      return next;
+    });
+
+    broadcast({ type: 'USER_UPDATED', payload: { email: originalEmail, ...updatedData } });
+  }, [broadcast]);
+
+  const deleteUser = useCallback((email) => {
+    setUsers(prev => {
+      const next = prev.filter(u => u.email.toLowerCase() !== email.toLowerCase());
+      saveToStorage(STORAGE_KEYS.users, next);
+      return next;
+    });
+
+    broadcast({ type: 'USER_DELETED', payload: { email } });
+  }, [broadcast]);
+
   const updateUserRole = useCallback((email, role) => {
     setUsers(prev => {
-      const next = prev.map(u => u.email === email ? { ...u, role } : u);
+      const next = prev.map(u => u.email.toLowerCase() === email.toLowerCase() ? { ...u, role } : u);
       saveToStorage(STORAGE_KEYS.users, next);
       return next;
     });
@@ -276,25 +327,25 @@ export function AppDataProvider({ children }) {
   }, [broadcast]);
 
   const toggleModelStatus = useCallback((id) => {
+    let nextStatus = 'Active';
     setMlModels(prev => {
       const next = prev.map(m => {
         if (m.id !== id) return m;
         const newStatus = m.status === 'Active' ? 'Standby' : 'Active';
+        nextStatus = newStatus;
         return { ...m, status: newStatus };
       });
       saveToStorage(STORAGE_KEYS.mlModels, next);
       return next;
     });
 
-    const target = mlModels.find(m => m.id === id);
-    const newStatus = target?.status === 'Active' ? 'Standby' : 'Active';
-    broadcast({ type: 'MODEL_TOGGLED', payload: { id, status: newStatus } });
+    broadcast({ type: 'MODEL_TOGGLED', payload: { id, status: nextStatus } });
 
-    // Sync to backend
-    modelsService.updateModel(id, { status: newStatus }).catch(err => {
+    // Sync to backend asynchronously
+    modelsService.updateModel(id, { status: nextStatus }).catch(err => {
       console.warn('Error updating model in backend:', err.message);
     });
-  }, [mlModels, broadcast]);
+  }, [broadcast]);
 
   const deleteModel = useCallback((id) => {
     setMlModels(prev => {
@@ -321,7 +372,7 @@ export function AppDataProvider({ children }) {
 
   const value = useMemo(() => ({
     scans, logs, users, stats, mlModels,
-    addScan, addLog, addUser, updateUserRole,
+    addScan, addLog, addUser, editUser, deleteUser, updateUserRole,
     addModel, toggleModelStatus, deleteModel,
     refreshAll,
     // Backend status (kept for FirebaseStatus component compatibility)
@@ -329,7 +380,7 @@ export function AppDataProvider({ children }) {
     firebaseError: backendError,
     isLocalMode: !backendReady || !!backendError,
   }), [scans, logs, users, stats, mlModels,
-    addScan, addLog, addUser, updateUserRole,
+    addScan, addLog, addUser, editUser, deleteUser, updateUserRole,
     addModel, toggleModelStatus, deleteModel, refreshAll,
     backendReady, backendError]);
 
