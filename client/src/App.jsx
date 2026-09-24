@@ -217,6 +217,7 @@ function AppInner() {
             searchQuery={searchQuery} setSearchQuery={setSearchQuery}
             onSelectSearchResult={() => setActiveTab('scan-history')}
             onMenuToggle={() => setSidebarOpen(v => !v)}
+            sidebarOpen={sidebarOpen}
             showSearch={showSearch}
             setShowSearch={setShowSearch}
             showNotifications={showNotifications}
@@ -225,15 +226,19 @@ function AppInner() {
           />
 
           <div className="app-body">
-            {activeTab !== 'home' && (
+            {(activeTab !== 'home' || sidebarOpen) && (
               <Sidebar
                 activeTab={activeTab}
-                setActiveTab={setActiveTab}
+                setActiveTab={(tab) => {
+                  setActiveTab(tab);
+                  setSidebarOpen(false);
+                }}
                 currentUser={currentUser}
                 onLogout={() => { localStorage.removeItem('user'); setCurrentUser(null); setGuestView('auth'); }}
                 onOpenAuth={() => setIsAuthOpen(true)}
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)}
+                isOverlay={activeTab === 'home'}
                 t={t}
               />
             )}

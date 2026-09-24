@@ -381,7 +381,7 @@ export default function LandingPage({
 
               {/* Hamburger */}
               <button
-                className="apds-nav-hamburger"
+                className={`apds-nav-hamburger${mobileMenuOpen ? ' active' : ''}`}
                 onClick={() => setMobileMenuOpen(v => !v)}
                 aria-label="Toggle menu"
               >
@@ -1316,33 +1316,68 @@ export default function LandingPage({
         }
         .apds-nav-hamburger {
           display: none;
-          background: none;
-          border: none;
-          color: #ffffff;
+          align-items: center;
+          justify-content: center;
+          width: 40px;
+          height: 40px;
+          min-width: 40px;
+          border-radius: 10px;
+          background: rgba(56, 189, 248, 0.12);
+          border: 1px solid rgba(56, 189, 248, 0.35);
+          color: #38bdf8;
           cursor: pointer;
-          padding: 4px;
+          transition: all 0.2s ease;
+          flex-shrink: 0;
+        }
+        .apds-nav-hamburger:hover,
+        .apds-nav-hamburger.active {
+          background: rgba(56, 189, 248, 0.25);
+          border-color: #38bdf8;
+          color: #ffffff;
+          box-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
         }
         .apds-mobile-dropdown {
           display: flex;
           flex-direction: column;
-          gap: 10px;
-          padding: 16px 24px;
-          background: #042c53;
-          border-bottom: 1px solid rgba(56, 189, 248, 0.3);
+          gap: 6px;
+          padding: 16px 20px 22px;
+          background: rgba(4, 30, 60, 0.98);
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
+          border-bottom: 2px solid rgba(56, 189, 248, 0.35);
+          box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65);
+          animation: mobDropSlide 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes mobDropSlide {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
         }
         .apds-mob-link {
           color: #e2e8f0;
           font-size: 0.95rem;
-          font-weight: 600;
+          font-weight: 700;
           text-decoration: none;
-          padding: 8px 0;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          padding: 10px 14px;
+          border-radius: 9px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          transition: all 0.18s ease;
+        }
+        .apds-mob-link:hover,
+        .apds-mob-link:active {
+          background: rgba(56, 189, 248, 0.15);
+          color: #38bdf8;
+          padding-left: 18px;
         }
         .apds-mob-auth {
           display: flex;
           flex-direction: column;
-          gap: 8px;
-          margin-top: 10px;
+          gap: 10px;
+          margin-top: 12px;
+          padding-top: 14px;
+          border-top: 1px solid rgba(56, 189, 248, 0.2);
         }
 
         /* ── HERO SECTION ── */
@@ -2517,15 +2552,35 @@ export default function LandingPage({
           }
         }
 
+        @media (max-width: 1024px) {
+          .apds-nav-menu { display: none !important; }
+          .apds-nav-hamburger { display: flex !important; }
+          .apds-nav-actions .apds-btn-ghost { display: none !important; }
+          .apds-nav-actions .apds-btn-glow span { display: none !important; }
+          .apds-nav-actions .apds-btn-glow {
+            padding: 8px 12px !important;
+          }
+        }
+
         @media (max-width: 768px) {
-          .apds-nav-menu { display: none; }
-          .apds-nav-hamburger { display: block; }
-          .apds-hero-h1 { font-size: 2.3rem; }
+          .apds-nav-menu { display: none !important; }
+          .apds-nav-hamburger { display: flex !important; }
+          .apds-nav-actions .apds-btn-glow { display: none !important; }
+          .apds-nav-actions { gap: 8px !important; }
+          .apds-nav-container { padding: 0 14px !important; }
+          .apds-hero-h1 { font-size: clamp(1.8rem, 6vw, 2.3rem); }
           .apds-matrix-grid { grid-template-columns: 1fr; }
           .apds-vector-grid,
           .apds-pipeline-grid { grid-template-columns: 1fr; }
           .apds-footer-grid { grid-template-columns: 1fr; }
           .apds-cta-heading { font-size: 1.8rem; }
+        }
+
+        @media (max-width: 640px) {
+          .apds-navbar { height: 60px !important; }
+          .apds-nav-container { height: 60px !important; padding: 0 10px !important; }
+          .logo-brand-desktop { display: none !important; }
+          .logo-brand-mobile { display: inline-flex !important; }
         }
         /* ═══════════════════════════════════════════════
            HERO V2 — 3D Globe Design

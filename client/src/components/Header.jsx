@@ -10,6 +10,7 @@ export default function Header({
   notifications, onMarkNotificationRead, onClearNotifications,
   searchQuery, setSearchQuery, onSelectSearchResult,
   onMenuToggle,
+  sidebarOpen,
   showSearch, setShowSearch,
   showNotifications, setShowNotifications,
   t
@@ -49,11 +50,14 @@ export default function Header({
     <header className="app-header">
       {/* ── LEFT ── */}
       <div className="header-left">
-        {activeTab !== 'home' && (
-          <button onClick={onMenuToggle} className="hamburger-btn" aria-label="Open menu">
-            <Menu size={19} />
-          </button>
-        )}
+        <button
+          onClick={onMenuToggle}
+          className={`hamburger-btn${sidebarOpen ? ' active' : ''}`}
+          aria-label="Toggle navigation menu"
+          title="Menu"
+        >
+          <Menu size={20} />
+        </button>
 
         <div
           className="header-brand-wrap"
@@ -472,6 +476,33 @@ export default function Header({
           display: none;
         }
 
+        .hamburger-btn {
+          display: none;
+          align-items: center;
+          justify-content: center;
+          width: 38px;
+          height: 38px;
+          min-width: 38px;
+          border-radius: 9px;
+          background: rgba(56, 189, 248, 0.12);
+          border: 1px solid rgba(56, 189, 248, 0.3);
+          color: #38bdf8;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          flex-shrink: 0;
+          margin-right: 6px;
+        }
+        .hamburger-btn:hover,
+        .hamburger-btn.active {
+          background: rgba(56, 189, 248, 0.25);
+          border-color: #38bdf8;
+          color: #ffffff;
+          box-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
+        }
+        .hamburger-btn:active {
+          transform: scale(0.94);
+        }
+
         /* ── MOBILE FIXES ── */
         .app-header {
           height: 64px !important;
@@ -480,6 +511,11 @@ export default function Header({
           flex-wrap: nowrap !important;
           overflow: visible !important;
           padding: 0 16px !important;
+        }
+        @media (max-width: 1024px) {
+          .hamburger-btn {
+            display: flex !important;
+          }
         }
         @media (max-width: 900px) {
           .pg-desktop-only {

@@ -84,9 +84,8 @@ export default function Logo({ size = 'md', showText = true, showSubtitle = fals
             }}
           >
             {useShort ? (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                <span>APDS</span>
-                <span style={{ color: '#38bdf8', fontSize: '0.85em', fontWeight: 800 }}>AI</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                <span style={{ color: lightText ? '#ffffff' : 'var(--text-primary, #0f172a)' }}>APDS</span>
               </span>
             ) : (
               <span className="logo-brand-text">
@@ -94,9 +93,8 @@ export default function Logo({ size = 'md', showText = true, showSubtitle = fals
                   <span style={{ color: lightText ? '#ffffff' : 'var(--text-primary, #0f172a)' }}>Automated</span>
                   <span style={{ color: '#38bdf8' }}>Phishing Detection System</span>
                 </span>
-                <span className="logo-brand-mobile" style={{ alignItems: 'center', gap: '4px' }}>
+                <span className="logo-brand-mobile" style={{ alignItems: 'center' }}>
                   <span style={{ color: lightText ? '#ffffff' : 'var(--text-primary, #0f172a)' }}>APDS</span>
-                  <span style={{ color: '#38bdf8', fontSize: '0.82em', fontWeight: 800 }}>AI</span>
                 </span>
               </span>
             )}

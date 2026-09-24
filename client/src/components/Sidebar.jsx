@@ -18,7 +18,7 @@ const NAV_ITEMS = [
   { id: 'profile-settings', label: 'Profile & Settings', icon: Settings },
 ];
 
-export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout, onOpenAuth, isOpen, onClose, t }) {
+export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout, onOpenAuth, isOpen, onClose, isOverlay = false, t }) {
   const handleNav = id => { setActiveTab(id); onClose?.(); };
 
   const isAdmin = currentUser?.role?.toLowerCase()?.includes('admin') ||
@@ -43,7 +43,7 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
         />
       )}
 
-      <aside className={`app-sidebar${isOpen ? ' sidebar-open' : ''}`}>
+      <aside className={`app-sidebar${isOpen ? ' sidebar-open' : ''}${isOverlay ? ' sidebar-overlay-mode' : ''}`}>
         {/* ── Header ── */}
         <div className="sidebar-header">
           <div className="sidebar-logo" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
