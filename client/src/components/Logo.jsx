@@ -84,9 +84,21 @@ export default function Logo({ size = 'md', showText = true, showSubtitle = fals
             }}
           >
             {useShort ? (
-              <>AP<span style={{ color: '#2563eb' }}>DS</span></>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <span>APDS</span>
+                <span style={{ color: '#38bdf8', fontSize: '0.85em', fontWeight: 800 }}>AI</span>
+              </span>
             ) : (
-              <>Automatic Phishing <span style={{ color: '#2563eb' }}>Detection System</span></>
+              <span className="logo-brand-text">
+                <span className="logo-brand-desktop" style={{ alignItems: 'baseline', gap: '5px' }}>
+                  <span style={{ color: lightText ? '#ffffff' : 'var(--text-primary, #0f172a)' }}>Automated</span>
+                  <span style={{ color: '#38bdf8' }}>Phishing Detection System</span>
+                </span>
+                <span className="logo-brand-mobile" style={{ alignItems: 'center', gap: '4px' }}>
+                  <span style={{ color: lightText ? '#ffffff' : 'var(--text-primary, #0f172a)' }}>APDS</span>
+                  <span style={{ color: '#38bdf8', fontSize: '0.82em', fontWeight: 800 }}>AI</span>
+                </span>
+              </span>
             )}
           </span>
           {showSubtitle && (
@@ -100,7 +112,7 @@ export default function Logo({ size = 'md', showText = true, showSubtitle = fals
                 marginTop: '2px',
               }}
             >
-              AUTOMATIC PHISHING DETECTION SYSTEM
+              REAL-TIME AI DEFENSE &amp; THREAT INTELLIGENCE
             </span>
           )}
         </div>

@@ -58,35 +58,11 @@ export default function EmailScanner({ onScanComplete, t }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '980px', margin: '0 auto' }}>
-      {/* ── VIBRANT HERO CARD (Exact Match to User Reference) ── */}
-      <div className="scanner-vibrant-hero">
-        <div className="scanner-vibrant-hero-content">
-          <div className="scanner-vibrant-pill-tag">
-            <span>EMAIL DETECTION SCREEN • NLP THREAT ENGINE</span>
-          </div>
-          <h2 className="scanner-vibrant-hero-title">NLP Email Threat Inspector</h2>
-          <p className="scanner-vibrant-hero-desc">
-            Deep linguistic and semantic scanning for social engineering, urgency coercions, and embedded malicious links.
-          </p>
-          <div className="scanner-vibrant-chips">
-            <div className="scanner-vibrant-chip-item">⏱️ Urgency Triggers</div>
-            <div className="scanner-vibrant-chip-item">🔗 Deceptive Links</div>
-            <div className="scanner-vibrant-chip-item">💳 Credential Phishing</div>
-            <div className="scanner-vibrant-chip-item">📎 Malicious Files</div>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              const el = document.getElementById('email-scan-textarea');
-              if (el) { el.focus(); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-            }}
-            className="scanner-vibrant-hero-btn"
-          >
-            Inspect Email Now →
-          </button>
-        </div>
-        <div className="scanner-vibrant-hero-circle">
-          <Mail size={46} strokeWidth={2.2} />
+      {/* ── Clean Page Header (Name Only) ── */}
+      <div className="page-header-clean">
+        <div className="page-header-text">
+          <h1 className="page-title-clean">Email Threat Inspector</h1>
+          <p className="page-subtitle-clean">Paste the email content or upload a file to analyze for phishing signs</p>
         </div>
       </div>
 

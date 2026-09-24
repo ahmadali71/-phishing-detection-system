@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Bell, Moon, Sun, Search, X, Trash2, Menu, Home, LayoutDashboard, Layers } from 'lucide-react';
+import { Bell, Search, X, Trash2, Menu } from 'lucide-react';
 import Logo from './Logo';
 
 export default function Header({
@@ -43,10 +43,7 @@ export default function Header({
     return () => document.removeEventListener('mousedown', onClickOutside);
   }, [setShowNotifications]);
 
-  const cycleTheme = () => {
-    const next = theme === 'light' ? 'dark' : theme === 'dark' ? 'navy' : 'light';
-    setTheme(next);
-  };
+
 
   return (
     <header className="app-header">
@@ -61,56 +58,62 @@ export default function Header({
         <div
           className="header-brand-wrap"
           onClick={() => setActiveTab && setActiveTab('home')}
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}
+          title="Automated Phishing Detection System - Home"
         >
-          <Logo size="sm" useShort={true} showText={true} />
-          <span className="hdr-brand-full pg-desktop-only">Automatic Phishing Detection System</span>
-          {activeTab !== 'home' && (
-            <div className="header-page-chip">
-              {getPageTitle()}
-            </div>
-          )}
+          <Logo size="sm" useShort={false} showText={true} lightText={true} className="hdr-logo-full" />
+
+
         </div>
       </div>
 
-      {/* ── CENTER: Home Navigation Links on Desktop (retains Landing nav on Home) ── */}
+      {/* ── CENTER: Navigation Links on Desktop ── */}
       {activeTab === 'home' && (
         <nav className="hdr-center-nav-links pg-desktop-only">
-          <a href="#features" className="hdr-nav-link">Features</a>
-          <a href="#sandbox" className="hdr-nav-link">Live Sandbox</a>
-          <a href="#capabilities" className="hdr-nav-link">Capabilities</a>
-          <a href="#how-it-works" className="hdr-nav-link">How It Works</a>
+          <button
+            type="button"
+            onClick={() => { setActiveTab && setActiveTab('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            className="hdr-nav-link hdr-nav-btn"
+          >Home</button>
+          <button
+            type="button"
+            onClick={() => setActiveTab && setActiveTab('dashboard')}
+            className="hdr-nav-link hdr-nav-btn"
+          >Dashboard</button>
+          <a href="#vectors" className="hdr-nav-link">Features</a>
+          <a href="#sandbox" className="hdr-nav-link">Live Scanner</a>
+          <a href="#pipeline" className="hdr-nav-link">How It Works</a>
           <a href="#faq" className="hdr-nav-link">FAQ</a>
         </nav>
       )}
 
       {/* ── RIGHT ── */}
       <div className="header-right">
-        {/* Home / Dashboard quick link */}
-        {activeTab !== 'home' ? (
-          <button
-            onClick={() => setActiveTab && setActiveTab('home')}
-            className="hdr-pill-btn"
-            title="Home"
-          >
-            <Home size={14} />
-            <span className="hdr-pill-text">Home</span>
-          </button>
-        ) : (
-          <button
-            onClick={() => setActiveTab && setActiveTab('dashboard')}
-            className="hdr-pill-btn"
-            title="Dashboard"
-          >
-            <LayoutDashboard size={14} />
-            <span className="hdr-pill-text">Dashboard</span>
-          </button>
-        )}
 
         {/* Search */}
         <button onClick={() => setShowSearch(v => !v)} className="hdr-btn" aria-label="Search">
           <Search size={17} />
         </button>
+
+        {/* Theme switcher pills — desktop only */}
+        {setTheme && (
+          <div className="hdr-theme-pills pg-desktop-only">
+            {[
+              { id: 'light',  label: '☀️', title: 'Light Mode' },
+              { id: 'dark',   label: '🌙', title: 'Dark Mode' },
+              { id: 'navy',   label: '🌊', title: 'Navy Blue' },
+            ].map(opt => (
+              <button
+                key={opt.id}
+                onClick={() => setTheme(opt.id)}
+                className={`hdr-theme-pill${theme === opt.id ? ' hdr-theme-pill-active' : ''}`}
+                title={opt.title}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Notifications (No number count per user request) */}
         <div ref={notifRef} style={{ position: 'relative' }}>
@@ -148,18 +151,6 @@ export default function Header({
           )}
         </div>
 
-        {/* Theme toggle */}
-        <button onClick={cycleTheme} className="hdr-btn" aria-label="Toggle theme"
-          title={theme === 'dark' ? 'Dark Mode' : theme === 'navy' ? 'Navy Blue' : 'Light Mode'}>
-          {theme === 'dark' ? (
-            <Sun size={17} color="#f59e0b" />
-          ) : theme === 'navy' ? (
-            <Layers size={17} color="#818cf8" />
-          ) : (
-            <Moon size={17} color="#3b82f6" />
-          )}
-        </button>
-
         {/* User */}
         {currentUser ? (
           <div className="hdr-user">
@@ -196,37 +187,130 @@ export default function Header({
         </div>
       )}
 
+      {/* ── Header Styles ── */}
       <style>{`
-        .hdr-brand-full {
-          font-size: 0.8rem;
-          font-weight: 700;
-          color: var(--text-muted);
+        .header-brand-wrap {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          text-decoration: none;
+        }
+
+        .hdr-page-chip-wrap {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .hdr-slash-sep {
+          color: rgba(255, 255, 255, 0.3);
+          font-weight: 300;
+          font-size: 1.1rem;
+        }
+
+        .logo-brand-text {
+          font-size: 0.96rem;
+          font-weight: 800;
+          letter-spacing: -0.015em;
           white-space: nowrap;
-          letter-spacing: -0.01em;
-          margin-left: 2px;
+        }
+
+        /* Desktop chip shown next to logo on inner pages */
+        .hdr-desktop-chip {
+          display: inline-flex;
+          align-items: center;
+          padding: 3px 9px;
+          border-radius: 6px;
+          font-size: 0.67rem;
+          font-weight: 800;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          background: rgba(56, 189, 248, 0.18);
+          color: #38bdf8;
+          border: 1px solid rgba(56, 189, 248, 0.35);
+          white-space: nowrap;
+        }
+
+        /* Theme switcher pills */
+        .hdr-theme-pills {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          padding: 3px 6px;
+          background: rgba(255,255,255,0.07);
+          border: 1px solid rgba(255,255,255,0.13);
+          border-radius: 20px;
+        }
+        .hdr-theme-pill {
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          border: 1.5px solid transparent;
+          background: transparent;
+          cursor: pointer;
+          font-size: 0.85rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s;
+          line-height: 1;
+        }
+        .hdr-theme-pill:hover {
+          background: rgba(255,255,255,0.12);
+          border-color: rgba(255,255,255,0.3);
+          transform: scale(1.15);
+        }
+        .hdr-theme-pill-active {
+          background: rgba(56,189,248,0.22);
+          border-color: #38bdf8;
+          box-shadow: 0 0 8px rgba(56,189,248,0.5);
+        }
+
+        /* Responsive brand label behavior */
+        @media (max-width: 1024px) {
+          .logo-brand-text {
+            font-size: 0.85rem;
+          }
+        }
+        @media (max-width: 860px) {
+          .hdr-desktop-chip { display: none !important; }
+          .hdr-slash-sep { display: none !important; }
         }
 
         .hdr-center-nav-links {
           display: flex;
           align-items: center;
-          gap: 22px;
+          gap: 20px;
           margin: 0 16px;
         }
         .hdr-nav-link {
           font-size: 0.86rem;
           font-weight: 600;
-          color: var(--text-secondary);
+          color: rgba(255, 255, 255, 0.85);
           text-decoration: none;
-          transition: color 0.2s ease;
+          transition: all 0.18s ease;
+          padding: 4px 8px;
+          border-radius: 6px;
         }
         .hdr-nav-link:hover {
-          color: var(--accent-blue, #2563eb);
+          color: #38bdf8;
+          background: rgba(56, 189, 248, 0.08);
+        }
+
+        .hdr-nav-btn {
+          background: none;
+          border: none;
+          cursor: pointer;
+          font-family: inherit;
+          display: inline-flex;
+          align-items: center;
         }
 
         @media (max-width: 960px) {
           .hdr-center-nav-links { display: none !important; }
           .hdr-brand-full { display: none !important; }
         }
+
 
         /* ── PILL LINK BUTTON ── */
         .hdr-pill-btn {
@@ -261,11 +345,11 @@ export default function Header({
           font-weight: 800;
           letter-spacing: 0.06em;
           text-transform: uppercase;
-          background: rgba(37,99,235,0.1);
-          color: var(--accent-blue, #2563eb);
-          border: 1px solid rgba(37,99,235,0.18);
+          background: rgba(56, 189, 248, 0.18);
+          color: #38bdf8;
+          border: 1px solid rgba(56, 189, 248, 0.35);
           white-space: nowrap;
-          max-width: 110px;
+          max-width: 120px;
           overflow: hidden;
           text-overflow: ellipsis;
         }
@@ -276,13 +360,13 @@ export default function Header({
           align-items: center;
           gap: 8px;
           padding-left: 8px;
-          border-left: 1px solid var(--border-color);
+          border-left: 1px solid rgba(255, 255, 255, 0.2);
         }
         .hdr-avatar {
           width: 32px;
           height: 32px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #2563eb, #7c3aed);
+          background: linear-gradient(135deg, #38bdf8, #0284c7);
           color: #fff;
           font-size: 0.85rem;
           font-weight: 900;
@@ -290,7 +374,7 @@ export default function Header({
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
-          box-shadow: 0 2px 8px rgba(37,99,235,0.35);
+          box-shadow: 0 2px 8px rgba(56, 189, 248, 0.4);
         }
         .hdr-user-info {
           display: flex;
@@ -300,7 +384,7 @@ export default function Header({
         .hdr-user-name {
           font-size: 0.8rem;
           font-weight: 800;
-          color: var(--text-primary);
+          color: #ffffff;
           white-space: nowrap;
           max-width: 100px;
           overflow: hidden;
@@ -308,23 +392,24 @@ export default function Header({
         }
         .hdr-user-role {
           font-size: 0.66rem;
-          color: var(--text-muted);
+          color: #38bdf8;
           white-space: nowrap;
         }
 
         /* Sign-in button */
         .hdr-signin-btn {
-          padding: 6px 14px;
+          padding: 6px 16px;
           border-radius: 8px;
-          background: var(--accent-blue, #2563eb);
+          background: #38bdf8;
           border: none;
-          color: #ffffff;
+          color: #042c53;
           font-size: 0.8rem;
           font-weight: 800;
           cursor: pointer;
           font-family: inherit;
           transition: opacity 0.2s;
           white-space: nowrap;
+          box-shadow: 0 2px 10px rgba(56, 189, 248, 0.4);
         }
         .hdr-signin-btn:hover { opacity: 0.88; }
 
@@ -376,17 +461,40 @@ export default function Header({
           box-shadow: 0 0 6px rgba(239, 68, 68, 0.8) !important;
         }
 
+        .pg-desktop-only {
+          display: flex;
+        }
+
+        .logo-brand-desktop {
+          display: inline-flex;
+        }
+        .logo-brand-mobile {
+          display: none;
+        }
+
         /* ── MOBILE FIXES ── */
         .app-header {
+          height: 64px !important;
+          min-height: 64px !important;
+          border-bottom: 1px solid rgba(56, 189, 248, 0.2) !important;
           flex-wrap: nowrap !important;
           overflow: visible !important;
+          padding: 0 16px !important;
+        }
+        @media (max-width: 900px) {
+          .pg-desktop-only {
+            display: none !important;
+          }
+          .hdr-center-nav-links {
+            display: none !important;
+          }
         }
         @media (max-width: 768px) {
           .hamburger-btn {
             display: flex !important;
           }
-          .hdr-user-info { display: none; }
-          .hdr-pill-text { display: none; }
+          .hdr-user-info { display: none !important; }
+          .hdr-pill-text { display: none !important; }
           .hdr-pill-btn {
             padding: 6px 8px;
           }
@@ -397,13 +505,25 @@ export default function Header({
             border-left: none;
             padding-left: 0;
           }
+          .header-right {
+            gap: 6px !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .logo-brand-desktop { display: none !important; }
+          .logo-brand-mobile { display: inline-flex !important; }
+          .app-header { padding: 0 10px !important; }
         }
         @media (max-width: 480px) {
           .header-page-chip { display: none !important; }
-          .hdr-pill-btn { display: none; }
+          .hdr-pill-btn { display: none !important; }
           .hdr-btn {
-            width: 32px;
-            height: 32px;
+            width: 34px !important;
+            height: 34px !important;
+          }
+          .hdr-avatar {
+            width: 32px !important;
+            height: 32px !important;
           }
         }
       `}</style>

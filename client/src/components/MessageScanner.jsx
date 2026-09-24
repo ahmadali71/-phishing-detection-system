@@ -354,36 +354,11 @@ export default function MessageScanner({ onScanComplete, onViewDetail, t }) {
 
   return (
     <div className="msg-scanner-container">
-      {/* ── VIBRANT HERO CARD (Exact Match to User Reference) ── */}
-      <div className="scanner-vibrant-hero">
-        <div className="scanner-vibrant-hero-content">
-          <div className="scanner-vibrant-pill-tag">
-            <span>Multi-Vector Smishing & Phone Spoofing Engine</span>
-          </div>
-          <h2 className="scanner-vibrant-hero-title">Message, Link & Phone Number Analysis</h2>
-          <p className="scanner-vibrant-hero-desc">
-            Evaluate deceptive SMS, WhatsApp texts, caller phone numbers, and shortened links. Our algorithms uncover sender spoofing, urgency extortion, and masked redirection targets in real time.
-          </p>
-          <div className="scanner-vibrant-chips">
-            <div className="scanner-vibrant-chip-item">📲 Caller ID Spoof Check</div>
-            <div className="scanner-vibrant-chip-item">⚡ Sub-Second Deep Scan</div>
-            <div className="scanner-vibrant-chip-item">🎯 96.2% Smish Accuracy</div>
-            <div className="scanner-vibrant-chip-item">🔗 Shortlink Unmasking</div>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              const el = document.querySelector('.msg-input') || document.querySelector('.msg-textarea');
-              el?.focus();
-              el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }}
-            className="scanner-vibrant-hero-btn"
-          >
-            Inspect Message Now →
-          </button>
-        </div>
-        <div className="scanner-vibrant-hero-circle">
-          <MessageSquare size={46} strokeWidth={2.2} />
+      {/* ── Clean Page Header (Name Only) ── */}
+      <div className="page-header-clean">
+        <div className="page-header-text">
+          <h1 className="page-title-clean">Message &amp; SMS Analysis</h1>
+          <p className="page-subtitle-clean">Enter a suspicious message to analyze its content, shortlinks, and sender legitimacy</p>
         </div>
       </div>
 

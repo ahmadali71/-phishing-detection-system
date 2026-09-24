@@ -26,33 +26,20 @@ export default function ScanHistory({ scanHistory, onViewDetail, onExportPdf, t,
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px', maxWidth: '1080px', margin: '0 auto' }}>
-      {/* ── VIBRANT HERO CARD (Exact Match to User Reference) ── */}
-      <div className="scanner-vibrant-hero">
-        <div className="scanner-vibrant-hero-content">
-          <div className="scanner-vibrant-pill-tag">
-            <span>SCAN HISTORY & REPORTS • FORENSIC AUDIT</span>
-          </div>
-          <h2 className="scanner-vibrant-hero-title">Scan History & Audit Reports</h2>
-          <p className="scanner-vibrant-hero-desc">
-            View and manage your past scan records and download security audit reports.
-          </p>
-          <div className="scanner-vibrant-chips">
-            <div className="scanner-vibrant-chip-item">📋 Forensic Audit Log</div>
-            <div className="scanner-vibrant-chip-item">🔍 Category Filters</div>
-            <div className="scanner-vibrant-chip-item">📄 PDF Export</div>
-            <div className="scanner-vibrant-chip-item">⏱️ Timestamps</div>
-          </div>
-          <button
-            type="button"
-            onClick={() => onExportPdf?.()}
-            className="scanner-vibrant-hero-btn"
-          >
-            Export Audit PDF →
-          </button>
+      {/* ── Clean Page Header (Name Only) ── */}
+      <div className="page-header-clean">
+        <div className="page-header-text">
+          <h1 className="page-title-clean">Scan History &amp; Audit Reports</h1>
+          <p className="page-subtitle-clean">Review historical security scans, threat verdicts, and export PDF audit dossiers</p>
         </div>
-        <div className="scanner-vibrant-hero-circle">
-          <Download size={46} strokeWidth={2.2} />
-        </div>
+        <button
+          type="button"
+          onClick={() => onExportPdf?.()}
+          className="btn-primary"
+          style={{ padding: '8px 18px', fontSize: '0.85rem' }}
+        >
+          <Download size={15} /> Export Audit PDF
+        </button>
       </div>
 
       {/* ── Filter Bar with Date Selectors & Export PDF (Exact Match to PDF Page 63 Screen 8) ── */}

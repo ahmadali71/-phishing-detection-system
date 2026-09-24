@@ -222,13 +222,11 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
   const hasMessages = messages.length > 0;
   const canSend = (inputText.trim().length > 0 || !!attachedFile) && !isTyping;
 
-  const getUserName = () => {
-    const raw = currentUser?.name || currentUser?.username || '';
-    if (raw && !raw.toLowerCase().includes('system') && !raw.toLowerCase().includes('admin')) {
-      const first = raw.split(' ')[0];
-      return first.charAt(0).toUpperCase() + first.slice(1);
-    }
-    return 'Ahmad';
+  const getTimeGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
   };
 
   useEffect(() => {
@@ -381,7 +379,7 @@ export default function AiChatbot({ t, language = 'English', currentUser }) {
               </div>
 
               <h1 className="ai-greeting">
-                Hi, <span>{getUserName()}!</span> 👋
+                <span>{getTimeGreeting()}!</span> 👋
               </h1>
               <p className="ai-greeting-sub">How can I help protect your security today?</p>
             </div>

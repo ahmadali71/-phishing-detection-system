@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   Home, LayoutDashboard, Globe, Mail, Image, MessageSquare, Bot, History,
-  FileText, Settings, LogOut, Shield, Award, X
+  FileText, Settings, LogOut, Shield, X
 } from 'lucide-react';
 import Logo from './Logo';
 
@@ -23,10 +23,7 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
 
   const isAdmin = currentUser?.role?.toLowerCase()?.includes('admin') ||
                   currentUser?.email?.toLowerCase()?.includes('admin') ||
-                  currentUser?.role?.toLowerCase()?.includes('analyst') ||
-                  currentUser?.email?.toLowerCase()?.includes('amna') ||
-                  currentUser?.email?.toLowerCase()?.includes('alisha') ||
-                  currentUser?.email?.toLowerCase()?.includes('shaista');
+                  currentUser?.role?.toLowerCase()?.includes('analyst');
 
   const visibleNavItems = NAV_ITEMS.filter(item => {
     if (item.adminOnly) {
@@ -49,8 +46,11 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
       <aside className={`app-sidebar${isOpen ? ' sidebar-open' : ''}`}>
         {/* ── Header ── */}
         <div className="sidebar-header">
-          <div className="sidebar-logo">
-            <Logo size="sm" useShort={true} showSubtitle={false} />
+          <div className="sidebar-logo" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Logo size="sm" showText={false} />
+            <span style={{ fontSize: '0.86rem', fontWeight: 800, color: '#38bdf8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              Console Menu
+            </span>
           </div>
           <button className="sidebar-close-btn" onClick={onClose} aria-label="Close">
             <X size={18} />
@@ -156,19 +156,6 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
               <span className="sidebar-item-label">Sign In / Register</span>
             </button>
           )}
-
-          {/* Academic card */}
-          <div className="sidebar-academic">
-            <div className="sidebar-academic-header">
-              <Award size={14} color="#f59e0b" />
-              <span>BS IT Final Year Project</span>
-            </div>
-            <div className="sidebar-academic-body">
-              <strong>Amna Najam &amp; Alisha Noor</strong>
-              <span>Supervisor: Mam Shaista Ghafoor</span>
-              <span className="sidebar-academic-year">Session 2022–2026</span>
-            </div>
-          </div>
         </div>
       </aside>
     </>

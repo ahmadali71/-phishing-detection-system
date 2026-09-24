@@ -371,32 +371,11 @@ export default function ImageScanner({ onScanComplete, onViewDetail, t }) {
 
   return (
     <div className="img-scanner-container">
-      {/* ── VIBRANT HERO CARD (Exact Match to User Reference) ── */}
-      <div className="scanner-vibrant-hero">
-        <div className="scanner-vibrant-hero-content">
-          <div className="scanner-vibrant-pill-tag">
-            <span>Computer Vision & OCR Neural Engine</span>
-          </div>
-          <h2 className="scanner-vibrant-hero-title">Screenshot & Image Phishing Analysis</h2>
-          <p className="scanner-vibrant-hero-desc">
-            Upload screenshots of suspicious emails, fake login portals, banking notices, or QR codes. Our OCR and visual brand matching algorithms identify deceptive visual cues, hidden URLs, and logo forgery.
-          </p>
-          <div className="scanner-vibrant-chips">
-            <div className="scanner-vibrant-chip-item">👁️ Visual Brand Matching</div>
-            <div className="scanner-vibrant-chip-item">🔍 OCR Neural Extraction</div>
-            <div className="scanner-vibrant-chip-item">📱 QR Quishing Detection</div>
-            <div className="scanner-vibrant-chip-item">🛡️ Zero-Day Logo Defense</div>
-          </div>
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="scanner-vibrant-hero-btn"
-          >
-            Upload Screenshot Now →
-          </button>
-        </div>
-        <div className="scanner-vibrant-hero-circle">
-          <Sparkles size={46} strokeWidth={2.2} />
+      {/* ── Clean Page Header (Name Only) ── */}
+      <div className="page-header-clean">
+        <div className="page-header-text">
+          <h1 className="page-title-clean">Screenshot &amp; Image Analysis</h1>
+          <p className="page-subtitle-clean">Upload a screenshot to check for phishing signs, fake login portals, and QR traps</p>
         </div>
       </div>
 

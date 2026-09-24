@@ -56,13 +56,16 @@ function AppInner() {
   const [selectedRecord, setSelectedRecord] = useState(null);
 
   useEffect(() => {
-    const themeClasses = ['light-theme', 'theme-dark', 'theme-navy'];
+    const themeClasses = ['light-theme', 'theme-dark', 'theme-navy', 'theme-royal'];
     themeClasses.forEach(cls => document.body.classList.remove(cls));
-    if (theme === 'navy') {
-      document.body.classList.add('theme-navy');
-    } else if (theme === 'dark') {
+    if (theme === 'dark') {
       document.body.classList.add('theme-dark');
+    } else if (theme === 'navy') {
+      document.body.classList.add('theme-navy');
+    } else if (theme === 'royal') {
+      document.body.classList.add('theme-royal');
     } else {
+      // default: 'light' uses :root / .theme-royal styles (Royal Blue sidebar + white dashboard)
       document.body.classList.add('light-theme');
     }
   }, [theme]);
@@ -159,10 +162,7 @@ function AppInner() {
 
   const isAdmin = currentUser?.role?.toLowerCase()?.includes('admin') ||
                   currentUser?.email?.toLowerCase()?.includes('admin') ||
-                  currentUser?.role?.toLowerCase()?.includes('analyst') ||
-                  currentUser?.email?.toLowerCase()?.includes('amna') ||
-                  currentUser?.email?.toLowerCase()?.includes('alisha') ||
-                  currentUser?.email?.toLowerCase()?.includes('shaista');
+                  currentUser?.role?.toLowerCase()?.includes('analyst');
 
   return (
     <>

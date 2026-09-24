@@ -32,32 +32,15 @@ export default function Dashboard({ stats, recentActivity, onNavigateScan, onVie
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
-      {/* ── VIBRANT HERO CARD (Exact Match to User Reference) ── */}
-      <div className="scanner-vibrant-hero">
-        <div className="scanner-vibrant-hero-content">
-          <div className="scanner-vibrant-pill-tag">
-            <span>ANALYTICS & CONTROL • DASHBOARD PORTAL</span>
-          </div>
-          <h2 className="scanner-vibrant-hero-title">Automated Threat Monitoring</h2>
-          <p className="scanner-vibrant-hero-desc">
-            Multi-layered ML & NLP analysis pipeline protecting web users against domain typosquatting, email social engineering, and fraudulent links.
-          </p>
-          <div className="scanner-vibrant-chips">
-            <div className="scanner-vibrant-chip-item">🛡️ Dual ML Scanners</div>
-            <div className="scanner-vibrant-chip-item">⚡ Sub-Second Scans</div>
-            <div className="scanner-vibrant-chip-item">🎯 94.6% Accuracy</div>
-            <div className="scanner-vibrant-chip-item">🔒 Risk Scoring Gauge</div>
-          </div>
-          <button
-            type="button"
-            onClick={() => onNavigateScan('url-detection')}
-            className="scanner-vibrant-hero-btn"
-          >
-            Scan URL Now →
-          </button>
+      {/* ── Clean Page Header (Name Only as Requested) ── */}
+      <div className="page-header-clean">
+        <div className="page-header-text">
+          <h1 className="page-title-clean">Dashboard</h1>
+          <p className="page-subtitle-clean">Welcome back 👋 • Here's what's happening with your security today.</p>
         </div>
-        <div className="scanner-vibrant-hero-circle">
-          <Zap size={46} strokeWidth={2.2} />
+        <div className="page-header-badge">
+          <span className="live-pulse-dot" />
+          <span>Real-time Monitoring Active</span>
         </div>
       </div>
 

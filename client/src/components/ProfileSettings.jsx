@@ -789,22 +789,6 @@ export default function ProfileSettings({
                 </div>
               </div>
 
-              <div>
-                <label style={{ fontSize: '0.72rem', fontWeight: '800', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', letterSpacing: '0.06em' }}>
-                  {t?.languageLabel || 'SYSTEM LANGUAGE'}
-                </label>
-                <select
-                  value={language || 'English'}
-                  onChange={e => {
-                    onLanguageChange?.(e.target.value);
-                    showToast(`Language switched to ${e.target.value}.`);
-                  }}
-                  style={{ width: '100%', padding: '9px 12px', borderRadius: '8px' }}
-                >
-                  <option value="English">English (Default)</option>
-                  <option value="Urdu">Urdu (اردو - Academic Mode)</option>
-                </select>
-              </div>
             </div>
           )}
 

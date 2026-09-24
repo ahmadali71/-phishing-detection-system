@@ -15,13 +15,12 @@ import { analyzeUrl } from './urlAnalyzer.js';
 import { analyzeEmailText } from './emailAnalyzer.js';
 import { getOpenRouterResponse } from './openRouter.js';
 
-// Academic Project Metadata
+// Project Metadata
 const PROJECT_CONTEXT = {
   title: 'Automated Phishing Detection System (APDS)',
-  authors: ['Amna Najam', 'Alisha Noor'],
-  supervisor: 'Mam Shaista Ghafoor',
-  institution: 'Govt Graduate College for Women & Dept of CS & IT, University of Sargodha',
-  session: '2022 - 2026',
+  authors: ['Cyber Security Research Team'],
+  supervisor: 'Cyber Defense Lab',
+  institution: 'Cybersecurity Intelligence Initiative',
   accuracy: '94.6%',
   models: [
     'Random Forest Classifier (Scikit-Learn)',
@@ -168,12 +167,11 @@ export async function generateChatbotResponse(userMessage, chatHistory = [], lan
     }
     if (lower.includes('author') || lower.includes('supervisor') || lower.includes('project') || lower.includes('team') || lower.includes('کون') || lower.includes('banaya')) {
       return {
-        text: `🎓 **پروجیکٹ کی تعلیمی تفصیلات:**\n\n` +
+        text: `🛡️ **سسٹم کی تکنیکی تفصیلات:**\n\n` +
           `• **عنوان:** خودکار فِشنگ ڈیٹیکشن سسٹم (APDS)\n` +
-          `• **محققین / طلباء:** آمنہ نجم (Amna Najam) اور علیشہ نور (Alisha Noor)\n` +
-          `• **نگران:** میڈم شائستہ غفور (Mam Shaista Ghafoor)\n` +
-          `• **ادارہ:** گورنمنٹ گریجویٹ کالج برائے خواتین و شعبہ کمپیوٹر سائنس، یونیورسٹی آف سرگودھا\n` +
-          `• **سیشن:** 2022 - 2026`,
+          `• **ماڈلز:** رینڈم فارسٹ، سپورٹ ویکٹر مشین (SVM)، ڈسٹل برٹ NLP\n` +
+          `• **درستگی:** 94.6% ہائی ایکوریسی ریٹ\n` +
+          `• **خصوصیات:** ریئل ٹائم یو آر ایل، ای میل اور اسکرین شاٹ اسکیننگ`,
         suggestions: ['ماڈل کی درستگی کیا ہے؟', 'یو آر ایل کیسے اسکین کریں؟', 'اہم سائبر خطرات']
       };
     }
@@ -186,7 +184,7 @@ export async function generateChatbotResponse(userMessage, chatHistory = [], lan
     const llmRes = await getOpenRouterResponse(chatHistory, {
       systemPrompt: `You are APDS AI Cyber Defense Assistant, a top-tier cybersecurity AI for the Automated Phishing Detection System (APDS). 
       You provide deep, accurate, structured answers to questions about phishing detection, malware, email security, URL heuristics, ML algorithms, and any related cybersecurity topics.
-      Project Info: APDS developed by Amna Najam & Alisha Noor, supervised by Mam Shaista Ghafoor, Dept of CS & IT, University of Sargodha (2022-2026). Accuracy: 94.6% (Random Forest, SVM, DistilBERT).
+      System Info: APDS provides 94.6% accuracy across Random Forest, SVM, and DistilBERT NLP engines.
       Always format responses with clear Markdown headings, bullet points, and code blocks where helpful.
       Answer ALL questions fully and directly, even if they are complex multi-part questions.`
     });
@@ -208,7 +206,7 @@ export async function generateChatbotResponse(userMessage, chatHistory = [], lan
       `• **Scan any URL or domain** — paste it in the chat for instant forensic analysis\n` +
       `• **Analyze suspicious email text** — paste the email body with "Subject:" or "From:" headers\n\n` +
       `Please try again later or use the scanners above.\n\n` +
-      `*APDS — 94.6% accuracy | Developed by Amna Najam & Alisha Noor | Supervised by Mam Shaista Ghafoor, University of Sargodha (2022–2026)*`,
-    suggestions: ['Scan paypal-secure-login.com', 'What is typosquatting?', 'Show Python ML code', 'Project Authors & Supervisor']
+      `*APDS — 94.6% accuracy | Multi-vector Enterprise Phishing Protection*`,
+    suggestions: ['Scan paypal-secure-login.com', 'What is typosquatting?', 'Show Python ML code', 'System Architecture']
   };
 }

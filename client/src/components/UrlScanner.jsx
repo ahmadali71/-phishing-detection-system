@@ -122,38 +122,11 @@ export default function UrlScanner({ onScanComplete, t }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '980px', margin: '0 auto' }}>
-      {/* ── VIBRANT HERO CARD (Exact Match to User Reference) ── */}
-      <div className="scanner-vibrant-hero">
-        <div className="scanner-vibrant-hero-content">
-          <div className="scanner-vibrant-pill-tag">
-            <span>URL PHISHING DETECTION • REAL-TIME AI SCANNER</span>
-          </div>
-          <h2 className="scanner-vibrant-hero-title">Real-Time URL Threat Inspector</h2>
-          <p className="scanner-vibrant-hero-desc">
-            Inspects 25+ lexical, host-based, cryptographic, and machine learning indicators in real time.
-          </p>
-          <div className="scanner-vibrant-chips">
-            <div className="scanner-vibrant-chip-item">⚡ 25+ Heuristic Checks</div>
-            <div className="scanner-vibrant-chip-item">🧠 Random Forest Engine</div>
-            <div className="scanner-vibrant-chip-item">🔒 SSL Handshake Audit</div>
-            <div className="scanner-vibrant-chip-item">🛡️ 94.6% Accuracy</div>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              const inputEl = document.getElementById('url-scan-input');
-              if (inputEl) {
-                inputEl.focus();
-                inputEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              }
-            }}
-            className="scanner-vibrant-hero-btn"
-          >
-            Scan URL Now →
-          </button>
-        </div>
-        <div className="scanner-vibrant-hero-circle">
-          <Globe size={46} strokeWidth={2.2} />
+      {/* ── Clean Page Header (Name Only) ── */}
+      <div className="page-header-clean">
+        <div className="page-header-text">
+          <h1 className="page-title-clean">URL Threat Detection</h1>
+          <p className="page-subtitle-clean">Enter a URL to check if it's safe or a phishing attempt</p>
         </div>
       </div>
 
