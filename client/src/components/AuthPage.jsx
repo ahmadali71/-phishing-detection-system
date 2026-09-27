@@ -5,6 +5,7 @@ import {
   Link2, Globe, MessageSquare, Image, Bot, ShieldCheck
 } from 'lucide-react';
 import { usersService } from '../firebase/services';
+import Logo from './Logo';
 
 // Animated particle canvas for the hero side
 function ParticleCanvas() {
@@ -151,14 +152,8 @@ export default function AuthPage({ onLoginSuccess, onNavigateHome, initialMode =
           )}
 
           {/* Brand */}
-          <div className="auth-hero-brand">
-            <div className="auth-hero-shield">
-              <Shield size={32} strokeWidth={1.5} />
-            </div>
-            <div>
-              <h1 className="auth-hero-title">APDS</h1>
-              <p className="auth-hero-subtitle">Automated Phishing Detection System</p>
-            </div>
+          <div className="auth-hero-brand" style={{ marginBottom: '24px' }}>
+            <Logo size="lg" lightText={true} showSubtitle={true} showBadge={true} />
           </div>
 
           {/* Headline */}
@@ -203,6 +198,11 @@ export default function AuthPage({ onLoginSuccess, onNavigateHome, initialMode =
       {/* ── RIGHT FORM PANEL ── */}
       <div className="auth-form-panel">
         <div className={`auth-card ${animating ? 'auth-card-fade' : ''}`}>
+
+          {/* Mobile-only brand emblem */}
+          <div className="auth-mobile-brand">
+            <Logo size="sm" lightText={false} showSubtitle={true} showBadge={false} />
+          </div>
 
           {/* Card Header */}
           <div className="auth-card-header">
@@ -502,7 +502,11 @@ export default function AuthPage({ onLoginSuccess, onNavigateHome, initialMode =
         .auth-hero-brand {
           display: flex;
           align-items: center;
-          gap: 16px;
+        }
+        .auth-mobile-brand {
+          display: none;
+          justify-content: center;
+          margin-bottom: 20px;
         }
         .auth-hero-shield {
           width: 60px;
@@ -975,6 +979,7 @@ export default function AuthPage({ onLoginSuccess, onNavigateHome, initialMode =
         /* ─── RESPONSIVE ─── */
         @media (max-width: 900px) {
           .auth-hero { display: none; }
+          .auth-mobile-brand { display: flex; }
           .auth-form-panel {
             flex: 1;
             background: linear-gradient(135deg, #0a0f2e, #0d1a4a);

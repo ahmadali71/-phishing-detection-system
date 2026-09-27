@@ -3,6 +3,7 @@ import { X, Mail, Lock, User, Eye, EyeOff, Shield, Loader2, CheckCircle2, AlertC
 import loginArt from '../assets/login_art.png';
 import registerArt from '../assets/register_art.png';
 import { usersService } from './../firebase/services';
+import Logo from './Logo';
 
 export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
   const [isRegister, setIsRegister] = useState(false);
@@ -119,18 +120,8 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
         <div className="modal-form-pane">
           
           {/* Brand Row */}
-          <div className="modal-brand-row">
-            <div className="modal-brand-icon">
-              <svg width="18" height="18" viewBox="0 0 48 48" fill="none">
-                <path d="M24 4L40 9.8V23.4C40 33.2 33.2 41.8 24 44C14.8 41.8 8 33.2 8 23.4V9.8L24 4Z" fill="#ffffff" fillOpacity="0.95" />
-                <path d="M24 14V26C24 28.2 22.2 30 20 30C17.8 30 16 28.2 16 26" stroke="#2563eb" strokeWidth="3.5" strokeLinecap="round" />
-                <circle cx="24" cy="14" r="2.5" fill="#2563eb" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="modal-brand-title">APDS CyberShield</h3>
-              <p className="modal-brand-sub">Phishing Defense Console</p>
-            </div>
+          <div className="modal-brand-row" style={{ marginBottom: '20px' }}>
+            <Logo size="md" lightText={false} showSubtitle={true} showBadge={true} />
           </div>
 
           {/* Welcome Text */}
@@ -426,9 +417,8 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
           <div className="art-orb art-orb-2" />
 
           {/* Brand watermark */}
-          <div className="art-brand-badge">
-            <Shield size={16} color="#ffffff" />
-            <span>APDS Security</span>
+          <div className="art-brand-badge" style={{ padding: '6px 12px', background: 'rgba(10, 25, 47, 0.75)', backdropFilter: 'blur(8px)', border: '1px solid rgba(56, 189, 248, 0.3)', borderRadius: '20px' }}>
+            <Logo size="xs" lightText={true} showText={true} />
           </div>
 
           <img
