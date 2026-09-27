@@ -36,18 +36,37 @@ try {
   console.warn('BroadcastChannel not supported, cross-tab sync disabled');
 }
 
+function deduplicateItems(items, keyFn) {
+  if (!Array.isArray(items)) return [];
+  const seen = new Set();
+  return items.filter((item, idx) => {
+    const key = keyFn(item, idx);
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 export function AppDataProvider({ children }) {
   // Backend connection state
   const [backendReady, setBackendReady] = useState(false);
   const [backendError, setBackendError] = useState(null);
 
-  // Data state
-  const [scans, setScans] = useState(() => loadFromStorage(STORAGE_KEYS.scans, INITIAL_SCAN_HISTORY));
-  const [logs, setLogs] = useState(() => loadFromStorage(STORAGE_KEYS.logs, INITIAL_SYSTEM_LOGS));
+  // Data state with automatic deduplication
+  const [scans, setScans] = useState(() => {
+    const loaded = loadFromStorage(STORAGE_KEYS.scans, INITIAL_SCAN_HISTORY);
+    return deduplicateItems(loaded, (s, i) => s.id || `${s.input}-${i}`);
+  });
+
+  const [logs, setLogs] = useState(() => {
+    const loaded = loadFromStorage(STORAGE_KEYS.logs, INITIAL_SYSTEM_LOGS);
+    return deduplicateItems(loaded, (l, i) => l.id || `${l.timestamp}-${i}`);
+  });
+
   const [users, setUsers] = useState(() => {
     const raw = loadFromStorage(STORAGE_KEYS.users, null);
-    if (raw && Array.isArray(raw) && raw.length > 0) {
-      return raw.map(u => ({
+    if (raw !== null && Array.isArray(raw)) {
+      const mapped = raw.map(u => ({
         id: u.id || `usr-${Math.random().toString(36).substring(2, 9)}`,
         name: u.name || 'User',
         email: u.email || 'user@apds.edu',
@@ -56,6 +75,7 @@ export function AppDataProvider({ children }) {
         status: u.status || 'Active',
         joinedDate: u.joinedDate || '2026-01-15'
       }));
+      return deduplicateItems(mapped, u => u.email?.toLowerCase());
     }
     return [
       { id: 'usr-01', name: 'Amna Najam', email: 'amnanajam2003@gmail.com', role: 'Admin', department: 'BS IT (Dept of CS & IT, UOS)', status: 'Active', joinedDate: '2026-01-15' },
@@ -64,10 +84,15 @@ export function AppDataProvider({ children }) {
       { id: 'usr-04', name: 'Cyber Security Auditor', email: 'auditor@apds.uos.edu.pk', role: 'Security Analyst', department: 'Forensic Lab', status: 'Active', joinedDate: '2026-02-20' },
     ];
   });
-  const [stats, setStats] = useState(() => loadFromStorage(STORAGE_KEYS.stats, INITIAL_STATS));
-  const [mlModels, setMlModels] = useState(() => loadFromStorage(STORAGE_KEYS.mlModels, INITIAL_ML_MODELS));
 
-  // Load data from backend API on mount
+  const [stats, setStats] = useState(() => loadFromStorage(STORAGE_KEYS.stats, INITIAL_STATS));
+
+  const [mlModels, setMlModels] = useState(() => {
+    const loaded = loadFromStorage(STORAGE_KEYS.mlModels, INITIAL_ML_MODELS);
+    return deduplicateItems(loaded, m => m.id || m.name);
+  });
+
+  // Load data from backend API on mount with deduplication and ID normalization
   useEffect(() => {
     const loadBackendData = async () => {
       try {
@@ -78,16 +103,37 @@ export function AppDataProvider({ children }) {
           modelsService.getModels().catch(() => []),
         ]);
 
-        if (apiScans.length > 0) {
-          setScans(apiScans);
-          saveToStorage(STORAGE_KEYS.scans, apiScans);
-          console.log(`✓ Loaded ${apiScans.length} scans from backend`);
+        if (apiScans && apiScans.length > 0) {
+          const normalizedScans = apiScans.map((s, idx) => ({
+            id: s._id || s.id || `SCN-API-${idx + 101}`,
+            type: s.type ? (s.type.charAt(0).toUpperCase() + s.type.slice(1)) : 'URL',
+            input: s.url || s.input || 'Threat Target',
+            result: s.status ? (s.status.charAt(0).toUpperCase() + s.status.slice(1)) : (s.result || 'Safe'),
+            riskScore: s.details?.riskScore || s.riskScore || '0/100',
+            date: s.details?.date || (s.createdAt ? new Date(s.createdAt).toLocaleString() : new Date().toLocaleString()),
+            category: s.details?.category || s.category || s.status || 'Safe',
+            badgeColor: s.details?.badgeColor || (s.status === 'phishing' ? 'danger' : s.status === 'suspicious' ? 'warning' : 'emerald')
+          }));
+          const dedupedScans = deduplicateItems(normalizedScans, s => s.id || s.input);
+          setScans(dedupedScans);
+          saveToStorage(STORAGE_KEYS.scans, dedupedScans);
+          console.log(`✓ Loaded ${dedupedScans.length} unique scans from backend`);
         }
 
-        if (apiModels.length > 0) {
-          setMlModels(apiModels);
-          saveToStorage(STORAGE_KEYS.mlModels, apiModels);
-          console.log(`✓ Loaded ${apiModels.length} models from backend`);
+        if (apiModels && apiModels.length > 0) {
+          const normalizedModels = apiModels.map((m, idx) => ({
+            id: m.id || `M-0${idx + 1}`,
+            name: m.name,
+            type: m.type || m.version || 'Supervised Classifier',
+            accuracy: typeof m.accuracy === 'number' ? `${m.accuracy}%` : (m.accuracy || '95.0%'),
+            status: m.status ? (m.status.charAt(0).toUpperCase() + m.status.slice(1)) : 'Active',
+            framework: m.framework || 'Scikit-Learn',
+            date: m.date || (m.createdAt ? new Date(m.createdAt).toISOString().split('T')[0] : '2026-05-01')
+          }));
+          const dedupedModels = deduplicateItems(normalizedModels, m => m.id || m.name);
+          setMlModels(dedupedModels);
+          saveToStorage(STORAGE_KEYS.mlModels, dedupedModels);
+          console.log(`✓ Loaded ${dedupedModels.length} unique models from backend`);
         }
 
         setBackendReady(true);
@@ -96,7 +142,7 @@ export function AppDataProvider({ children }) {
         console.warn('Backend API warning:', error.message);
         console.log('Continuing with localStorage-only mode');
         setBackendError(error.message);
-        setBackendReady(true); // Still mark as ready to not block UI
+        setBackendReady(true);
       }
     };
 
@@ -176,7 +222,7 @@ export function AppDataProvider({ children }) {
   const addScan = useCallback((scanObj) => {
     const newScan = {
       ...scanObj,
-      id: Date.now(),
+      id: `SCN-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
       date: new Date().toLocaleString(),
       syncedAt: new Date().toISOString()
     };
@@ -222,7 +268,7 @@ export function AppDataProvider({ children }) {
 
   const addLog = useCallback((level, module, message) => {
     const newLog = {
-      id: Date.now(),
+      id: `LOG-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
       timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19),
       level,
       module,
@@ -287,14 +333,28 @@ export function AppDataProvider({ children }) {
     broadcast({ type: 'USER_UPDATED', payload: { email: originalEmail, ...updatedData } });
   }, [broadcast]);
 
-  const deleteUser = useCallback((email) => {
+  const deleteUser = useCallback((identifier, userObj) => {
+    const targetEmail = String(identifier || userObj?.email || '').trim().toLowerCase();
+    const targetId = String(userObj?.id || identifier || '').trim().toLowerCase();
+
     setUsers(prev => {
-      const next = prev.filter(u => u.email.toLowerCase() !== email.toLowerCase());
+      const next = prev.filter(u => {
+        if (!u) return false;
+        const uEmail = String(u.email || '').trim().toLowerCase();
+        const uId = String(u.id || '').trim().toLowerCase();
+        if (targetEmail && uEmail === targetEmail) return false;
+        if (targetId && uId === targetId) return false;
+        if (userObj) {
+          if (userObj.email && String(userObj.email || '').trim().toLowerCase() === uEmail) return false;
+          if (userObj.id && String(userObj.id || '').trim().toLowerCase() === uId) return false;
+        }
+        return true;
+      });
       saveToStorage(STORAGE_KEYS.users, next);
       return next;
     });
 
-    broadcast({ type: 'USER_DELETED', payload: { email } });
+    broadcast({ type: 'USER_DELETED', payload: { email: targetEmail } });
   }, [broadcast]);
 
   const updateUserRole = useCallback((email, role) => {
@@ -330,7 +390,7 @@ export function AppDataProvider({ children }) {
     let nextStatus = 'Active';
     setMlModels(prev => {
       const next = prev.map(m => {
-        if (m.id !== id) return m;
+        if (m.id !== id && m._id !== id) return m;
         const newStatus = m.status === 'Active' ? 'Standby' : 'Active';
         nextStatus = newStatus;
         return { ...m, status: newStatus };
@@ -347,17 +407,33 @@ export function AppDataProvider({ children }) {
     });
   }, [broadcast]);
 
-  const deleteModel = useCallback((id) => {
+  const deleteModel = useCallback((identifier, modelObj) => {
+    const targetId = String(identifier || modelObj?.id || modelObj?._id || '').trim().toLowerCase();
+    const targetName = String(modelObj?.name || identifier || '').trim().toLowerCase();
+
     setMlModels(prev => {
-      const next = prev.filter(m => m.id !== id);
+      const next = prev.filter(m => {
+        if (!m) return false;
+        const mId = String(m.id || m._id || '').trim().toLowerCase();
+        const mName = String(m.name || '').trim().toLowerCase();
+        if (targetId && mId === targetId) return false;
+        if (targetName && mName === targetName) return false;
+        if (modelObj) {
+          if (modelObj.id && String(m.id || '').trim().toLowerCase() === String(modelObj.id).trim().toLowerCase()) return false;
+          if (modelObj._id && String(m._id || '').trim().toLowerCase() === String(modelObj._id).trim().toLowerCase()) return false;
+          if (modelObj.name && String(m.name || '').trim().toLowerCase() === String(modelObj.name).trim().toLowerCase()) return false;
+        }
+        return true;
+      });
       saveToStorage(STORAGE_KEYS.mlModels, next);
       return next;
     });
 
-    broadcast({ type: 'MODEL_DELETED', payload: { id } });
+    broadcast({ type: 'MODEL_DELETED', payload: { id: identifier } });
 
     // Sync to backend
-    modelsService.deleteModel(id).catch(err => {
+    const backendId = modelObj?._id || modelObj?.id || identifier;
+    modelsService.deleteModel(backendId).catch(err => {
       console.warn('Error deleting model from backend:', err.message);
     });
   }, [broadcast]);

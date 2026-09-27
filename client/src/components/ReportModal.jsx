@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, ShieldAlert, Download, CheckCircle2, AlertTriangle, ShieldCheck, Lock, Shield, Calendar, Terminal, Check } from 'lucide-react';
+import Logo from './Logo';
 
 export default function ReportModal({ record, onClose, onExportPdf }) {
   if (!record) return null;
@@ -94,11 +95,7 @@ export default function ReportModal({ record, onClose, onExportPdf }) {
       <div className="print-dossier-root only-print">
         <div className="print-dossier-header">
           <div className="print-brand-group">
-            <Shield size={28} color="#2563eb" />
-            <div>
-              <h1 className="print-main-title">AUTOMATIC PHISHING DETECTION SYSTEM</h1>
-              <div className="print-sub-title">CONFIDENTIAL FORENSIC THREAT AUDIT REPORT</div>
-            </div>
+            <Logo size="md" lightText={false} showSubtitle={true} showBadge={true} />
           </div>
           <div className="print-doc-meta">
             <div><strong>DOSSIER ID:</strong> {scanId}</div>

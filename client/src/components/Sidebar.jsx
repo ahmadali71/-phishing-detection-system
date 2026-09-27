@@ -49,7 +49,7 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
           <div className="sidebar-logo" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Logo size="sm" showText={false} />
             <span style={{ fontSize: '0.86rem', fontWeight: 800, color: '#38bdf8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-              Console Menu
+              Main Menu
             </span>
           </div>
           <button className="sidebar-close-btn" onClick={onClose} aria-label="Close">
@@ -57,49 +57,7 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
           </button>
         </div>
 
-        {/* ── User Role Identity Card ── */}
-        {currentUser && (
-          <div style={{
-            margin: '0 12px 14px',
-            padding: '10px 14px',
-            background: isAdmin ? 'rgba(99, 95, 236, 0.12)' : 'rgba(59, 130, 246, 0.08)',
-            border: `1px solid ${isAdmin ? 'rgba(99, 95, 236, 0.3)' : 'rgba(59, 130, 246, 0.2)'}`,
-            borderRadius: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px'
-          }}>
-            <div style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '8px',
-              background: isAdmin ? 'linear-gradient(135deg, #635fec, #4338ca)' : 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
-              color: '#ffffff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: '800',
-              fontSize: '0.85rem',
-              flexShrink: 0
-            }}>
-              {(currentUser.name || 'U')[0].toUpperCase()}
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-              <span style={{ fontSize: '0.84rem', fontWeight: '800', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {currentUser.name || 'User'}
-              </span>
-              <span style={{
-                fontSize: '0.68rem',
-                fontWeight: '700',
-                color: isAdmin ? '#818cf8' : '#3b82f6',
-                textTransform: 'uppercase',
-                letterSpacing: '0.04em'
-              }}>
-                {isAdmin ? '🛡️ Administrator' : '👤 Standard User'}
-              </span>
-            </div>
-          </div>
-        )}
+
 
         {/* ── Navigation ── */}
         <nav className="sidebar-nav">

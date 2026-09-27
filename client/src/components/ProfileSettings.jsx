@@ -369,16 +369,6 @@ export default function ProfileSettings({
                           style={{ width: '100%', marginTop: '4px', padding: '8px 12px', borderRadius: '8px' }}
                         />
                       </div>
-                      <div>
-                        <label style={{ fontSize: '0.74rem', fontWeight: '700', color: 'var(--text-muted)' }}>Department</label>
-                        <input
-                          type="text"
-                          value={department}
-                          onChange={e => setDepartment(e.target.value)}
-                          placeholder="Department"
-                          style={{ width: '100%', marginTop: '4px', padding: '8px 12px', borderRadius: '8px' }}
-                        />
-                      </div>
                       <button
                         onClick={handleSaveProfile}
                         className="btn-primary"
@@ -394,7 +384,6 @@ export default function ProfileSettings({
                         {role === 'Admin' || role?.toLowerCase()?.includes('admin') ? '🛡️ System Administrator' : '👤 Verified Research Analyst'}
                       </div>
                       <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px' }}>{email}</div>
-                      <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '2px' }}>{department} • {university}</div>
                     </div>
                   )}
                 </div>

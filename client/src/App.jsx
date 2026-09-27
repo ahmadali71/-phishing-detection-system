@@ -38,8 +38,8 @@ function AppInner() {
   const t = TRANSLATIONS[language] || TRANSLATIONS['English'];
 
   const [notifications, setNotifications] = useState([
-    { id: 1, title: 'High-Risk Phishing Intercepted', message: 'paypal-secure-login.com blocked with 90/100 risk.', type: 'THREAT', time: '10 min ago', read: false },
-    { id: 2, title: 'ML Engine Status', message: 'Random Forest, Vision OCR and NLP BERT models synchronized.', type: 'INFO', time: '1 hour ago', read: false },
+    { id: 'NTF-01', title: 'High-Risk Phishing Intercepted', message: 'paypal-secure-login.com blocked with 90/100 risk.', type: 'THREAT', time: '10 min ago', read: false },
+    { id: 'NTF-02', title: 'ML Engine Status', message: 'Random Forest, Vision OCR and NLP BERT models synchronized.', type: 'INFO', time: '1 hour ago', read: false },
   ]);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
@@ -77,7 +77,7 @@ function AppInner() {
   }, [language]);
 
   const addNotification = useCallback((title, message, type = 'INFO') => {
-    setNotifications(prev => [{ id: Date.now(), title, message, type, time: 'Just now', read: false }, ...prev]);
+    setNotifications(prev => [{ id: `NTF-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`, title, message, type, time: 'Just now', read: false }, ...prev]);
   }, []);
 
   const addSystemLog = useCallback((level, module, message) => {

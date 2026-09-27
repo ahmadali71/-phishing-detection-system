@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 export default function RadialGauge({ score = 85, label, maxScore = 100, size = 160 }) {
+  const uid = useId().replace(/[:]/g, '');
   const numericScore = Math.min(100, Math.max(0, Number(score) || 0));
 
   // Gauge calculations
@@ -11,43 +12,47 @@ export default function RadialGauge({ score = 85, label, maxScore = 100, size = 
   const arcLength = Math.PI * radius;
   const strokeDashoffset = arcLength * (1 - numericScore / 100);
 
+  const dangerGrad = `gauge-danger-${uid}`;
+  const warningGrad = `gauge-warning-${uid}`;
+  const safeGrad = `gauge-safe-${uid}`;
+
   // Status & color scheme
   let riskLevel = label;
   let statusColor = '#ef4444';
   let badgeBg = 'rgba(239, 68, 68, 0.12)';
-  let gradientId = 'gauge-danger';
+  let gradientId = dangerGrad;
 
   if (!riskLevel) {
     if (numericScore >= 70) {
       riskLevel = 'High Risk';
       statusColor = '#ef4444';
       badgeBg = 'rgba(239, 68, 68, 0.12)';
-      gradientId = 'gauge-danger';
+      gradientId = dangerGrad;
     } else if (numericScore >= 35) {
       riskLevel = 'Medium Risk';
       statusColor = '#f59e0b';
       badgeBg = 'rgba(245, 158, 11, 0.12)';
-      gradientId = 'gauge-warning';
+      gradientId = warningGrad;
     } else {
       riskLevel = 'Low Risk';
       statusColor = '#10b981';
       badgeBg = 'rgba(16, 185, 129, 0.12)';
-      gradientId = 'gauge-safe';
+      gradientId = safeGrad;
     }
   } else {
     const l = riskLevel.toLowerCase();
     if (l.includes('high') || l.includes('crit') || l.includes('danger')) {
       statusColor = '#ef4444';
       badgeBg = 'rgba(239, 68, 68, 0.12)';
-      gradientId = 'gauge-danger';
+      gradientId = dangerGrad;
     } else if (l.includes('med') || l.includes('warn') || l.includes('susp')) {
       statusColor = '#f59e0b';
       badgeBg = 'rgba(245, 158, 11, 0.12)';
-      gradientId = 'gauge-warning';
+      gradientId = warningGrad;
     } else {
       statusColor = '#10b981';
       badgeBg = 'rgba(16, 185, 129, 0.12)';
-      gradientId = 'gauge-safe';
+      gradientId = safeGrad;
     }
   }
 
@@ -86,18 +91,18 @@ export default function RadialGauge({ score = 85, label, maxScore = 100, size = 
           style={{ width: '100%', height: '100%', overflow: 'visible' }}
         >
           <defs>
-            <linearGradient id="gauge-danger" x1="0%" y1="100%" x2="100%" y2="0%">
+            <linearGradient id={dangerGrad} x1="0%" y1="100%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#ef4444" />
               <stop offset="70%" stopColor="#f97316" />
               <stop offset="100%" stopColor="#fb7185" />
             </linearGradient>
 
-            <linearGradient id="gauge-warning" x1="0%" y1="100%" x2="100%" y2="0%">
+            <linearGradient id={warningGrad} x1="0%" y1="100%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#f59e0b" />
               <stop offset="100%" stopColor="#fbbf24" />
             </linearGradient>
 
-            <linearGradient id="gauge-safe" x1="0%" y1="100%" x2="100%" y2="0%">
+            <linearGradient id={safeGrad} x1="0%" y1="100%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#10b981" />
               <stop offset="100%" stopColor="#06b6d4" />
             </linearGradient>

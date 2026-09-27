@@ -71,6 +71,11 @@ export default function AdminPanel({
   const [editDept, setEditDept] = useState('Dept of CS & IT, UOS');
   const [editStatus, setEditStatus] = useState('Active');
 
+  // Deletion Confirmation Modal State
+  const [deleteConfirmTarget, setDeleteConfirmTarget] = useState(null);
+  const [deletedUserEmails, setDeletedUserEmails] = useState(new Set());
+  const [deletedModelIds, setDeletedModelIds] = useState(new Set());
+
   // Performance Telemetry & Benchmark State
   const [benchmarkRunning, setBenchmarkRunning] = useState(false);
   const [benchmarkProgress, setBenchmarkProgress] = useState(0);
@@ -90,13 +95,23 @@ export default function AdminPanel({
     return l.level?.toUpperCase() === logFilter.toUpperCase();
   });
 
-  // Filtered Users list
-  const filteredUsers = usersList.filter(u => {
+  // Deduplicate users and ensure no duplicate accounts
+  const uniqueUsers = React.useMemo(() => {
+    const seen = new Set();
+    return (usersList || []).filter(u => {
+      const key = u.email?.toLowerCase();
+      if (!key || seen.has(key) || deletedUserEmails.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }, [usersList, deletedUserEmails]);
+
+  // Filtered Users list (without department column)
+  const filteredUsers = uniqueUsers.filter(u => {
     const q = userSearchQuery.toLowerCase();
     const matchesSearch = !q ||
       u.name?.toLowerCase().includes(q) ||
       u.email?.toLowerCase().includes(q) ||
-      u.department?.toLowerCase().includes(q) ||
       u.role?.toLowerCase().includes(q);
 
     const matchesRole = userRoleFilter === 'ALL' ||
@@ -107,12 +122,42 @@ export default function AdminPanel({
     return matchesSearch && matchesRole;
   });
 
+  // Deduplicate and ensure all models have unique, distinct non-repeating IDs
+  const uniqueModels = React.useMemo(() => {
+    const seenIds = new Set();
+    let counter = 1;
+    return (models || [])
+      .filter(m => !deletedModelIds.has(String(m.id || m._id || '').toLowerCase()))
+      .map((m) => {
+        let id = m.id || m._id;
+        if (!id || seenIds.has(id)) {
+          while (seenIds.has(`M-${counter < 10 ? '0' : ''}${counter}`)) {
+            counter++;
+          }
+          id = `M-${counter < 10 ? '0' : ''}${counter}`;
+          counter++;
+        }
+        seenIds.add(id);
+        return { ...m, id, _rawModel: m };
+      });
+  }, [models, deletedModelIds]);
+
   // ── HANDLERS: ML Models ──
   const handleUploadSubmit = (e) => {
     e.preventDefault();
     if (!newModelName.trim()) return;
 
-    const newId = `M-0${models.length + 1}`;
+    let maxNum = 0;
+    (models || []).forEach(m => {
+      const match = String(m.id || '').match(/(\d+)/);
+      if (match) {
+        const val = parseInt(match[1], 10);
+        if (val > maxNum) maxNum = val;
+      }
+    });
+    const nextNum = maxNum + 1;
+    const newId = `M-${nextNum < 10 ? '0' : ''}${nextNum}`;
+
     if (onAddModel) {
       onAddModel({
         id: newId,
@@ -204,14 +249,48 @@ export default function AdminPanel({
   };
 
   const handleDeleteUserClick = (user) => {
-    if (window.confirm(`Are you sure you want to delete user account: ${user.name} (${user.email})? This action will remove their system permissions immediately.`)) {
+    setDeleteConfirmTarget({
+      type: 'user',
+      data: user,
+    });
+  };
+
+  const handleDeleteModelClick = (model) => {
+    setDeleteConfirmTarget({
+      type: 'model',
+      data: model,
+    });
+  };
+
+  const handleConfirmDelete = () => {
+    if (!deleteConfirmTarget) return;
+    const { type, data } = deleteConfirmTarget;
+
+    if (type === 'user') {
+      const emailKey = data.email?.toLowerCase();
+      if (emailKey) {
+        setDeletedUserEmails(prev => new Set([...prev, emailKey]));
+      }
       if (onDeleteUser) {
-        onDeleteUser(user.email);
+        onDeleteUser(data.email, data);
       }
       if (onAddLog) {
-        onAddLog('WARN', 'User Management', `Revoked and deleted user account: ${user.name} (${user.email})`);
+        onAddLog('WARN', 'User Management', `Revoked and deleted user account: ${data.name || data.email}`);
+      }
+    } else if (type === 'model') {
+      const modelId = String(data.id || data._id || '').toLowerCase();
+      if (modelId) {
+        setDeletedModelIds(prev => new Set([...prev, modelId]));
+      }
+      if (onDeleteModel) {
+        onDeleteModel(data.id, data._rawModel || data);
+      }
+      if (onAddLog) {
+        onAddLog('WARN', 'Model Orchestration', `Removed model ${data.name} (${data.id})`);
       }
     }
+
+    setDeleteConfirmTarget(null);
   };
 
   // ── HANDLERS: Performance Benchmark ──
@@ -376,7 +455,7 @@ export default function AdminPanel({
                 </tr>
               </thead>
               <tbody>
-                {models.map((m) => (
+                {uniqueModels.map((m) => (
                   <tr key={m.id}>
                     <td style={{ fontFamily: 'var(--font-mono)', fontWeight: '700' }}>{m.id}</td>
                     <td style={{ fontWeight: '700' }}>
@@ -406,12 +485,7 @@ export default function AdminPanel({
                           {m.status === 'Active' ? 'Deactivate' : 'Activate'}
                         </button>
                         <button
-                          onClick={() => {
-                            if (window.confirm(`Delete model ${m.name}?`)) {
-                              if (onDeleteModel) onDeleteModel(m.id);
-                              if (onAddLog) onAddLog('WARN', 'Model Orchestration', `Removed model ${m.name} (${m.id})`);
-                            }
-                          }}
+                          onClick={() => handleDeleteModelClick(m)}
                           className="btn-secondary"
                           style={{ fontSize: '0.75rem', padding: '4px 8px', color: '#f87171' }}
                           title="Delete Model"
@@ -695,7 +769,7 @@ export default function AdminPanel({
               <Search size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
               <input
                 type="text"
-                placeholder="Search by name, email, or department..."
+                placeholder="Search by name or email..."
                 value={userSearchQuery}
                 onChange={(e) => setUserSearchQuery(e.target.value)}
                 style={{ width: '100%', paddingLeft: '36px' }}
@@ -721,7 +795,6 @@ export default function AdminPanel({
                 <tr>
                   <th>User Profile</th>
                   <th>Email</th>
-                  <th>Department / Affiliation</th>
                   <th>Role Privilege</th>
                   <th>Status</th>
                   <th style={{ textAlign: 'right' }}>Actions</th>
@@ -730,7 +803,7 @@ export default function AdminPanel({
               <tbody>
                 {filteredUsers.length === 0 ? (
                   <tr>
-                    <td colSpan={6} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '24px' }}>
+                    <td colSpan={5} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '24px' }}>
                       No registered user accounts match your search criteria.
                     </td>
                   </tr>
@@ -739,7 +812,7 @@ export default function AdminPanel({
                     const initials = (u.name || 'U').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
                     const isAdminUser = u.role?.toLowerCase().includes('admin');
                     return (
-                      <tr key={u.email}>
+                      <tr key={u.id || u.email}>
                         <td style={{ fontWeight: '700' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                             <div style={{
@@ -767,7 +840,6 @@ export default function AdminPanel({
                           </div>
                         </td>
                         <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.84rem' }}>{u.email}</td>
-                        <td style={{ color: 'var(--text-secondary)', fontSize: '0.84rem' }}>{u.department || 'Dept of CS & IT, UOS'}</td>
                         <td>
                           <span className={`badge ${isAdminUser ? 'badge-blue' : 'badge-emerald'}`}>
                             {u.role}
@@ -955,17 +1027,6 @@ export default function AdminPanel({
                 </div>
               </div>
 
-              <div>
-                <label style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-secondary)' }}>Department / Organization</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Dept of CS & IT, University of Sargodha"
-                  value={addDept}
-                  onChange={(e) => setAddDept(e.target.value)}
-                  style={{ width: '100%', marginTop: '4px' }}
-                />
-              </div>
-
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '14px' }}>
                 <button type="button" onClick={() => setShowAddUserModal(false)} className="btn-secondary">
                   Cancel
@@ -1045,16 +1106,6 @@ export default function AdminPanel({
                 </div>
               </div>
 
-              <div>
-                <label style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-secondary)' }}>Department / Affiliation</label>
-                <input
-                  type="text"
-                  value={editDept}
-                  onChange={(e) => setEditDept(e.target.value)}
-                  style={{ width: '100%', marginTop: '4px' }}
-                />
-              </div>
-
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '14px' }}>
                 <button type="button" onClick={() => setShowEditUserModal(false)} className="btn-secondary">
                   Cancel
@@ -1067,6 +1118,108 @@ export default function AdminPanel({
           </div>
         </div>
       )}
+
+      {/* ── MODAL: CONFIRM DELETION ── */}
+      {deleteConfirmTarget && (
+        <div
+          className="admin-delete-modal-overlay"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.78)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+            backdropFilter: 'blur(5px)',
+          }}
+          onClick={() => setDeleteConfirmTarget(null)}
+        >
+          <div
+            className="glass-panel"
+            style={{
+              width: '100%',
+              maxWidth: '440px',
+              padding: '26px',
+              background: 'var(--bg-secondary, #0c1322)',
+              border: '1px solid rgba(239, 68, 68, 0.5)',
+              boxShadow: '0 25px 60px rgba(0, 0, 0, 0.8), 0 0 25px rgba(239, 68, 68, 0.25)',
+              borderRadius: '16px',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
+              <div style={{
+                width: '46px',
+                height: '46px',
+                borderRadius: '12px',
+                background: 'rgba(239, 68, 68, 0.15)',
+                border: '1px solid rgba(239, 68, 68, 0.4)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#ef4444',
+                flexShrink: 0
+              }}>
+                <Trash2 size={24} />
+              </div>
+              <div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: '800', color: 'var(--text-primary, #ffffff)', margin: 0 }}>
+                  Confirm Deletion
+                </h3>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted, #94a3b8)', margin: '2px 0 0' }}>
+                  This action is permanent and cannot be undone.
+                </p>
+              </div>
+            </div>
+
+            <p style={{ fontSize: '0.92rem', color: 'var(--text-secondary, #cbd5e1)', marginBottom: '22px', lineHeight: 1.5 }}>
+              Are you sure you want to permanently remove {deleteConfirmTarget.type === 'model' ? 'machine learning model' : 'user account'}:
+              <br />
+              <strong style={{ color: '#ef4444', display: 'inline-block', marginTop: '6px', fontSize: '1rem' }}>
+                {deleteConfirmTarget.data.name || deleteConfirmTarget.data.email}
+              </strong>
+              {deleteConfirmTarget.data.email && deleteConfirmTarget.data.name && (
+                <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted, #64748b)', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>
+                  ({deleteConfirmTarget.data.email})
+                </span>
+              )}
+            </p>
+
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                onClick={() => setDeleteConfirmTarget(null)}
+                className="btn-secondary"
+                style={{ padding: '9px 18px', fontSize: '0.85rem', fontWeight: 600 }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                className="btn-primary delete-confirm-btn"
+                style={{
+                  background: '#ef4444',
+                  borderColor: '#dc2626',
+                  color: '#ffffff',
+                  padding: '9px 20px',
+                  fontSize: '0.85rem',
+                  fontWeight: 800,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <Trash2 size={15} />
+                <span>Yes, Delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

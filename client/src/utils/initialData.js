@@ -13,22 +13,22 @@ export const INITIAL_STATS = {
 };
 
 export const INITIAL_RECENT_ACTIVITY = [
-  { id: 1, type: 'URL', input: 'paypal-secure-login.com', result: 'Phishing', riskScore: 90, time: '2 min ago', badgeColor: 'danger' },
-  { id: 2, type: 'Email', input: 'Verify your account.eml', result: 'Suspicious', riskScore: 65, time: '15 min ago', badgeColor: 'warning' },
-  { id: 3, type: 'URL', input: 'microsoft.com', result: 'Safe', riskScore: 10, time: '1 hour ago', badgeColor: 'emerald' },
-  { id: 4, type: 'URL', input: 'secure-login.bank.com', result: 'Phishing', riskScore: 95, time: '3 hours ago', badgeColor: 'danger' },
-  { id: 5, type: 'Email', input: 'Meeting schedule.eml', result: 'Safe', riskScore: 15, time: '5 hours ago', badgeColor: 'emerald' }
+  { id: 'REC-01', type: 'URL', input: 'paypal-secure-login.com', result: 'Phishing', riskScore: 90, time: '2 min ago', badgeColor: 'danger' },
+  { id: 'REC-02', type: 'Email', input: 'Verify your account.eml', result: 'Suspicious', riskScore: 65, time: '15 min ago', badgeColor: 'warning' },
+  { id: 'REC-03', type: 'URL', input: 'microsoft.com', result: 'Safe', riskScore: 10, time: '1 hour ago', badgeColor: 'emerald' },
+  { id: 'REC-04', type: 'URL', input: 'secure-login.bank.com', result: 'Phishing', riskScore: 95, time: '3 hours ago', badgeColor: 'danger' },
+  { id: 'REC-05', type: 'Email', input: 'Meeting schedule.eml', result: 'Safe', riskScore: 15, time: '5 hours ago', badgeColor: 'emerald' }
 ];
 
 export const INITIAL_SCAN_HISTORY = [
-  { id: 1, type: 'URL', input: 'paypal-secure-login.com', result: 'Phishing', riskScore: '90/100', date: '2026-05-15 10:30 AM', category: 'Phishing' },
-  { id: 2, type: 'Email', input: 'Verify your account.eml', result: 'Suspicious', riskScore: '65/100', date: '2026-05-15 10:15 AM', category: 'Suspicious' },
-  { id: 3, type: 'URL', input: 'microsoft.com', result: 'Safe', riskScore: '10/100', date: '2026-05-15 09:45 AM', category: 'Safe' },
-  { id: 4, type: 'Email', input: 'Meeting schedule.eml', result: 'Safe', riskScore: '15/100', date: '2026-05-14 04:20 PM', category: 'Safe' },
-  { id: 5, type: 'URL', input: 'secure-login.bank.com', result: 'Phishing', riskScore: '95/100', date: '2026-05-14 03:10 PM', category: 'Phishing' },
-  { id: 6, type: 'URL', input: 'apple-id-verify.org', result: 'Phishing', riskScore: '88/100', date: '2026-05-14 01:25 PM', category: 'Phishing' },
-  { id: 7, type: 'Email', input: 'Urgent Tax Refund Claim.eml', result: 'Phishing', riskScore: '92/100', date: '2026-05-13 11:05 AM', category: 'Phishing' },
-  { id: 8, type: 'URL', input: 'github.com', result: 'Safe', riskScore: '05/100', date: '2026-05-13 09:12 AM', category: 'Safe' }
+  { id: 'SCN-101', type: 'URL', input: 'paypal-secure-login.com', result: 'Phishing', riskScore: '90/100', date: '2026-05-15 10:30 AM', category: 'Phishing' },
+  { id: 'SCN-102', type: 'Email', input: 'Verify your account.eml', result: 'Suspicious', riskScore: '65/100', date: '2026-05-15 10:15 AM', category: 'Suspicious' },
+  { id: 'SCN-103', type: 'URL', input: 'microsoft.com', result: 'Safe', riskScore: '10/100', date: '2026-05-15 09:45 AM', category: 'Safe' },
+  { id: 'SCN-104', type: 'Email', input: 'Meeting schedule.eml', result: 'Safe', riskScore: '15/100', date: '2026-05-14 04:20 PM', category: 'Safe' },
+  { id: 'SCN-105', type: 'URL', input: 'secure-login.bank.com', result: 'Phishing', riskScore: '95/100', date: '2026-05-14 03:10 PM', category: 'Phishing' },
+  { id: 'SCN-106', type: 'URL', input: 'apple-id-verify.org', result: 'Phishing', riskScore: '88/100', date: '2026-05-14 01:25 PM', category: 'Phishing' },
+  { id: 'SCN-107', type: 'Email', input: 'Urgent Tax Refund Claim.eml', result: 'Phishing', riskScore: '92/100', date: '2026-05-13 11:05 AM', category: 'Phishing' },
+  { id: 'SCN-108', type: 'URL', input: 'github.com', result: 'Safe', riskScore: '05/100', date: '2026-05-13 09:12 AM', category: 'Safe' }
 ];
 
 export const INITIAL_ML_MODELS = [
@@ -39,11 +39,11 @@ export const INITIAL_ML_MODELS = [
 ];
 
 export const INITIAL_SYSTEM_LOGS = [
-  { id: 101, timestamp: '2026-08-12 08:35:12', level: 'INFO', module: 'API Gateway', message: 'User amna_najam submitted URL scan request for paypal-secure-login.com' },
-  { id: 102, timestamp: '2026-08-12 08:35:13', level: 'WARN', module: 'Feature Extractor', message: 'Raw IP and typosquatting pattern detected in host domain' },
-  { id: 103, timestamp: '2026-08-12 08:35:13', level: 'THREAT', module: 'ML Classifier', message: 'Phishing verdict returned with score 90/100 (Model M-01)' },
-  { id: 104, timestamp: '2026-08-12 08:32:00', level: 'INFO', module: 'NLP Engine', message: 'Processed email text snippet, 3 urgency keywords identified' },
-  { id: 105, timestamp: '2026-08-12 08:20:44', level: 'INFO', module: 'Auth Service', message: 'User alisha_noor authenticated successfully via web interface' }
+  { id: 'LOG-101', timestamp: '2026-08-12 08:35:12', level: 'INFO', module: 'API Gateway', message: 'User amna_najam submitted URL scan request for paypal-secure-login.com' },
+  { id: 'LOG-102', timestamp: '2026-08-12 08:35:13', level: 'WARN', module: 'Feature Extractor', message: 'Raw IP and typosquatting pattern detected in host domain' },
+  { id: 'LOG-103', timestamp: '2026-08-12 08:35:13', level: 'THREAT', module: 'ML Classifier', message: 'Phishing verdict returned with score 90/100 (Model M-01)' },
+  { id: 'LOG-104', timestamp: '2026-08-12 08:32:00', level: 'INFO', module: 'NLP Engine', message: 'Processed email text snippet, 3 urgency keywords identified' },
+  { id: 'LOG-105', timestamp: '2026-08-12 08:20:44', level: 'INFO', module: 'Auth Service', message: 'User alisha_noor authenticated successfully via web interface' }
 ];
 
 export const CHATBOT_KNOWLEDGE_BASE = [

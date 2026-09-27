@@ -328,26 +328,15 @@ export default function LandingPage({
           <div className="apds-nav-container">
             {/* Brand Logo & Name */}
             <div className="apds-nav-brand">
-              <Logo size="sm" useShort={false} lightText={!isDark && !isNavy ? false : true} />
+              <Logo size="sm" showSubtitle={false} showBadge={false} lightText={!isDark && !isNavy ? false : true} />
             </div>
 
-            {/* Nav Links: Home, Dashboard, Features, Live Scanner, Threat Intel, How It Works, FAQ */}
+            {/* Nav Links: Home, Features, Live Scanner, Threat Intel, FAQ */}
             <nav className="apds-nav-menu">
               <a href="#hero" className="apds-nav-item">Home</a>
-              <button
-                type="button"
-                onClick={() => {
-                  if (currentUser) onNavigateDashboard();
-                  else onNavigateAuth('login');
-                }}
-                className="apds-nav-item apds-nav-btn-link"
-              >
-                Dashboard
-              </button>
               <a href="#vectors" className="apds-nav-item">Features</a>
               <a href="#sandbox" className="apds-nav-item">Live Scanner</a>
               <a href="#threat-matrix" className="apds-nav-item">Threat Intel</a>
-              <a href="#pipeline" className="apds-nav-item">How It Works</a>
               <a href="#faq" className="apds-nav-item">FAQ</a>
             </nav>
 
@@ -394,17 +383,6 @@ export default function LandingPage({
           {mobileMenuOpen && (
             <div className="apds-mobile-dropdown">
               <a href="#hero" className="apds-mob-link" onClick={() => setMobileMenuOpen(false)}>Home</a>
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  if (currentUser) onNavigateDashboard();
-                  else onNavigateAuth('login');
-                }}
-                className="apds-mob-link apds-nav-btn-link"
-              >
-                Dashboard
-              </button>
               <a href="#vectors" className="apds-mob-link" onClick={() => setMobileMenuOpen(false)}>Features</a>
               <a href="#sandbox" className="apds-mob-link" onClick={() => setMobileMenuOpen(false)}>Live Scanner</a>
               <a href="#threat-matrix" className="apds-mob-link" onClick={() => setMobileMenuOpen(false)}>Threat Matrix</a>
@@ -479,24 +457,6 @@ export default function LandingPage({
               <a href="#vectors" className="hero2-btn-secondary">
                 Learn More
               </a>
-            </div>
-
-            {/* Stats Row */}
-            <div className="hero2-stats-row">
-              <div className="hero2-stat">
-                <span className="hero2-stat-num">99.9%</span>
-                <span className="hero2-stat-lbl">Detection Rate</span>
-              </div>
-              <div className="hero2-stat-sep" />
-              <div className="hero2-stat">
-                <span className="hero2-stat-num">&lt;65ms</span>
-                <span className="hero2-stat-lbl">Scan Speed</span>
-              </div>
-              <div className="hero2-stat-sep" />
-              <div className="hero2-stat">
-                <span className="hero2-stat-num">4 Types</span>
-                <span className="hero2-stat-lbl">Threat Coverage</span>
-              </div>
             </div>
           </div>
 
@@ -1147,7 +1107,7 @@ export default function LandingPage({
       <footer className="apds-footer">
         <div className="apds-container apds-footer-grid">
           <div className="apds-footer-brand-col">
-            <Logo size="md" useShort={false} lightText={true} />
+            <Logo size="md" showSubtitle={true} showBadge={false} lightText={true} />
             <p className="apds-footer-tagline">
               Advanced multi-vector automated phishing detection powered by Machine Learning, Natural Language Processing, and Computer Vision heuristics.
             </p>

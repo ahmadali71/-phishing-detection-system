@@ -7,14 +7,24 @@ export default function ScanHistory({ scanHistory, onViewDetail, onExportPdf, t,
   const [toDate, setToDate] = useState('');
 
   const defaultRecords = [
-    { id: 1, type: 'URL', input: 'paypal-secure-login.com', result: 'Phishing', riskScore: '90/100', date: '2024-05-15 10:30 AM', category: 'Phishing' },
-    { id: 2, type: 'Email', input: 'Verify your account.eml', result: 'Suspicious', riskScore: '65/100', date: '2024-05-15 10:15 AM', category: 'Suspicious' },
-    { id: 3, type: 'URL', input: 'microsoft.com', result: 'Safe', riskScore: '10/100', date: '2024-05-15 09:45 AM', category: 'Safe' },
-    { id: 4, type: 'Email', input: 'Meeting schedule.eml', result: 'Safe', riskScore: '15/100', date: '2024-05-14 04:20 PM', category: 'Safe' },
-    { id: 5, type: 'URL', input: 'secure-login.bank.com', result: 'Phishing', riskScore: '95/100', date: '2024-05-14 03:10 PM', category: 'Phishing' },
+    { id: 'SCN-101', type: 'URL', input: 'paypal-secure-login.com', result: 'Phishing', riskScore: '90/100', date: '2024-05-15 10:30 AM', category: 'Phishing' },
+    { id: 'SCN-102', type: 'Email', input: 'Verify your account.eml', result: 'Suspicious', riskScore: '65/100', date: '2024-05-15 10:15 AM', category: 'Suspicious' },
+    { id: 'SCN-103', type: 'URL', input: 'microsoft.com', result: 'Safe', riskScore: '10/100', date: '2024-05-15 09:45 AM', category: 'Safe' },
+    { id: 'SCN-104', type: 'Email', input: 'Meeting schedule.eml', result: 'Safe', riskScore: '15/100', date: '2024-05-14 04:20 PM', category: 'Safe' },
+    { id: 'SCN-105', type: 'URL', input: 'secure-login.bank.com', result: 'Phishing', riskScore: '95/100', date: '2024-05-14 03:10 PM', category: 'Phishing' },
   ];
 
-  const records = (scanHistory?.length > 0 ? scanHistory : defaultRecords).filter(r => {
+  // Deduplicate records by ID or composite key to ensure no duplicate IDs are shown
+  const rawRecords = scanHistory?.length > 0 ? scanHistory : defaultRecords;
+  const seenIds = new Set();
+  const dedupedRecords = rawRecords.filter((r, idx) => {
+    const key = r.id || r._id || `${r.type}-${r.input}-${r.date || idx}`;
+    if (seenIds.has(key)) return false;
+    seenIds.add(key);
+    return true;
+  });
+
+  const records = dedupedRecords.filter(r => {
     const matchesCategory = filter === 'All' || r.result === filter || r.category === filter;
     const q = (searchQuery || '').toLowerCase();
     const matchesSearch = !q ||
