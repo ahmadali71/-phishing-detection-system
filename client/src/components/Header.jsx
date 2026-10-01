@@ -67,6 +67,17 @@ export default function Header({
     };
   }, [showSearch, setShowSearch]);
 
+  // Auto-close search on mobile viewports
+  useEffect(() => {
+    function handleResize() {
+      if (window.innerWidth <= 768) {
+        setShowSearch(false);
+      }
+    }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [setShowSearch]);
+
   const q = (searchQuery || '').trim().toLowerCase();
 
   const QUICK_PAGES = useMemo(() => [
@@ -177,10 +188,10 @@ export default function Header({
       {/* ── RIGHT ── */}
       <div className="header-right">
 
-        {/* Search button */}
+        {/* Search button — desktop / tablet only */}
         <button
           onClick={() => setShowSearch(v => !v)}
-          className={`hdr-btn${showSearch ? ' active' : ''}`}
+          className={`hdr-btn hdr-btn-search${showSearch ? ' active' : ''}`}
           aria-label="Search"
           title="Search scans and URLs"
         >
@@ -952,6 +963,8 @@ export default function Header({
           .hamburger-btn {
             display: flex !important;
           }
+          .hdr-btn-search { display: none !important; }
+          .hdr-search-container { display: none !important; }
           .hdr-user-info { display: none !important; }
           .hdr-pill-text { display: none !important; }
           .hdr-pill-btn {
@@ -972,18 +985,8 @@ export default function Header({
           .logo-brand-desktop { display: none !important; }
           .logo-brand-mobile { display: inline-flex !important; }
           .app-header { padding: 0 10px !important; }
-          .hdr-search-container {
-            position: fixed !important;
-            top: 56px !important;
-            left: 8px !important;
-            right: 8px !important;
-            width: auto !important;
-            max-width: none !important;
-            z-index: 1001 !important;
-          }
-          .hdr-search-dropdown {
-            max-height: min(320px, 50vh) !important;
-          }
+          .hdr-btn-search { display: none !important; }
+          .hdr-search-container { display: none !important; }
         }
         @media (max-width: 480px) {
           .header-page-chip { display: none !important; }
