@@ -50,7 +50,7 @@ export default function Header({
     return () => document.removeEventListener('mousedown', onClickOutside);
   }, [setShowNotifications]);
 
-  // Close search popover on outside click
+  // Close search popover on outside click/tap
   useEffect(() => {
     function onClickOutsideSearch(e) {
       if (searchRef.current && !searchRef.current.contains(e.target)) {
@@ -59,8 +59,12 @@ export default function Header({
     }
     if (showSearch) {
       document.addEventListener('mousedown', onClickOutsideSearch);
+      document.addEventListener('touchstart', onClickOutsideSearch, { passive: true });
     }
-    return () => document.removeEventListener('mousedown', onClickOutsideSearch);
+    return () => {
+      document.removeEventListener('mousedown', onClickOutsideSearch);
+      document.removeEventListener('touchstart', onClickOutsideSearch);
+    };
   }, [showSearch, setShowSearch]);
 
   const q = (searchQuery || '').trim().toLowerCase();
@@ -83,12 +87,13 @@ export default function Header({
   }, [q, QUICK_PAGES]);
 
   const matchedScans = useMemo(() => {
-    if (q.length < 1) return [];
+    if (!q || q.length < 1) return [];
     return (scans || []).filter(s => {
-      const inputStr = (s.input || s.url || '').toLowerCase();
-      const typeStr = (s.type || '').toLowerCase();
-      const resultStr = (s.result || s.status || '').toLowerCase();
-      const idStr = (s.id || '').toLowerCase();
+      if (!s) return false;
+      const inputStr = s.input != null ? String(s.input).toLowerCase() : (s.url != null ? String(s.url).toLowerCase() : '');
+      const typeStr = s.type != null ? String(s.type).toLowerCase() : '';
+      const resultStr = s.result != null ? String(s.result).toLowerCase() : (s.status != null ? String(s.status).toLowerCase() : '');
+      const idStr = s.id != null ? String(s.id).toLowerCase() : '';
       return inputStr.includes(q) || typeStr.includes(q) || resultStr.includes(q) || idStr.includes(q);
     }).slice(0, 5);
   }, [q, scans]);
@@ -967,6 +972,18 @@ export default function Header({
           .logo-brand-desktop { display: none !important; }
           .logo-brand-mobile { display: inline-flex !important; }
           .app-header { padding: 0 10px !important; }
+          .hdr-search-container {
+            position: fixed !important;
+            top: 56px !important;
+            left: 8px !important;
+            right: 8px !important;
+            width: auto !important;
+            max-width: none !important;
+            z-index: 1001 !important;
+          }
+          .hdr-search-dropdown {
+            max-height: min(320px, 50vh) !important;
+          }
         }
         @media (max-width: 480px) {
           .header-page-chip { display: none !important; }

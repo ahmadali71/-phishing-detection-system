@@ -42,12 +42,21 @@ const logRoutes = require('./routes/logRoutes');
 const statRoutes = require('./routes/statRoutes');
 const modelRoutes = require('./routes/modelRoutes');
 
-// Mount routes
+// Mount routes (supporting both with and without /api prefix for Vercel serverless functions)
 app.use('/api/auth', authRoutes);
+app.use('/auth', authRoutes);
+
 app.use('/api/scans', scanRoutes);
+app.use('/scans', scanRoutes);
+
 app.use('/api/logs', logRoutes);
+app.use('/logs', logRoutes);
+
 app.use('/api/stats', statRoutes);
+app.use('/stats', statRoutes);
+
 app.use('/api/models', modelRoutes);
+app.use('/models', modelRoutes);
 
 // API info endpoint
 app.get('/api', (req, res) => {
