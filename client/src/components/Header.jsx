@@ -1,5 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Bell, Search, X, Trash2, Menu } from 'lucide-react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import {
+  Bell, Search, X, Trash2, Menu, LogOut,
+  Globe, Mail, Image, MessageSquare, ArrowRight, ShieldAlert
+} from 'lucide-react';
 import Logo from './Logo';
 
 export default function Header({
@@ -9,6 +12,7 @@ export default function Header({
   currentUser, onOpenAuth, onLogout,
   notifications, onMarkNotificationRead, onClearNotifications,
   searchQuery, setSearchQuery, onSelectSearchResult,
+  scans = [],
   onMenuToggle,
   sidebarOpen,
   showSearch, setShowSearch,
@@ -17,10 +21,11 @@ export default function Header({
 }) {
   const unreadCount = (notifications || []).filter(n => !n.read).length;
   const notifRef = useRef(null);
+  const searchRef = useRef(null);
 
   const getPageTitle = () => {
     switch (activeTab) {
-      case 'home':             return 'Home';
+      case 'home':             return currentUser ? 'Dashboard' : 'Home';
       case 'dashboard':        return 'Dashboard';
       case 'url-detection':    return 'URL Detection';
       case 'email-detection':  return 'Email Detection';
@@ -34,6 +39,7 @@ export default function Header({
     }
   };
 
+  // Close notifications on outside click
   useEffect(() => {
     function onClickOutside(e) {
       if (notifRef.current && !notifRef.current.contains(e.target)) {
@@ -43,6 +49,78 @@ export default function Header({
     document.addEventListener('mousedown', onClickOutside);
     return () => document.removeEventListener('mousedown', onClickOutside);
   }, [setShowNotifications]);
+
+  // Close search popover on outside click
+  useEffect(() => {
+    function onClickOutsideSearch(e) {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setShowSearch(false);
+      }
+    }
+    if (showSearch) {
+      document.addEventListener('mousedown', onClickOutsideSearch);
+    }
+    return () => document.removeEventListener('mousedown', onClickOutsideSearch);
+  }, [showSearch, setShowSearch]);
+
+  const q = (searchQuery || '').trim().toLowerCase();
+
+  const QUICK_PAGES = useMemo(() => [
+    { id: 'dashboard', title: 'Dashboard', desc: 'Real-time telemetry & posture' },
+    { id: 'url-detection', title: 'URL Detection', desc: 'Heuristics & domain reputation scanner' },
+    { id: 'email-detection', title: 'Email Detection', desc: 'Header analysis & NLP phishing detection' },
+    { id: 'image-detection', title: 'Screenshot Analysis', desc: 'Visual brand impersonation scanner' },
+    { id: 'message-detection', title: 'SMS & Smishing', desc: 'Smishing & social engineering detector' },
+    { id: 'scan-history', title: 'Scan History', desc: 'Historical audit log & PDF reports' },
+    { id: 'ai-assistant', title: 'AI Assistant', desc: 'Interactive LLM threat analysis' },
+  ], []);
+
+  const matchedPages = useMemo(() => {
+    if (q.length < 2) return [];
+    return QUICK_PAGES.filter(p =>
+      p.title.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q)
+    ).slice(0, 3);
+  }, [q, QUICK_PAGES]);
+
+  const matchedScans = useMemo(() => {
+    if (q.length < 1) return [];
+    return (scans || []).filter(s => {
+      const inputStr = (s.input || s.url || '').toLowerCase();
+      const typeStr = (s.type || '').toLowerCase();
+      const resultStr = (s.result || s.status || '').toLowerCase();
+      const idStr = (s.id || '').toLowerCase();
+      return inputStr.includes(q) || typeStr.includes(q) || resultStr.includes(q) || idStr.includes(q);
+    }).slice(0, 5);
+  }, [q, scans]);
+
+  const handleSelectScan = (scan) => {
+    if (onSelectSearchResult) {
+      onSelectSearchResult(scan);
+    }
+    setShowSearch(false);
+  };
+
+  const handleSelectPage = (pageId) => {
+    setActiveTab(pageId);
+    setShowSearch(false);
+    setSearchQuery('');
+  };
+
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (matchedScans.length > 0) {
+        handleSelectScan(matchedScans[0]);
+      } else if (matchedPages.length > 0) {
+        handleSelectPage(matchedPages[0].id);
+      } else {
+        setActiveTab('scan-history');
+        setShowSearch(false);
+      }
+    } else if (e.key === 'Escape') {
+      setShowSearch(false);
+    }
+  };
 
 
 
@@ -61,9 +139,9 @@ export default function Header({
 
         <div
           className="header-brand-wrap"
-          onClick={() => setActiveTab && setActiveTab('home')}
+          onClick={() => setActiveTab && setActiveTab(currentUser ? 'dashboard' : 'home')}
           style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}
-          title="Automated Phishing Detection System - Home"
+          title={currentUser ? "Automated Phishing Detection System - Dashboard" : "Automated Phishing Detection System - Home"}
         >
           <Logo size="sm" useShort={false} showText={true} lightText={true} className="hdr-logo-full" />
 
@@ -71,8 +149,8 @@ export default function Header({
         </div>
       </div>
 
-      {/* ── CENTER: Navigation Links on Desktop ── */}
-      {activeTab === 'home' && (
+      {/* ── CENTER: Navigation Links on Desktop (Only when outside app on home) ── */}
+      {(!currentUser && activeTab === 'home') && (
         <nav className="hdr-center-nav-links pg-desktop-only">
           <button
             type="button"
@@ -94,13 +172,18 @@ export default function Header({
       {/* ── RIGHT ── */}
       <div className="header-right">
 
-        {/* Search */}
-        <button onClick={() => setShowSearch(v => !v)} className="hdr-btn" aria-label="Search">
+        {/* Search button */}
+        <button
+          onClick={() => setShowSearch(v => !v)}
+          className={`hdr-btn${showSearch ? ' active' : ''}`}
+          aria-label="Search"
+          title="Search scans and URLs"
+        >
           <Search size={17} />
         </button>
 
-        {/* Theme switcher pills — desktop only */}
-        {setTheme && (
+        {/* Theme switcher pills — strictly only showing after sign in */}
+        {currentUser && setTheme && (
           <div className="hdr-theme-pills pg-desktop-only">
             {[
               { id: 'light',  label: '☀️', title: 'Light Mode' },
@@ -112,6 +195,7 @@ export default function Header({
                 onClick={() => setTheme(opt.id)}
                 className={`hdr-theme-pill${theme === opt.id ? ' hdr-theme-pill-active' : ''}`}
                 title={opt.title}
+                aria-label={opt.title}
               >
                 {opt.label}
               </button>
@@ -165,28 +249,148 @@ export default function Header({
               <span className="hdr-user-name">{currentUser.name}</span>
               <span className="hdr-user-role">{currentUser.role || 'User'}</span>
             </div>
+            <button
+              onClick={onLogout}
+              className="hdr-logout-quick-btn"
+              title="Sign Out"
+              aria-label="Sign Out"
+            >
+              <LogOut size={15} />
+            </button>
           </div>
         ) : (
           <button onClick={onOpenAuth} className="hdr-signin-btn">Sign In</button>
         )}
       </div>
 
-      {/* ── Search bar ── */}
+      {/* ── Search Bar & Interactive Live Results Dropdown ── */}
       {showSearch && (
-        <div className="hdr-search-bar">
-          <Search size={14} color="var(--text-muted)" />
-          <input
-            autoFocus
-            type="text"
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            placeholder="Search scans, URLs…"
-            className="hdr-search-input"
-          />
-          {searchQuery && (
-            <button onClick={() => { setSearchQuery(''); setShowSearch(false); }} className="hdr-search-clear">
-              <X size={13} />
+        <div ref={searchRef} className="hdr-search-container">
+          <div className="hdr-search-bar">
+            <Search size={15} className="hdr-search-icon" />
+            <input
+              autoFocus
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              onKeyDown={handleSearchKeyDown}
+              placeholder="Search scans, URLs, emails, pages… (Press Enter)"
+              className="hdr-search-input"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="hdr-search-clear"
+                title="Clear query"
+              >
+                <X size={13} />
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setShowSearch(false)}
+              className="hdr-search-close"
+              title="Close search"
+            >
+              <X size={14} />
             </button>
+          </div>
+
+          {/* Live Search Dropdown */}
+          {q.length > 0 && (
+            <div className="hdr-search-dropdown">
+              {matchedScans.length > 0 && (
+                <div className="hdr-search-group">
+                  <div className="hdr-search-group-header">
+                    <span>Threat Scans &amp; Audits</span>
+                    <span className="hdr-search-count-tag">{matchedScans.length} found</span>
+                  </div>
+                  {matchedScans.map((scan, idx) => {
+                    const isPhishing = scan.result === 'Phishing' || (typeof scan.result === 'string' && scan.result.includes('Phishing'));
+                    const isSuspicious = scan.result === 'Suspicious';
+                    const verdictClass = isPhishing ? 'danger' : isSuspicious ? 'warning' : 'safe';
+                    return (
+                      <div
+                        key={scan.id || idx}
+                        onClick={() => handleSelectScan(scan)}
+                        className="hdr-search-result-item"
+                        role="button"
+                        tabIndex={0}
+                      >
+                        <div className={`hdr-result-type-badge ${verdictClass}`}>
+                          {scan.type || 'URL'}
+                        </div>
+                        <div className="hdr-result-info">
+                          <div className="hdr-result-target">{scan.input || scan.url}</div>
+                          <div className="hdr-result-meta">
+                            <span className={`hdr-verdict-pill ${verdictClass}`}>{scan.result || 'Safe'}</span>
+                            <span className="hdr-meta-sep">•</span>
+                            <span>Risk {scan.riskScore || '0/100'}</span>
+                            {scan.date && (
+                              <>
+                                <span className="hdr-meta-sep">•</span>
+                                <span>{scan.date}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        <ArrowRight size={13} className="hdr-result-arrow" />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {matchedPages.length > 0 && (
+                <div className="hdr-search-group">
+                  <div className="hdr-search-group-header">
+                    <span>Quick Navigation</span>
+                  </div>
+                  {matchedPages.map(page => (
+                    <div
+                      key={page.id}
+                      onClick={() => handleSelectPage(page.id)}
+                      className="hdr-search-result-item"
+                      role="button"
+                      tabIndex={0}
+                    >
+                      <div className="hdr-result-type-badge page-badge">
+                        PAGE
+                      </div>
+                      <div className="hdr-result-info">
+                        <div className="hdr-result-target">{page.title}</div>
+                        <div className="hdr-result-meta">{page.desc}</div>
+                      </div>
+                      <ArrowRight size={13} className="hdr-result-arrow" />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {matchedScans.length === 0 && matchedPages.length === 0 && (
+                <div className="hdr-search-no-results">
+                  <p>No scans or pages matched "<strong>{searchQuery}</strong>"</p>
+                  <button
+                    type="button"
+                    onClick={() => { setActiveTab('scan-history'); setShowSearch(false); }}
+                    className="hdr-search-history-link"
+                  >
+                    Open Full Scan History
+                  </button>
+                </div>
+              )}
+
+              <div className="hdr-search-dropdown-footer">
+                <button
+                  type="button"
+                  onClick={() => { setActiveTab('scan-history'); setShowSearch(false); }}
+                  className="hdr-search-view-all-btn"
+                >
+                  View all in Scan History →
+                </button>
+              </div>
+            </div>
           )}
         </div>
       )}
@@ -400,6 +604,27 @@ export default function Header({
           white-space: nowrap;
         }
 
+        .hdr-logout-quick-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 30px;
+          height: 30px;
+          border-radius: 8px;
+          background: rgba(239, 68, 68, 0.12);
+          border: 1px solid rgba(239, 68, 68, 0.3);
+          color: #f87171;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          margin-left: 4px;
+        }
+        .hdr-logout-quick-btn:hover {
+          background: #ef4444;
+          color: #ffffff;
+          border-color: transparent;
+          transform: scale(1.05);
+        }
+
         /* Sign-in button */
         .hdr-signin-btn {
           padding: 6px 16px;
@@ -417,39 +642,232 @@ export default function Header({
         }
         .hdr-signin-btn:hover { opacity: 0.88; }
 
-        /* Search bar */
-        .hdr-search-bar {
+        /* Search Container & Bar */
+        .hdr-search-container {
           position: absolute;
-          top: calc(100% + 4px);
+          top: calc(100% + 6px);
           right: 16px;
-          width: min(320px, calc(100vw - 32px));
-          background: var(--bg-card);
-          border: 1px solid var(--border-color);
+          width: min(440px, calc(100vw - 32px));
+          z-index: 1000;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          animation: hdrSearchIn 0.18s ease;
+        }
+        @keyframes hdrSearchIn {
+          from { opacity: 0; transform: translateY(-6px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .hdr-search-bar {
+          width: 100%;
+          background: var(--bg-card, #071e3d);
+          border: 1px solid rgba(56, 189, 248, 0.4);
           border-radius: 12px;
           padding: 8px 12px;
           display: flex;
           align-items: center;
-          gap: 8px;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-          z-index: 999;
-          animation: hdrSearchIn 0.18s ease;
+          gap: 10px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
         }
-        @keyframes hdrSearchIn {
-          from { opacity: 0; transform: translateY(-4px); }
-          to   { opacity: 1; transform: translateY(0); }
+
+        .hdr-search-icon {
+          color: #38bdf8;
+          flex-shrink: 0;
         }
+
         .hdr-search-input {
           flex: 1;
           border: none;
           background: transparent;
-          color: var(--text-primary);
+          color: var(--text-primary, #ffffff);
           font-size: 0.88rem;
           outline: none;
           font-family: inherit;
         }
-        .hdr-search-input::placeholder { color: var(--text-muted); }
-        .hdr-search-clear {
-          background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 2px;
+        .hdr-search-input::placeholder {
+          color: var(--text-muted, rgba(255, 255, 255, 0.5));
+        }
+
+        .hdr-search-clear,
+        .hdr-search-close {
+          background: none;
+          border: none;
+          color: var(--text-muted, rgba(255, 255, 255, 0.5));
+          cursor: pointer;
+          padding: 3px;
+          border-radius: 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.15s ease;
+        }
+        .hdr-search-clear:hover,
+        .hdr-search-close:hover {
+          color: #ffffff;
+          background: rgba(255, 255, 255, 0.12);
+        }
+
+        .hdr-search-dropdown {
+          background: var(--bg-card, #071e3d);
+          border: 1px solid rgba(56, 189, 248, 0.3);
+          border-radius: 12px;
+          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+          overflow: hidden;
+          max-height: 380px;
+          display: flex;
+          flex-direction: column;
+          backdrop-filter: blur(14px);
+        }
+
+        .hdr-search-group {
+          padding: 8px 0;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .hdr-search-group:last-of-type {
+          border-bottom: none;
+        }
+
+        .hdr-search-group-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 4px 14px 6px;
+          font-size: 0.72rem;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          color: #38bdf8;
+        }
+        .hdr-search-count-tag {
+          font-size: 0.65rem;
+          color: rgba(255, 255, 255, 0.5);
+          font-weight: 600;
+        }
+
+        .hdr-search-result-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 8px 14px;
+          cursor: pointer;
+          transition: background 0.15s ease;
+        }
+        .hdr-search-result-item:hover {
+          background: rgba(56, 189, 248, 0.1);
+        }
+
+        .hdr-result-type-badge {
+          font-size: 0.62rem;
+          font-weight: 800;
+          padding: 2px 6px;
+          border-radius: 5px;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          flex-shrink: 0;
+        }
+        .hdr-result-type-badge.danger {
+          background: rgba(239, 68, 68, 0.2);
+          color: #f87171;
+          border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+        .hdr-result-type-badge.warning {
+          background: rgba(245, 158, 11, 0.2);
+          color: #fbbf24;
+          border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+        .hdr-result-type-badge.safe {
+          background: rgba(16, 185, 129, 0.2);
+          color: #34d399;
+          border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+        .hdr-result-type-badge.page-badge {
+          background: rgba(99, 102, 241, 0.2);
+          color: #a5b4fc;
+          border: 1px solid rgba(99, 102, 241, 0.4);
+        }
+
+        .hdr-result-info {
+          flex: 1;
+          min-width: 0;
+        }
+        .hdr-result-target {
+          font-size: 0.82rem;
+          font-weight: 700;
+          color: #ffffff;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .hdr-result-meta {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 0.72rem;
+          color: rgba(255, 255, 255, 0.6);
+          margin-top: 2px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .hdr-meta-sep {
+          opacity: 0.4;
+        }
+        .hdr-verdict-pill {
+          font-weight: 700;
+        }
+        .hdr-verdict-pill.danger { color: #f87171; }
+        .hdr-verdict-pill.warning { color: #fbbf24; }
+        .hdr-verdict-pill.safe { color: #34d399; }
+
+        .hdr-result-arrow {
+          color: rgba(255, 255, 255, 0.35);
+          flex-shrink: 0;
+          transition: transform 0.15s ease, color 0.15s ease;
+        }
+        .hdr-search-result-item:hover .hdr-result-arrow {
+          color: #38bdf8;
+          transform: translateX(2px);
+        }
+
+        .hdr-search-no-results {
+          padding: 18px 14px;
+          text-align: center;
+          font-size: 0.82rem;
+          color: rgba(255, 255, 255, 0.7);
+        }
+        .hdr-search-no-results p {
+          margin: 0 0 10px;
+        }
+        .hdr-search-history-link {
+          background: rgba(56, 189, 248, 0.12);
+          border: 1px solid rgba(56, 189, 248, 0.3);
+          color: #38bdf8;
+          padding: 4px 12px;
+          border-radius: 6px;
+          font-size: 0.75rem;
+          font-weight: 700;
+          cursor: pointer;
+        }
+
+        .hdr-search-dropdown-footer {
+          padding: 8px 14px;
+          background: rgba(0, 0, 0, 0.2);
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
+          display: flex;
+          justify-content: flex-end;
+        }
+        .hdr-search-view-all-btn {
+          background: none;
+          border: none;
+          color: #38bdf8;
+          font-size: 0.75rem;
+          font-weight: 700;
+          cursor: pointer;
+          padding: 2px 4px;
+        }
+        .hdr-search-view-all-btn:hover {
+          text-decoration: underline;
         }
 
         /* Red unread indicator dot without numbers */

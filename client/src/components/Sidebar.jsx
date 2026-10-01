@@ -26,6 +26,10 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
                   currentUser?.role?.toLowerCase()?.includes('analyst');
 
   const visibleNavItems = NAV_ITEMS.filter(item => {
+    // If user is logged in, do not show Home page in sidebar
+    if (currentUser && item.id === 'home') {
+      return false;
+    }
     if (item.adminOnly) {
       return isAdmin;
     }
@@ -56,8 +60,6 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
             <X size={18} />
           </button>
         </div>
-
-
 
         {/* ── Navigation ── */}
         <nav className="sidebar-nav">

@@ -331,26 +331,17 @@ export default function LandingPage({
               <Logo size="sm" showSubtitle={false} showBadge={false} lightText={!isDark && !isNavy ? false : true} />
             </div>
 
-            {/* Nav Links: Home, Features, Live Scanner, Threat Intel, FAQ */}
+            {/* Nav Links: Home, Features, Live Scanner, How It Works, FAQ */}
             <nav className="apds-nav-menu">
               <a href="#hero" className="apds-nav-item">Home</a>
               <a href="#vectors" className="apds-nav-item">Features</a>
               <a href="#sandbox" className="apds-nav-item">Live Scanner</a>
-              <a href="#threat-matrix" className="apds-nav-item">Threat Intel</a>
+              <a href="#pipeline" className="apds-nav-item">How It Works</a>
               <a href="#faq" className="apds-nav-item">FAQ</a>
             </nav>
 
             {/* Right Actions */}
             <div className="apds-nav-actions">
-              <button
-                type="button"
-                onClick={cycleTheme}
-                className="apds-theme-toggle"
-                title={`Switch Theme (Current: ${theme})`}
-              >
-                {isDark ? <Sun size={17} color="#f59e0b" /> : isNavy ? <Layers size={17} color="#38bdf8" /> : <Moon size={17} color="#0284c7" />}
-              </button>
-
               {currentUser ? (
                 <button onClick={onNavigateDashboard} className="apds-btn-glow">
                   <span>Dashboard</span>
@@ -385,7 +376,6 @@ export default function LandingPage({
               <a href="#hero" className="apds-mob-link" onClick={() => setMobileMenuOpen(false)}>Home</a>
               <a href="#vectors" className="apds-mob-link" onClick={() => setMobileMenuOpen(false)}>Features</a>
               <a href="#sandbox" className="apds-mob-link" onClick={() => setMobileMenuOpen(false)}>Live Scanner</a>
-              <a href="#threat-matrix" className="apds-mob-link" onClick={() => setMobileMenuOpen(false)}>Threat Matrix</a>
               <a href="#pipeline" className="apds-mob-link" onClick={() => setMobileMenuOpen(false)}>How It Works</a>
               <a href="#faq" className="apds-mob-link" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
 
@@ -424,12 +414,6 @@ export default function LandingPage({
 
           {/* ── LEFT: Text Content ── */}
           <div className="hero2-left">
-
-            {/* Badge */}
-            <div className="hero2-badge">
-              <span className="hero2-badge-dot" />
-              <span>AI-Powered Security Platform</span>
-            </div>
 
             {/* Main Headline */}
             <h1 className="hero2-h1">
@@ -1134,7 +1118,6 @@ export default function LandingPage({
               <li><a href="#hero">Overview</a></li>
               <li><a href="#vectors">Defense Vectors</a></li>
               <li><a href="#sandbox">Live Threat Sandbox</a></li>
-              <li><a href="#threat-matrix">Threat Matrix</a></li>
               <li><a href="#pipeline">System Architecture</a></li>
               <li><a href="#faq">Frequently Asked</a></li>
             </ul>
@@ -1169,9 +1152,9 @@ export default function LandingPage({
         }
 
         .apds-container {
-          max-width: 1240px;
+          max-width: 1560px;
           margin: 0 auto;
-          padding: 0 24px;
+          padding: 0 clamp(20px, 3.5vw, 48px);
         }
 
         /* ── NAVBAR ── */
@@ -1185,9 +1168,9 @@ export default function LandingPage({
           transition: all 0.25s ease;
         }
         .apds-nav-container {
-          max-width: 1240px;
+          max-width: 1560px;
           margin: 0 auto;
-          padding: 0 24px;
+          padding: 0 clamp(20px, 3.5vw, 48px);
           height: 68px;
           display: flex;
           align-items: center;
@@ -2603,52 +2586,25 @@ export default function LandingPage({
           position: relative;
           z-index: 2;
           display: grid;
-          grid-template-columns: 52% 48%;
+          grid-template-columns: 1.2fr 0.95fr;
           align-items: center;
-          gap: 20px;
-          padding-top: 4px;
-          padding-bottom: 12px;
+          gap: clamp(24px, 4vw, 56px);
+          padding-top: 8px;
+          padding-bottom: 20px;
+          width: 100%;
         }
 
         /* ── LEFT TEXT ── */
         .hero2-left {
           display: flex;
           flex-direction: column;
-          gap: 20px;
-        }
-
-        /* Badge */
-        .hero2-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          padding: 6px 14px;
-          border-radius: 999px;
-          background: rgba(56,189,248,0.1);
-          border: 1px solid rgba(56,189,248,0.3);
-          color: #38bdf8;
-          font-size: 0.78rem;
-          font-weight: 700;
-          letter-spacing: 0.03em;
-          align-self: flex-start;
-        }
-        .hero2-badge-dot {
-          width: 7px;
-          height: 7px;
-          border-radius: 50%;
-          background: #38bdf8;
-          box-shadow: 0 0 8px #38bdf8;
-          animation: hero2pulse 1.8s ease-in-out infinite;
-          flex-shrink: 0;
-        }
-        @keyframes hero2pulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.5; transform: scale(0.75); }
+          gap: 18px;
+          max-width: 720px;
         }
 
         /* Headline */
         .hero2-h1 {
-          font-size: 3.6rem;
+          font-size: clamp(2.8rem, 4.2vw, 3.8rem);
           font-weight: 900;
           line-height: 1.08;
           letter-spacing: -0.03em;
@@ -2673,10 +2629,10 @@ export default function LandingPage({
 
         /* Description */
         .hero2-desc {
-          font-size: 0.97rem;
-          color: rgba(203,213,225,0.78);
+          font-size: 1.02rem;
+          color: rgba(203,213,225,0.85);
           line-height: 1.7;
-          max-width: 440px;
+          max-width: 600px;
           margin: 0;
         }
 
@@ -2725,6 +2681,8 @@ export default function LandingPage({
           border-color: rgba(255,255,255,0.45);
           transform: translateY(-2px);
         }
+
+
 
         /* Stats row */
         .hero2-stats-row {

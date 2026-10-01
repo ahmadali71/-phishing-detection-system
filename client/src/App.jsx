@@ -146,6 +146,14 @@ function AppInner() {
     s.result?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem('user');
+    setCurrentUser(null);
+    setGuestView('landing');
+    setActiveTab('dashboard');
+    window.location.hash = '';
+  }, []);
+
   const handleLoginSuccess = useCallback((user) => {
     const isUserAdmin = user.role === 'admin' || user.role === 'Admin' || user.email?.toLowerCase().includes('admin');
     const userData = {
@@ -156,9 +164,18 @@ function AppInner() {
     };
     setCurrentUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
+    setActiveTab('dashboard');
+    setGuestView('landing');
     addSystemLog('INFO', 'Auth', `${user.name} logged in (${userData.role}).`);
     addNotification('Welcome Back!', `Logged in as ${user.name} (${userData.role}).`, 'INFO');
   }, [addSystemLog, addNotification]);
+
+  // Ensure logged-in users are never shown the home page; automatically redirect to dashboard
+  useEffect(() => {
+    if (currentUser && activeTab === 'home') {
+      setActiveTab('dashboard');
+    }
+  }, [currentUser, activeTab]);
 
   const isAdmin = currentUser?.role?.toLowerCase()?.includes('admin') ||
                   currentUser?.email?.toLowerCase()?.includes('admin') ||
@@ -210,12 +227,19 @@ function AppInner() {
             theme={theme} setTheme={setTheme}
             currentUser={currentUser}
             onOpenAuth={() => setIsAuthOpen(true)}
-            onLogout={() => { localStorage.removeItem('user'); setCurrentUser(null); setGuestView('landing'); }}
+            onLogout={handleLogout}
             notifications={notifications}
             onMarkNotificationRead={(id) => setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))}
             onClearNotifications={() => setNotifications([])}
             searchQuery={searchQuery} setSearchQuery={setSearchQuery}
-            onSelectSearchResult={() => setActiveTab('scan-history')}
+            scans={scans}
+            onSelectSearchResult={(record) => {
+              if (record) {
+                setSelectedRecord(record);
+              } else {
+                setActiveTab('scan-history');
+              }
+            }}
             onMenuToggle={() => setSidebarOpen(v => !v)}
             sidebarOpen={sidebarOpen}
             showSearch={showSearch}
@@ -226,36 +250,23 @@ function AppInner() {
           />
 
           <div className="app-body">
-            {(activeTab !== 'home' || sidebarOpen) && (
-              <Sidebar
-                activeTab={activeTab}
-                setActiveTab={(tab) => {
-                  setActiveTab(tab);
-                  setSidebarOpen(false);
-                }}
-                currentUser={currentUser}
-                onLogout={() => { localStorage.removeItem('user'); setCurrentUser(null); setGuestView('auth'); }}
-                onOpenAuth={() => setIsAuthOpen(true)}
-                isOpen={sidebarOpen}
-                onClose={() => setSidebarOpen(false)}
-                isOverlay={activeTab === 'home'}
-                t={t}
-              />
-            )}
+            <Sidebar
+              activeTab={activeTab}
+              setActiveTab={(tab) => {
+                setActiveTab(tab);
+                setSidebarOpen(false);
+              }}
+              currentUser={currentUser}
+              onLogout={handleLogout}
+              onOpenAuth={() => setIsAuthOpen(true)}
+              isOpen={sidebarOpen}
+              onClose={() => setSidebarOpen(false)}
+              isOverlay={false}
+              t={t}
+            />
 
-            <main className={`app-main${activeTab === 'home' ? ' app-main-landing-full' : ''}${activeTab === 'ai-assistant' ? ' app-main-chat' : ''}`}>
-              {activeTab === 'home' && (
-                <LandingPage
-                  onNavigateAuth={() => setIsAuthOpen(true)}
-                  onNavigateDashboard={() => setActiveTab('dashboard')}
-                  onNavigateScanner={(page) => setActiveTab(page)}
-                  theme={theme}
-                  setTheme={setTheme}
-                  currentUser={currentUser}
-                  isInsideApp={true}
-                />
-              )}
-              {activeTab === 'dashboard' && (
+            <main className={`app-main${activeTab === 'ai-assistant' ? ' app-main-chat' : ''}`}>
+              {(activeTab === 'dashboard' || activeTab === 'home') && (
                 <Dashboard stats={stats} recentActivity={recentActivity}
                   onNavigateScan={setActiveTab} onViewDetail={setSelectedRecord} t={t} />
               )}
