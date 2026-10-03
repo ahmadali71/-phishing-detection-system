@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   Bell, Search, X, Trash2, Menu, LogOut,
-  Globe, Mail, Image, MessageSquare, ArrowRight, ShieldAlert
+  Globe, Mail, Image, MessageSquare, ArrowRight, ShieldAlert, LayoutDashboard
 } from 'lucide-react';
 import Logo from './Logo';
 
@@ -25,7 +25,7 @@ export default function Header({
 
   const getPageTitle = () => {
     switch (activeTab) {
-      case 'home':             return currentUser ? 'Dashboard' : 'Home';
+      case 'home':             return 'Home';
       case 'dashboard':        return 'Dashboard';
       case 'url-detection':    return 'URL Detection';
       case 'email-detection':  return 'Email Detection';
@@ -147,41 +147,104 @@ export default function Header({
         <button
           onClick={onMenuToggle}
           className={`hamburger-btn${sidebarOpen ? ' active' : ''}`}
-          aria-label="Toggle navigation menu"
-          title="Menu"
+          aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+          title={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+          aria-expanded={sidebarOpen}
         >
           <Menu size={20} />
         </button>
 
         <div
           className="header-brand-wrap"
-          onClick={() => setActiveTab && setActiveTab(currentUser ? 'dashboard' : 'home')}
+          onClick={() => setActiveTab && setActiveTab('home')}
           style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}
-          title={currentUser ? "Automated Phishing Detection System - Dashboard" : "Automated Phishing Detection System - Home"}
+          title="Automated Phishing Detection System"
         >
           <Logo size="sm" useShort={false} showText={true} lightText={true} className="hdr-logo-full" />
-
-
         </div>
       </div>
 
-      {/* ── CENTER: Navigation Links on Desktop (Only when outside app on home) ── */}
-      {(!currentUser && activeTab === 'home') && (
+      {/* ── CENTER: Navigation Links on Desktop (When activeTab is home) ── */}
+      {activeTab === 'home' && (
         <nav className="hdr-center-nav-links pg-desktop-only">
           <button
             type="button"
-            onClick={() => { setActiveTab && setActiveTab('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-            className="hdr-nav-link hdr-nav-btn"
-          >Home</button>
+            onClick={() => {
+              setActiveTab && setActiveTab('home');
+              const main = document.querySelector('.app-main');
+              if (main) main.scrollTo({ top: 0, behavior: 'smooth' });
+              else window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="hdr-nav-link hdr-nav-btn active"
+            title="Home"
+          >
+            Home
+          </button>
           <button
             type="button"
             onClick={() => setActiveTab && setActiveTab('dashboard')}
-            className="hdr-nav-link hdr-nav-btn"
-          >Dashboard</button>
-          <a href="#vectors" className="hdr-nav-link">Features</a>
-          <a href="#sandbox" className="hdr-nav-link">Live Scanner</a>
-          <a href="#pipeline" className="hdr-nav-link">How It Works</a>
-          <a href="#faq" className="hdr-nav-link">FAQ</a>
+            className="hdr-nav-link hdr-nav-btn hdr-nav-dashboard-badge"
+            title="Go to Dashboard"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.25), rgba(56, 189, 248, 0.15))',
+              border: '1px solid rgba(56, 189, 248, 0.45)',
+              color: '#38bdf8',
+              fontWeight: 700,
+              padding: '6px 14px',
+              borderRadius: '8px',
+              boxShadow: '0 0 10px rgba(56, 189, 248, 0.15)'
+            }}
+          >
+            <LayoutDashboard size={15} />
+            Dashboard
+          </button>
+          <a
+            href="#vectors"
+            className="hdr-nav-link"
+            onClick={(e) => {
+              e.preventDefault();
+              const el = document.getElementById('vectors');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            Features
+          </a>
+          <a
+            href="#sandbox"
+            className="hdr-nav-link"
+            onClick={(e) => {
+              e.preventDefault();
+              const el = document.getElementById('sandbox');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            Live Scanner
+          </a>
+          <a
+            href="#pipeline"
+            className="hdr-nav-link"
+            onClick={(e) => {
+              e.preventDefault();
+              const el = document.getElementById('pipeline');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            How It Works
+          </a>
+          <a
+            href="#faq"
+            className="hdr-nav-link"
+            onClick={(e) => {
+              e.preventDefault();
+              const el = document.getElementById('faq');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            FAQ
+          </a>
         </nav>
       )}
 
@@ -911,7 +974,7 @@ export default function Header({
         }
 
         .hamburger-btn {
-          display: none;
+          display: flex !important;
           align-items: center;
           justify-content: center;
           width: 38px;

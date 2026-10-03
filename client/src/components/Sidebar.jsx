@@ -19,17 +19,18 @@ const NAV_ITEMS = [
 ];
 
 export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout, onOpenAuth, isOpen, onClose, isOverlay = false, t }) {
-  const handleNav = id => { setActiveTab(id); onClose?.(); };
+  const handleNav = id => {
+    setActiveTab(id);
+    if (typeof window !== 'undefined' && window.innerWidth <= 1024) {
+      onClose?.();
+    }
+  };
 
   const isAdmin = currentUser?.role?.toLowerCase()?.includes('admin') ||
                   currentUser?.email?.toLowerCase()?.includes('admin') ||
                   currentUser?.role?.toLowerCase()?.includes('analyst');
 
   const visibleNavItems = NAV_ITEMS.filter(item => {
-    // If user is logged in, do not show Home page in sidebar
-    if (currentUser && item.id === 'home') {
-      return false;
-    }
     if (item.adminOnly) {
       return isAdmin;
     }
@@ -38,7 +39,7 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
 
   return (
     <>
-      {/* Dimmed overlay when drawer open */}
+      {/* Dimmed overlay when drawer open on mobile */}
       {isOpen && (
         <div
           className="sidebar-backdrop"
@@ -47,7 +48,7 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
         />
       )}
 
-      <aside className={`app-sidebar${isOpen ? ' sidebar-open' : ''}${isOverlay ? ' sidebar-overlay-mode' : ''}`}>
+      <aside className={`app-sidebar${isOpen ? ' sidebar-open' : ' sidebar-closed'}${isOverlay ? ' sidebar-overlay-mode' : ''}`}>
         {/* ── Header ── */}
         <div className="sidebar-header">
           <div className="sidebar-logo" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -56,7 +57,7 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
               Main Menu
             </span>
           </div>
-          <button className="sidebar-close-btn" onClick={onClose} aria-label="Close">
+          <button className="sidebar-close-btn" onClick={onClose} aria-label="Collapse sidebar" title="Collapse sidebar">
             <X size={18} />
           </button>
         </div>
@@ -66,20 +67,23 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
           {visibleNavItems.map(item => {
             const Icon = item.icon;
             const active = activeTab === item.id;
+            const itemLabel = t?.[item.id] || item.label;
             return (
               <button
                 key={item.id}
                 className={`sidebar-item${active ? ' active' : ''}`}
                 onClick={() => handleNav(item.id)}
+                title={itemLabel}
+                aria-label={itemLabel}
               >
                 <span className="sidebar-item-icon">
-                  <Icon size={18} />
+                  <Icon size={19} />
                 </span>
                 <span className="sidebar-item-label">
-                  {t?.[item.id] || item.label}
+                  {itemLabel}
                 </span>
                 {item.adminOnly && (
-                  <span style={{
+                  <span className="sidebar-admin-badge" style={{
                     fontSize: '0.62rem',
                     fontWeight: '800',
                     background: '#635fec',
@@ -103,6 +107,8 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
             <button
               className="sidebar-item sidebar-logout"
               onClick={() => { onLogout?.(); onClose?.(); }}
+              title="Logout"
+              aria-label="Logout"
             >
               <span className="sidebar-item-icon"><LogOut size={17} /></span>
               <span className="sidebar-item-label">Logout</span>
@@ -111,6 +117,8 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout
             <button
               className="sidebar-item sidebar-signin"
               onClick={() => { onOpenAuth?.(); onClose?.(); }}
+              title="Sign In / Register"
+              aria-label="Sign In / Register"
             >
               <span className="sidebar-item-icon"><Shield size={17} /></span>
               <span className="sidebar-item-label">Sign In / Register</span>

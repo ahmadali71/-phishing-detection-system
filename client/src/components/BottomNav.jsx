@@ -5,7 +5,7 @@ export default function BottomNav({ activeTab, setActiveTab, currentUser, t }) {
   const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'Admin' || currentUser?.email?.toLowerCase().includes('admin');
 
   const navItems = [
-    ...(!currentUser ? [{ id: 'home', label: 'Home', icon: Home }] : []),
+    { id: 'home',              label: 'Home',       icon: Home },
     { id: 'dashboard',         label: 'Dashboard',  icon: LayoutDashboard },
     { id: 'url-detection',     label: 'URL',        icon: Globe },
     { id: 'image-detection',   label: 'Vision',     icon: Image },

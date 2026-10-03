@@ -29,7 +29,18 @@ function AppInner() {
   const [theme, setTheme] = useState('light');
   const [language, setLanguage] = useState('English');
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  const handleToggleSidebar = useCallback(() => {
+    setSidebarOpen(prev => {
+      const next = !prev;
+      if (typeof window !== 'undefined' && window.innerWidth > 1024) {
+        try { localStorage.setItem('sidebarOpen', JSON.stringify(next)); } catch {}
+      }
+      return next;
+    });
+  }, []);
+
   const [guestView, setGuestView] = useState(() => {
     return window.location.hash.includes('auth') || window.location.hash.includes('login') ? 'auth' : 'landing';
   });
@@ -166,16 +177,12 @@ function AppInner() {
     localStorage.setItem('user', JSON.stringify(userData));
     setActiveTab('dashboard');
     setGuestView('landing');
+    setSidebarOpen(true);
+    try { localStorage.setItem('sidebarOpen', 'true'); } catch {}
     addSystemLog('INFO', 'Auth', `${user.name} logged in (${userData.role}).`);
     addNotification('Welcome Back!', `Logged in as ${user.name} (${userData.role}).`, 'INFO');
   }, [addSystemLog, addNotification]);
 
-  // Ensure logged-in users are never shown the home page; automatically redirect to dashboard
-  useEffect(() => {
-    if (currentUser && activeTab === 'home') {
-      setActiveTab('dashboard');
-    }
-  }, [currentUser, activeTab]);
 
   const isAdmin = currentUser?.role?.toLowerCase()?.includes('admin') ||
                   currentUser?.email?.toLowerCase()?.includes('admin') ||
@@ -183,8 +190,19 @@ function AppInner() {
 
   return (
     <>
-      {!currentUser ? (
-        guestView === 'landing' ? (
+      {(!currentUser || activeTab === 'home') ? (
+        guestView === 'auth' && !currentUser ? (
+          <AuthPage
+            initialMode={authInitialMode}
+            onLoginSuccess={handleLoginSuccess}
+            onNavigateHome={() => {
+              setGuestView('landing');
+              setActiveTab('home');
+            }}
+            theme={theme}
+            setTheme={setTheme}
+          />
+        ) : (
           <LandingPage
             onNavigateAuth={(mode = 'login') => {
               setAuthInitialMode(mode);
@@ -196,6 +214,7 @@ function AppInner() {
                 setGuestView('auth');
               } else {
                 setActiveTab('dashboard');
+                setSidebarOpen(true);
               }
             }}
             onNavigateScanner={(page) => {
@@ -209,14 +228,7 @@ function AppInner() {
             theme={theme}
             setTheme={setTheme}
             currentUser={currentUser}
-          />
-        ) : (
-          <AuthPage
-            initialMode={authInitialMode}
-            onLoginSuccess={handleLoginSuccess}
-            onNavigateHome={() => setGuestView('landing')}
-            theme={theme}
-            setTheme={setTheme}
+            isInsideApp={false}
           />
         )
       ) : (
@@ -240,7 +252,7 @@ function AppInner() {
                 setActiveTab('scan-history');
               }
             }}
-            onMenuToggle={() => setSidebarOpen(v => !v)}
+            onMenuToggle={handleToggleSidebar}
             sidebarOpen={sidebarOpen}
             showSearch={showSearch}
             setShowSearch={setShowSearch}
@@ -254,7 +266,9 @@ function AppInner() {
               activeTab={activeTab}
               setActiveTab={(tab) => {
                 setActiveTab(tab);
-                setSidebarOpen(false);
+                if (typeof window !== 'undefined' && window.innerWidth <= 1024) {
+                  setSidebarOpen(false);
+                }
               }}
               currentUser={currentUser}
               onLogout={handleLogout}
@@ -266,7 +280,7 @@ function AppInner() {
             />
 
             <main className={`app-main${activeTab === 'ai-assistant' ? ' app-main-chat' : ''}`}>
-              {(activeTab === 'dashboard' || activeTab === 'home') && (
+              {activeTab === 'dashboard' && (
                 <Dashboard stats={stats} recentActivity={recentActivity}
                   onNavigateScan={setActiveTab} onViewDetail={setSelectedRecord} t={t} />
               )}

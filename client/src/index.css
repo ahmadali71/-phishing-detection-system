@@ -695,15 +695,21 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .hamburger-btn {
-  display: none;
-  background: var(--bg-input);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
+  display: flex;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 9px;
   padding: 8px;
   cursor: pointer;
-  color: var(--text-primary);
+  color: #38bdf8;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
+}
+.hamburger-btn:hover {
+  background: rgba(56, 189, 248, 0.25);
+  border-color: #38bdf8;
+  color: #ffffff;
 }
 
 /* ================================================================
@@ -1654,9 +1660,106 @@ tr:hover td {
   top: 0 !important;
   position: relative;
   z-index: 50;
-  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  transition: width 0.28s cubic-bezier(0.4,0,0.2,1),
+              min-width 0.28s cubic-bezier(0.4,0,0.2,1),
+              max-width 0.28s cubic-bezier(0.4,0,0.2,1),
+              padding 0.28s cubic-bezier(0.4,0,0.2,1),
+              opacity 0.22s ease,
+              border-color 0.2s ease !important;
   scrollbar-width: thin;
   scrollbar-color: rgba(56, 189, 248, 0.3) transparent;
+}
+
+@media (min-width: 1025px) {
+  .app-sidebar {
+    width: 250px;
+    min-width: 250px;
+    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                padding 0.25s ease !important;
+  }
+
+  /* Collapsed icon-only rail matching user screenshot */
+  .app-sidebar.sidebar-closed {
+    width: 68px !important;
+    min-width: 68px !important;
+    max-width: 68px !important;
+    padding: 14px 8px !important;
+    overflow-x: hidden !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    border-right: 1px solid var(--sidebar-border, rgba(56, 189, 248, 0.2)) !important;
+  }
+
+  .app-sidebar.sidebar-closed .sidebar-header {
+    justify-content: center !important;
+    padding-bottom: 12px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .app-sidebar.sidebar-closed .sidebar-logo {
+    justify-content: center !important;
+    gap: 0 !important;
+  }
+
+  .app-sidebar.sidebar-closed .sidebar-logo span,
+  .app-sidebar.sidebar-closed .sidebar-close-btn,
+  .app-sidebar.sidebar-closed .sidebar-item-label,
+  .app-sidebar.sidebar-closed .sidebar-admin-badge,
+  .app-sidebar.sidebar-closed .sidebar-item-pip {
+    display: none !important;
+  }
+
+  .app-sidebar.sidebar-closed .sidebar-nav {
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .app-sidebar.sidebar-closed .sidebar-item {
+    width: 46px !important;
+    height: 46px !important;
+    min-height: 46px !important;
+    padding: 0 !important;
+    margin: 0 auto 6px !important;
+    justify-content: center !important;
+    align-items: center !important;
+    border-radius: 12px !important;
+    gap: 0 !important;
+  }
+
+  .app-sidebar.sidebar-closed .sidebar-item-icon {
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Active item in collapsed rail: rounded box with soft light background matching screenshot */
+  .app-sidebar.sidebar-closed .sidebar-item.active {
+    background: rgba(16, 185, 129, 0.16) !important;
+    border: 1px solid rgba(16, 185, 129, 0.35) !important;
+    color: #38bdf8 !important;
+    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.18) !important;
+  }
+
+  .light-theme .app-sidebar.sidebar-closed .sidebar-item.active {
+    background: #eefcf2 !important;
+    border: 1px solid #bbf7d0 !important;
+    color: #4f46e5 !important;
+  }
+
+  .app-sidebar.sidebar-closed .sidebar-footer .sidebar-item {
+    width: 46px !important;
+    height: 46px !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+  }
+
+  .sidebar-backdrop {
+    display: none !important;
+  }
 }
 
 .app-sidebar::-webkit-scrollbar {
@@ -1727,19 +1830,25 @@ tr:hover td {
 }
 
 .sidebar-close-btn {
-  display: none;
-  width: 32px;
-  height: 32px;
+  display: flex !important;
+  width: 30px;
+  height: 30px;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #ffffff;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  color: #38bdf8;
   cursor: pointer;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 }
-.sidebar-close-btn:hover { background: rgba(255, 255, 255, 0.2); color: #ffffff; }
+.sidebar-close-btn:hover {
+  background: rgba(56, 189, 248, 0.25);
+  border-color: #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
+}
 
 .sidebar-nav {
   display: flex;

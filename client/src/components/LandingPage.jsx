@@ -5,7 +5,7 @@ import {
   ChevronUp, ExternalLink, BarChart3, Activity, ShieldCheck, Sparkles,
   Moon, Sun, Menu, X, Check, Eye, ShieldAlert, Cpu, FileText,
   ArrowUpRight, Radio, RefreshCw, Terminal, Layers, Crosshair,
-  HelpCircle, UserCheck, ShieldOff
+  HelpCircle, UserCheck, ShieldOff, LayoutDashboard
 } from 'lucide-react';
 import Logo from './Logo';
 import CyberMeshCanvas from './CyberMeshCanvas';
@@ -296,6 +296,18 @@ export default function LandingPage({
   // FAQ Items strictly reflecting only website features
   const faqList = [
     {
+      q: 'How do I use this website? (Complete Step-by-Step Guide)',
+      a: 'Using the Automated Phishing Detection System is designed to be effortless and intuitive for all users:\n\n' +
+         '• 1. URL & Domain Scanner: Click "URL Detection" from the Dashboard or Sidebar. Enter or paste any suspicious website link to inspect domain age, typosquatting, Punycode homoglyphs, and SSL certificate validity in under 65ms.\n\n' +
+         '• 2. Email BEC Analyzer: Open "Email Detection" and paste suspicious email headers or body text. Our DistilBERT NLP model examines linguistic urgency, financial harvesting requests, and executive CEO spoofing.\n\n' +
+         '• 3. Screenshot Vision & OCR: Select "Screenshot / Image" to upload images of suspicious login portals or invoices. Computer Vision analyzes authentic brand pixel geometries and decodes malicious QR codes.\n\n' +
+         '• 4. SMS & Smishing Shield: Choose "SMS & Smishing" to scan mobile text messages or shortlinks (bit.ly, tinyurl) to uncover banking impersonation and package delivery traps.\n\n' +
+         '• 5. 24/7 AI Security Assistant: Click "AI Assistant" to converse with our specialized cybersecurity copilot for threat explanations and step-by-step incident response advice.\n\n' +
+         '• 6. Scan History & PDF Reports: Go to "Scan History" to review all past detections, inspect technical risk gauges, and download forensic PDF audit dossiers with one click.\n\n' +
+         '• 7. Desktop Sidebar Controls: On desktop view, you can easily collapse the sidebar into a compact icon rail or expand it to full width anytime using the menu toggle button.\n\n' +
+         '• 8. Home vs. Dashboard: Switch freely between the public threat knowledge base (Home Page) and your security workspace (Dashboard) anytime using the sidebar or top navbar!'
+    },
+    {
       q: 'How does the Automated Phishing Detection System detect zero-day attacks?',
       a: 'Unlike legacy anti-phishing tools that rely purely on outdated static blacklists, our engine combines multi-layer lexical heuristics, NLP semantic coercion modeling, and computer vision OCR. This enables our AI models to intercept brand-new, never-before-seen phishing pages and BEC emails within milliseconds of deployment.'
     },
@@ -340,10 +352,11 @@ export default function LandingPage({
               <a href="#faq" className="apds-nav-item">FAQ</a>
             </nav>
 
-            {/* Right Actions */}
+            {/* Right Actions — Exactly ONE prominent Dashboard button when signed in */}
             <div className="apds-nav-actions">
               {currentUser ? (
-                <button onClick={onNavigateDashboard} className="apds-btn-glow">
+                <button onClick={onNavigateDashboard} className="apds-btn-glow" title="Open Security Dashboard">
+                  <LayoutDashboard size={15} />
                   <span>Dashboard</span>
                   <ArrowRight size={15} />
                 </button>
@@ -382,7 +395,8 @@ export default function LandingPage({
               <div className="apds-mob-auth">
                 {currentUser ? (
                   <button onClick={() => { onNavigateDashboard(); setMobileMenuOpen(false); }} className="apds-btn-glow" style={{ width: '100%', justifyContent: 'center' }}>
-                    Dashboard
+                    <LayoutDashboard size={16} />
+                    <span>Dashboard</span>
                   </button>
                 ) : (
                   <>
@@ -432,12 +446,25 @@ export default function LandingPage({
 
             {/* CTA Buttons */}
             <div className="hero2-ctas">
-              <button
-                className="hero2-btn-primary"
-                onClick={() => onNavigateAuth ? onNavigateAuth('register') : null}
-              >
-                Get Started
-              </button>
+              {currentUser ? (
+                <button
+                  className="hero2-btn-primary"
+                  onClick={onNavigateDashboard}
+                  title="Open Real-Time Security Dashboard"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                >
+                  <LayoutDashboard size={18} />
+                  <span>Go to Dashboard</span>
+                  <ArrowRight size={16} />
+                </button>
+              ) : (
+                <button
+                  className="hero2-btn-primary"
+                  onClick={() => onNavigateAuth ? onNavigateAuth('register') : null}
+                >
+                  Get Started
+                </button>
+              )}
               <a href="#vectors" className="hero2-btn-secondary">
                 Learn More
               </a>
@@ -1066,7 +1093,8 @@ export default function LandingPage({
               </p>
               <div className="apds-cta-buttons">
                 {currentUser ? (
-                  <button onClick={onNavigateDashboard} className="apds-btn-glow">
+                  <button onClick={onNavigateDashboard} className="apds-btn-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                    <LayoutDashboard size={16} />
                     <span>Go To Dashboard</span>
                     <ArrowRight size={16} />
                   </button>

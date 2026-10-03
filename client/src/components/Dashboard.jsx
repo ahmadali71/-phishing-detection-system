@@ -1,13 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Search,
   Zap,
   ExternalLink,
   Shield,
-  Sparkles
+  Sparkles,
+  HelpCircle,
+  ChevronDown,
+  ChevronUp,
+  Globe,
+  Mail,
+  Image,
+  MessageSquare,
+  Bot,
+  History,
+  ArrowRight
 } from 'lucide-react';
 
 export default function Dashboard({ stats, recentActivity, onNavigateScan, onViewDetail, t }) {
+  const [showGuide, setShowGuide] = useState(false);
   // Weekly points matching Page 61 line chart:
   // Mon: 50, Tue: 100, Wed: 75, Thu: 125, Fri: 110, Sat: 140, Sun: 190
   const points = [
@@ -32,17 +43,131 @@ export default function Dashboard({ stats, recentActivity, onNavigateScan, onVie
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
-      {/* ── Clean Page Header (Name Only as Requested) ── */}
-      <div className="page-header-clean">
+      {/* ── Clean Page Header with Guide Toggle ── */}
+      <div className="page-header-clean" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
         <div className="page-header-text">
           <h1 className="page-title-clean">Dashboard</h1>
           <p className="page-subtitle-clean">Welcome back 👋 • Here's what's happening with your security today.</p>
         </div>
-        <div className="page-header-badge">
-          <span className="live-pulse-dot" />
-          <span>Real-time Monitoring Active</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button
+            onClick={() => setShowGuide(v => !v)}
+            className="btn-secondary"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '7px 14px',
+              fontSize: '0.82rem',
+              fontWeight: 700,
+              borderRadius: '8px',
+              background: showGuide ? 'rgba(56, 189, 248, 0.2)' : 'rgba(56, 189, 248, 0.1)',
+              border: '1px solid rgba(56, 189, 248, 0.35)',
+              color: '#38bdf8',
+              cursor: 'pointer'
+            }}
+            title="Step-by-step instructions on how to use this website"
+          >
+            <HelpCircle size={15} />
+            <span>How to Use Website</span>
+            {showGuide ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+          </button>
+          <div className="page-header-badge">
+            <span className="live-pulse-dot" />
+            <span>Real-time Monitoring Active</span>
+          </div>
         </div>
       </div>
+
+      {/* ── Interactive Website User Guide (Collapsible) ── */}
+      {showGuide && (
+        <div className="glass-panel" style={{
+          padding: '20px 24px',
+          background: 'var(--bg-card)',
+          border: '1px solid rgba(56, 189, 248, 0.3)',
+          borderRadius: '14px',
+          animation: 'fadeIn 0.25s ease'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '1.2rem' }}>📖</span>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
+                How to Use This Website — Quick Step-by-Step Guide
+              </h3>
+            </div>
+            <button
+              onClick={() => setShowGuide(false)}
+              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}
+            >
+              Dismiss
+            </button>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
+            <div style={{ padding: '12px 14px', background: 'rgba(56, 189, 248, 0.06)', borderRadius: '10px', border: '1px solid rgba(56, 189, 248, 0.15)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#38bdf8', fontWeight: 700, fontSize: '0.88rem', marginBottom: '6px' }}>
+                <Globe size={16} /> 1. URL Phishing Scanner
+              </div>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.45 }}>
+                Paste links to inspect typosquatting, Punycode homoglyphs, DNS age, and SSL chain validity in under 65ms.
+              </p>
+            </div>
+
+            <div style={{ padding: '12px 14px', background: 'rgba(96, 165, 250, 0.06)', borderRadius: '10px', border: '1px solid rgba(96, 165, 250, 0.15)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#60a5fa', fontWeight: 700, fontSize: '0.88rem', marginBottom: '6px' }}>
+                <Mail size={16} /> 2. Email BEC &amp; NLP Engine
+              </div>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.45 }}>
+                Paste suspicious emails to detect executive CEO impersonation, wire fraud urgency, and spoofed senders.
+              </p>
+            </div>
+
+            <div style={{ padding: '12px 14px', background: 'rgba(52, 211, 153, 0.06)', borderRadius: '10px', border: '1px solid rgba(52, 211, 153, 0.15)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#34d399', fontWeight: 700, fontSize: '0.88rem', marginBottom: '6px' }}>
+                <Image size={16} /> 3. Screenshot Vision &amp; OCR
+              </div>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.45 }}>
+                Upload portal login screenshots or invoice images to match brand geometry and decode hidden QR codes.
+              </p>
+            </div>
+
+            <div style={{ padding: '12px 14px', background: 'rgba(167, 139, 250, 0.06)', borderRadius: '10px', border: '1px solid rgba(167, 139, 250, 0.15)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#a78bfa', fontWeight: 700, fontSize: '0.88rem', marginBottom: '6px' }}>
+                <MessageSquare size={16} /> 4. SMS &amp; Smishing Shield
+              </div>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.45 }}>
+                Inspect mobile text messages and shortlinks (bit.ly, tinyurl) to uncover banking and parcel scams.
+              </p>
+            </div>
+
+            <div style={{ padding: '12px 14px', background: 'rgba(244, 114, 182, 0.06)', borderRadius: '10px', border: '1px solid rgba(244, 114, 182, 0.15)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f472b6', fontWeight: 700, fontSize: '0.88rem', marginBottom: '6px' }}>
+                <Bot size={16} /> 5. AI Security Copilot
+              </div>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.45 }}>
+                Chat 24/7 with the specialized cybersecurity assistant for threat reasoning and incident response advice.
+              </p>
+            </div>
+
+            <div style={{ padding: '12px 14px', background: 'rgba(251, 191, 36, 0.06)', borderRadius: '10px', border: '1px solid rgba(251, 191, 36, 0.15)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#fbbf24', fontWeight: 700, fontSize: '0.88rem', marginBottom: '6px' }}>
+                <History size={16} /> 6. History &amp; PDF Reports
+              </div>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.45 }}>
+                Review historical threat posture, inspect technical risk gauges, and export forensic PDF dossiers with one click.
+              </p>
+            </div>
+          </div>
+
+          <div style={{ marginTop: '14px', padding: '10px 14px', background: 'rgba(56, 189, 248, 0.08)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+            <span>💡 <strong>Sidebar &amp; Navigation:</strong> Use the close button on the sidebar to collapse it into a sleek icon rail on desktop, or switch to the Home page anytime from the sidebar item.</span>
+            <button onClick={() => onNavigateScan?.('url-detection')} className="btn-primary" style={{ padding: '5px 12px', fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              <span>Try URL Scanner</span>
+              <ArrowRight size={13} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── 4 Stat Metric Cards ── */}
       <div className="responsive-grid-4">
